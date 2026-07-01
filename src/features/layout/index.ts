@@ -1,0 +1,5 @@
+export { AppShell } from './components/AppShell'
+export { Header } from './components/Header'
+export { Sidebar, type CategorySidebarItem } from './components/Sidebar'
+export { DecorBackground } from './components/DecorBackground'
+export { LanguageSwitcher } from './components/LanguageSwitcher'

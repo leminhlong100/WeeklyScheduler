@@ -1,0 +1,820 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Quicksand:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;700&family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0;}
+    html,body{height:100%;}
+    body{font-family:'Quicksand','Noto Sans SC','Noto Sans JP',system-ui,sans-serif;-webkit-font-smoothing:antialiased;}
+    ::selection{background:rgba(180,140,240,0.3);}
+    input,select,textarea,button{font-family:inherit;}
+    input:focus,select:focus,textarea:focus{outline:none;}
+    ::-webkit-scrollbar{width:10px;height:10px;}
+    ::-webkit-scrollbar-thumb{background:rgba(170,150,210,0.35);border-radius:20px;border:2px solid transparent;background-clip:padding-box;}
+    ::-webkit-scrollbar-thumb:hover{background:rgba(170,150,210,0.55);background-clip:padding-box;}
+    @keyframes schedFade{from{opacity:0;}to{opacity:1;}}
+    @keyframes schedPop{from{opacity:0;transform:translateY(12px) scale(.97);}to{opacity:1;transform:none;}}
+    @keyframes floatY{0%,100%{transform:translateY(0);}50%{transform:translateY(-9px);}}
+    @keyframes twinkle{0%,100%{opacity:.35;transform:scale(1);}50%{opacity:.85;transform:scale(1.15);}}
+  </style>
+</helmet>
+<div style="position:relative;min-height:100vh;width:100%;overflow:auto;padding:26px;display:flex;align-items:center;justify-content:center;background:{{ theme.pageBg }};color:{{ theme.text }};font-family:'Baloo 2','Quicksand','Noto Sans SC','Noto Sans JP',sans-serif;">
+
+  <!-- ===================== PAGE BACKGROUND DECOR ===================== -->
+  <div style="position:absolute;inset:0;overflow:hidden;pointer-events:none;z-index:0;">
+    <sc-for list="{{ decorMain }}" as="d" hint-placeholder-count="0">
+      <div style="{{ d.style }}"></div>
+    </sc-for>
+  </div>
+
+  <!-- ===================== WINDOW CARD ===================== -->
+  <div style="position:relative;z-index:1;width:100%;max-width:1460px;height:calc(100vh - 52px);display:flex;flex-direction:column;border-radius:26px;overflow:hidden;background:{{ theme.panel }};border:1.5px solid {{ theme.borderStrong }};box-shadow:{{ theme.windowShadow }};">
+
+    <!-- app body -->
+    <div style="flex:1;min-height:0;display:flex;overflow:hidden;">
+
+  <!-- ===================== SIDEBAR ===================== -->
+  <aside style="position:relative;width:{{ sidebarW }};flex-shrink:0;overflow:hidden;transition:width .3s cubic-bezier(.4,0,.2,1);background:{{ theme.sideGrad }};color:{{ theme.sidebarText }};">
+    <!-- sidebar decor -->
+    <div style="position:absolute;inset:0;overflow:hidden;pointer-events:none;">
+      <sc-for list="{{ decorSide }}" as="d" hint-placeholder-count="6">
+        <div style="{{ d.style }}"></div>
+      </sc-for>
+    </div>
+
+    <div style="position:relative;z-index:1;width:288px;height:100%;overflow-y:auto;overflow-x:hidden;padding:22px 20px 28px;display:flex;flex-direction:column;gap:20px;">
+
+      <!-- brand -->
+      <div style="display:flex;align-items:center;gap:11px;">
+        <div style="width:44px;height:44px;border-radius:15px;flex-shrink:0;display:grid;place-items:center;background:rgba(255,255,255,.92);box-shadow:0 8px 18px rgba(0,0,0,.14);font-size:24px;">🗓️</div>
+        <div style="min-width:0;">
+          <div style="font-family:'Baloo 2',sans-serif;font-weight:800;font-size:19px;letter-spacing:.01em;line-height:1.05;color:{{ theme.sidebarStrong }};">{{ t.appName }}</div>
+          <div style="font-size:12px;color:{{ theme.sidebarMuted }};font-weight:600;">{{ t.appSub }}</div>
+        </div>
+      </div>
+
+      <!-- language -->
+      <div style="display:flex;gap:6px;">
+        <sc-for list="{{ langs }}" as="lg" hint-placeholder-count="4">
+          <button onClick="{{ lg.onClick }}" style="flex:1;padding:8px 0;border-radius:12px;border:none;background:{{ lg.bg }};color:{{ lg.color }};font-weight:800;font-size:12.5px;cursor:pointer;transition:all .15s;">{{ lg.label }}</button>
+        </sc-for>
+      </div>
+
+      <!-- mini calendar -->
+      <div style="background:{{ theme.sidebarCard }};border:1px solid {{ theme.sidebarBorder }};border-radius:20px;padding:15px 15px 13px;backdrop-filter:blur(4px);">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:11px;">
+          <div style="font-family:'Baloo 2',sans-serif;font-weight:700;font-size:15px;color:{{ theme.sidebarStrong }};">{{ mini.label }}</div>
+          <div style="display:flex;gap:5px;">
+            <button onClick="{{ mini.prev }}" style="width:28px;height:28px;border-radius:10px;border:none;background:rgba(255,255,255,.22);color:{{ theme.sidebarStrong }};cursor:pointer;font-size:15px;line-height:1;display:grid;place-items:center;">‹</button>
+            <button onClick="{{ mini.next }}" style="width:28px;height:28px;border-radius:10px;border:none;background:rgba(255,255,255,.22);color:{{ theme.sidebarStrong }};cursor:pointer;font-size:15px;line-height:1;display:grid;place-items:center;">›</button>
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px;margin-bottom:5px;">
+          <sc-for list="{{ mini.dow }}" as="d" hint-placeholder-count="7">
+            <div style="text-align:center;font-size:10.5px;font-weight:800;color:{{ theme.sidebarMuted }};padding:2px 0;">{{ d }}</div>
+          </sc-for>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px;">
+          <sc-for list="{{ mini.cells }}" as="c" hint-placeholder-count="42">
+            <button onClick="{{ c.onClick }}" style="aspect-ratio:1;border:none;border-radius:9px;cursor:pointer;font-size:12px;font-weight:{{ c.weight }};color:{{ c.color }};background:{{ c.bg }};transition:all .12s;">{{ c.day }}</button>
+          </sc-for>
+        </div>
+      </div>
+
+      <!-- categories -->
+      <div>
+        <div style="font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:{{ theme.sidebarMuted }};margin-bottom:11px;">{{ t.categories }}</div>
+        <div style="display:flex;flex-direction:column;gap:6px;">
+          <sc-for list="{{ cats }}" as="c" hint-placeholder-count="6">
+            <button onClick="{{ c.onClick }}" style="display:flex;align-items:center;gap:10px;padding:9px 11px;border-radius:14px;border:none;background:rgba(255,255,255,.13);cursor:pointer;text-align:left;transition:all .14s;opacity:{{ c.opacity }};">
+              <span style="font-size:16px;flex-shrink:0;">{{ c.emoji }}</span>
+              <span style="flex:1;font-size:13.5px;font-weight:700;color:{{ theme.sidebarStrong }};">{{ c.label }}</span>
+              <span style="font-size:12px;font-weight:800;color:{{ theme.sidebarStrong }};background:rgba(255,255,255,.25);min-width:22px;text-align:center;border-radius:8px;padding:1px 5px;">{{ c.count }}</span>
+            </button>
+          </sc-for>
+        </div>
+      </div>
+
+      <div style="flex:1;"></div>
+      <div style="text-align:center;font-size:11.5px;font-weight:600;color:{{ theme.sidebarMuted }};">{{ t.footer }}</div>
+
+    </div>
+  </aside>
+
+  <!-- ===================== MAIN ===================== -->
+  <main style="position:relative;flex:1;min-width:0;display:flex;flex-direction:column;background:{{ theme.mainBg }};">
+
+    <!-- header -->
+    <header style="position:relative;z-index:3;flex-shrink:0;padding:15px 22px;display:flex;align-items:center;gap:13px;flex-wrap:wrap;border-bottom:1px solid {{ theme.border }};background:{{ theme.panel }};">
+      <button onClick="{{ toggleSidebar }}" title="Menu" style="width:40px;height:40px;flex-shrink:0;border-radius:13px;border:1.5px solid {{ theme.border }};background:{{ theme.chip }};color:{{ theme.text }};cursor:pointer;display:grid;place-items:center;">
+        <div style="width:15px;height:2px;background:currentColor;border-radius:2px;box-shadow:0 5px 0 currentColor,0 -5px 0 currentColor;"></div>
+      </button>
+
+      <div style="display:flex;align-items:center;gap:6px;">
+        <button onClick="{{ prevWeek }}" style="width:40px;height:40px;border-radius:13px;border:1.5px solid {{ theme.border }};background:{{ theme.chip }};color:{{ theme.text }};cursor:pointer;font-size:18px;display:grid;place-items:center;">‹</button>
+        <button onClick="{{ nextWeek }}" style="width:40px;height:40px;border-radius:13px;border:1.5px solid {{ theme.border }};background:{{ theme.chip }};color:{{ theme.text }};cursor:pointer;font-size:18px;display:grid;place-items:center;">›</button>
+        <button onClick="{{ goToday }}" style="margin-left:4px;padding:0 16px;height:40px;border-radius:13px;border:1.5px solid {{ theme.border }};background:{{ theme.chip }};color:{{ theme.text }};cursor:pointer;font-size:13px;font-weight:700;">{{ t.today }}</button>
+      </div>
+
+      <div style="font-family:'Baloo 2',sans-serif;font-weight:800;font-size:21px;letter-spacing:.01em;white-space:nowrap;">{{ weekRange }}</div>
+
+      <div style="flex:1;"></div>
+
+      <button onClick="{{ openTheme }}" style="display:flex;align-items:center;gap:8px;height:40px;padding:0 15px;border-radius:14px;border:1.5px solid {{ theme.border }};background:{{ theme.chip }};color:{{ theme.text }};cursor:pointer;font-size:13.5px;font-weight:700;">
+        <span style="font-size:16px;line-height:1;">🎨</span>{{ currentThemeName }}
+      </button>
+
+      <button onClick="{{ newEvent }}" style="display:flex;align-items:center;gap:7px;height:40px;padding:0 18px;border-radius:14px;border:none;cursor:pointer;font-size:13.5px;font-weight:800;color:#fff;background:{{ theme.brandGrad }};box-shadow:0 7px 18px {{ theme.brandShadow }};">
+        <span style="font-size:19px;line-height:1;margin-top:-1px;">+</span>{{ t.newEvent }}
+      </button>
+
+      <button onClick="{{ openUser }}" title="{{ user.name }}" style="position:relative;width:42px;height:42px;flex-shrink:0;border-radius:50%;border:2px solid {{ theme.panel }};cursor:pointer;display:grid;place-items:center;font-family:'Baloo 2',sans-serif;font-weight:800;font-size:15px;color:#fff;background:{{ user.avatarGrad }};box-shadow:0 5px 14px {{ theme.brandShadow }},0 0 0 1.5px {{ theme.borderStrong }};">
+        {{ user.initials }}
+        <span style="position:absolute;right:0px;bottom:0px;width:11px;height:11px;border-radius:50%;background:#39d98a;border:2px solid {{ theme.panel }};"></span>
+      </button>
+    </header>
+
+    <!-- scroll area -->
+    <div style="position:relative;z-index:1;flex:1;min-height:0;overflow:auto;">
+      <div style="min-width:880px;">
+
+        <!-- day header row -->
+        <div style="position:sticky;top:0;z-index:6;display:flex;background:{{ theme.panel }};border-bottom:1px solid {{ theme.borderStrong }};">
+          <div style="width:64px;flex-shrink:0;"></div>
+          <div style="flex:1;display:flex;">
+            <sc-for list="{{ days }}" as="d" hint-placeholder-count="7">
+              <div style="flex:1;min-width:0;text-align:center;padding:9px 4px 11px;border-left:1px solid {{ theme.border }};">
+                <div style="font-size:11.5px;font-weight:800;letter-spacing:.02em;color:{{ d.dowColor }};text-transform:uppercase;">{{ d.dow }}</div>
+                <div style="margin:5px auto 0;width:36px;height:36px;border-radius:13px;display:grid;place-items:center;font-family:'Baloo 2',sans-serif;font-weight:800;font-size:18px;color:{{ d.numColor }};background:{{ d.numBg }};box-shadow:{{ d.numShadow }};">{{ d.dayNum }}</div>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+
+        <!-- grid body -->
+        <div style="display:flex;position:relative;">
+          <div style="width:64px;flex-shrink:0;position:relative;height:{{ totalHpx }};">
+            <sc-for list="{{ hours }}" as="h" hint-placeholder-count="18">
+              <div style="position:absolute;right:9px;top:{{ h.top }};transform:translateY(-50%);font-size:11px;font-weight:700;color:{{ theme.muted }};white-space:nowrap;">{{ h.label }}</div>
+            </sc-for>
+          </div>
+          <div ref="{{ setGridRef }}" style="flex:1;display:flex;">
+            <sc-for list="{{ days }}" as="d" hint-placeholder-count="7">
+              <div onClick="{{ d.onCreate }}" style="flex:1;min-width:0;position:relative;height:{{ totalHpx }};cursor:pointer;border-left:1px solid {{ theme.border }};background-color:{{ d.colBg }};background-image:{{ theme.gridLines }};">
+                <sc-if value="{{ d.now.show }}" hint-placeholder-val="{{ false }}">
+                  <div style="position:absolute;left:0;right:0;top:{{ d.now.top }};height:2px;background:{{ theme.nowLine }};z-index:20;pointer-events:none;">
+                    <div style="position:absolute;left:-4px;top:-3px;width:8px;height:8px;border-radius:50%;background:{{ theme.nowLine }};"></div>
+                  </div>
+                </sc-if>
+                <sc-for list="{{ d.events }}" as="ev" hint-placeholder-count="0">
+                  <div onPointerDown="{{ ev.onDown }}" style="{{ ev.box }}">
+                    <sc-if value="{{ ev.accent }}" hint-placeholder-val="{{ false }}">
+                      <div style="position:absolute;left:0;top:0;bottom:0;width:4px;border-radius:5px 0 0 5px;background:{{ ev.accentColor }};"></div>
+                    </sc-if>
+                    <div style="display:flex;align-items:center;gap:5px;min-width:0;">
+                      <span style="font-size:13px;flex-shrink:0;line-height:1;">{{ ev.emoji }}</span>
+                      <div style="font-weight:700;font-size:12.5px;line-height:1.2;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">{{ ev.title }}</div>
+                    </div>
+                    <sc-if value="{{ ev.showTime }}" hint-placeholder-val="{{ false }}">
+                      <div style="font-size:11px;font-weight:600;opacity:.82;margin-top:2px;">{{ ev.timeLabel }}</div>
+                    </sc-if>
+                    <div onPointerDown="{{ ev.onResize }}" style="position:absolute;left:0;right:0;bottom:0;height:9px;cursor:ns-resize;"></div>
+                  </div>
+                </sc-for>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </main>
+
+    </div><!-- /app body -->
+  </div><!-- /window card -->
+
+  <!-- ===================== STICKER OVERLAY ===================== -->
+  <div style="position:fixed;inset:0;z-index:60;pointer-events:none;">
+    <sc-for list="{{ stickers }}" as="s" hint-placeholder-count="0">
+      <div onPointerDown="{{ s.onDown }}" style="{{ s.wrap }}">
+        <div style="{{ s.ring }}"></div>
+        <sc-if value="{{ s.isSvg }}" hint-placeholder-val="{{ false }}"><div style="{{ s.inner }}"></div></sc-if>
+        <sc-if value="{{ s.isEmoji }}" hint-placeholder-val="{{ true }}"><div style="{{ s.inner }}">{{ s.ch }}</div></sc-if>
+        <sc-if value="{{ s.selected }}" hint-placeholder-val="{{ false }}">
+          <button onPointerDown="{{ s.onDelete }}" style="position:absolute;top:-13px;right:-13px;width:25px;height:25px;border-radius:50%;border:none;background:#ff5d7a;color:#fff;font-size:15px;line-height:1;cursor:pointer;box-shadow:0 3px 7px rgba(0,0,0,.28);display:grid;place-items:center;z-index:3;">×</button>
+          <div onPointerDown="{{ s.onResize }}" style="position:absolute;bottom:-11px;right:-11px;width:19px;height:19px;border-radius:50%;background:#fff;border:2.5px solid {{ theme.accent }};cursor:nwse-resize;box-shadow:0 2px 6px rgba(0,0,0,.22);z-index:3;"></div>
+        </sc-if>
+      </div>
+    </sc-for>
+  </div>
+
+  <!-- placing ghost -->
+  <sc-if value="{{ placing.show }}" hint-placeholder-val="{{ false }}">
+    <div style="{{ placing.wrap }}">
+      <sc-if value="{{ placing.isSvg }}" hint-placeholder-val="{{ false }}"><div style="{{ placing.inner }}"></div></sc-if>
+      <sc-if value="{{ placing.isEmoji }}" hint-placeholder-val="{{ true }}"><div style="{{ placing.inner }}">{{ placing.ch }}</div></sc-if>
+    </div>
+  </sc-if>
+
+  <!-- ===================== STICKER TRAY ===================== -->
+  <div style="position:fixed;right:22px;bottom:22px;z-index:92;display:flex;flex-direction:column;align-items:flex-end;gap:12px;">
+    <sc-if value="{{ trayOpen }}" hint-placeholder-val="{{ false }}">
+      <div style="width:308px;max-height:58vh;overflow:auto;background:{{ theme.panel }};border:1.5px solid {{ theme.border }};border-radius:24px;box-shadow:0 22px 55px rgba(0,0,0,.22);padding:17px;animation:schedPop .2s cubic-bezier(.34,1.3,.5,1);">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
+          <div style="font-family:'Baloo 2',sans-serif;font-weight:800;font-size:16px;color:{{ theme.text }};">{{ t.stickerTitle }}</div>
+          <button onClick="{{ clearStickers }}" style="padding:5px 11px;border-radius:10px;border:1.5px solid {{ theme.border }};background:transparent;color:{{ theme.muted }};font-size:11.5px;font-weight:700;cursor:pointer;">{{ t.clearAll }}</button>
+        </div>
+        <div style="font-size:12px;font-weight:600;color:{{ theme.muted }};margin-bottom:13px;">{{ t.dragHint }}</div>
+        <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:7px;">
+          <sc-for list="{{ trayItems }}" as="it" hint-placeholder-count="30">
+            <button onPointerDown="{{ it.onDown }}" style="aspect-ratio:1;border:1.5px solid {{ theme.border }};background:{{ theme.chip }};border-radius:13px;cursor:grab;display:grid;place-items:center;font-size:22px;touch-action:none;color:{{ theme.text }};transition:transform .1s;" style-hover="transform:scale(1.12);">
+              <sc-if value="{{ it.isSvg }}" hint-placeholder-val="{{ false }}"><div style="{{ it.preview }}"></div></sc-if>
+              <sc-if value="{{ it.isEmoji }}" hint-placeholder-val="{{ true }}">{{ it.ch }}</sc-if>
+            </button>
+          </sc-for>
+        </div>
+      </div>
+    </sc-if>
+    <button onClick="{{ toggleTray }}" style="height:56px;padding:0 22px;border-radius:20px;border:none;cursor:pointer;background:{{ theme.brandGrad }};color:#fff;font-weight:800;font-size:15px;box-shadow:0 11px 26px {{ theme.brandShadow }};display:flex;align-items:center;gap:9px;">
+      <span style="font-size:20px;line-height:1;">🌈</span>{{ t.stickers }}
+    </button>
+  </div>
+
+  <!-- ===================== THEME POPOVER ===================== -->
+  <sc-if value="{{ themeOpen }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ closeTheme }}" style="position:fixed;inset:0;z-index:110;background:rgba(24,20,46,.42);backdrop-filter:blur(4px);display:grid;place-items:center;padding:20px;animation:schedFade .18s ease;">
+      <div onClick="{{ stop }}" style="width:100%;max-width:540px;background:{{ theme.modalBg }};border:1.5px solid {{ theme.border }};border-radius:28px;padding:26px;box-shadow:0 32px 84px rgba(0,0,0,.32);animation:schedPop .22s cubic-bezier(.34,1.3,.5,1);">
+        <div style="font-family:'Baloo 2',sans-serif;font-weight:800;font-size:21px;color:{{ theme.text }};margin-bottom:3px;">{{ t.themeTitle }}</div>
+        <div style="font-size:13px;font-weight:600;color:{{ theme.muted }};margin-bottom:20px;">{{ t.themeSub }}</div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:13px;">
+          <sc-for list="{{ themeList }}" as="th2" hint-placeholder-count="6">
+            <button onClick="{{ th2.onClick }}" style="position:relative;border:2.5px solid {{ th2.ring }};border-radius:20px;padding:0;overflow:hidden;cursor:pointer;background:{{ theme.chip }};transition:transform .12s;" style-hover="transform:translateY(-3px);">
+              <div style="height:74px;background:{{ th2.grad }};position:relative;">
+                <div style="position:absolute;right:9px;top:9px;font-size:16px;">{{ th2.icon }}</div>
+              </div>
+              <div style="padding:11px 12px;display:flex;align-items:center;gap:8px;">
+                <span style="width:14px;height:14px;border-radius:50%;flex-shrink:0;background:{{ th2.accent }};"></span>
+                <span style="font-weight:700;font-size:13px;color:{{ theme.text }};">{{ th2.name }}</span>
+              </div>
+              <sc-if value="{{ th2.active }}" hint-placeholder-val="{{ false }}">
+                <div style="position:absolute;top:9px;left:9px;width:25px;height:25px;border-radius:50%;background:#fff;color:{{ th2.accent }};display:grid;place-items:center;font-weight:800;font-size:14px;box-shadow:0 2px 7px rgba(0,0,0,.22);">✓</div>
+              </sc-if>
+            </button>
+          </sc-for>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+  <!-- ===================== MODAL ===================== -->
+  <sc-if value="{{ modal.open }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ closeModal }}" style="position:fixed;inset:0;z-index:100;background:rgba(24,20,46,.42);backdrop-filter:blur(3px);display:grid;place-items:center;padding:20px;animation:schedFade .18s ease;">
+      <div onClick="{{ stop }}" style="width:100%;max-width:440px;border-radius:26px;background:{{ theme.modalBg }};border:1.5px solid {{ theme.border }};box-shadow:0 32px 84px rgba(0,0,0,.32);overflow:hidden;animation:schedPop .22s cubic-bezier(.34,1.3,.5,1);">
+        <div style="height:8px;background:{{ modal.headColor }};"></div>
+        <div style="padding:22px 24px 24px;display:flex;flex-direction:column;gap:16px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;">
+            <div style="font-family:'Baloo 2',sans-serif;font-weight:800;font-size:20px;">{{ modal.title }}</div>
+            <button onClick="{{ closeModal }}" style="width:34px;height:34px;border-radius:11px;border:none;background:{{ theme.chip }};color:{{ theme.text }};cursor:pointer;font-size:19px;line-height:1;">×</button>
+          </div>
+
+          <input value="{{ modal.draft.title }}" onInput="{{ onTitle }}" placeholder="{{ t.titlePh }}" style="width:100%;padding:13px 15px;border-radius:14px;border:1.5px solid {{ theme.border }};background:{{ theme.inputBg }};color:{{ theme.text }};font-size:15px;font-weight:600;" />
+
+          <div>
+            <div style="font-size:12px;font-weight:800;color:{{ theme.muted }};margin-bottom:8px;">{{ t.category }}</div>
+            <div style="display:flex;flex-wrap:wrap;gap:7px;">
+              <sc-for list="{{ modal.cats }}" as="c" hint-placeholder-count="6">
+                <button onClick="{{ c.onClick }}" style="display:flex;align-items:center;gap:6px;padding:8px 13px;border-radius:12px;cursor:pointer;font-size:12.5px;font-weight:700;border:1.5px solid {{ c.border }};background:{{ c.bg }};color:{{ c.color }};transition:all .14s;">
+                  <span style="font-size:14px;">{{ c.emoji }}</span>{{ c.label }}
+                </button>
+              </sc-for>
+            </div>
+          </div>
+
+          <div>
+            <div style="font-size:12px;font-weight:800;color:{{ theme.muted }};margin-bottom:8px;">{{ t.date }}</div>
+            <input type="date" value="{{ modal.draft.date }}" onInput="{{ onDate }}" style="width:100%;padding:11px 14px;border-radius:14px;border:1.5px solid {{ theme.border }};background:{{ theme.inputBg }};color:{{ theme.text }};font-size:14px;font-weight:600;" />
+          </div>
+
+          <div style="display:flex;gap:12px;">
+            <div style="flex:1;">
+              <div style="font-size:12px;font-weight:800;color:{{ theme.muted }};margin-bottom:8px;">{{ t.start }}</div>
+              <select value="{{ modal.draft.startMin }}" onChange="{{ onStart }}" style="width:100%;padding:11px 12px;border-radius:14px;border:1.5px solid {{ theme.border }};background:{{ theme.inputBg }};color:{{ theme.text }};font-size:14px;font-weight:600;cursor:pointer;">
+                <sc-for list="{{ startOptions }}" as="o" hint-placeholder-count="4">
+                  <option value="{{ o.value }}">{{ o.label }}</option>
+                </sc-for>
+              </select>
+            </div>
+            <div style="flex:1;">
+              <div style="font-size:12px;font-weight:800;color:{{ theme.muted }};margin-bottom:8px;">{{ t.duration }}</div>
+              <select value="{{ modal.draft.durMin }}" onChange="{{ onDur }}" style="width:100%;padding:11px 12px;border-radius:14px;border:1.5px solid {{ theme.border }};background:{{ theme.inputBg }};color:{{ theme.text }};font-size:14px;font-weight:600;cursor:pointer;">
+                <sc-for list="{{ durOptions }}" as="o" hint-placeholder-count="4">
+                  <option value="{{ o.value }}">{{ o.label }}</option>
+                </sc-for>
+              </select>
+            </div>
+          </div>
+
+          <div style="display:flex;align-items:center;gap:12px;margin-top:3px;">
+            <sc-if value="{{ modal.isEdit }}" hint-placeholder-val="{{ false }}">
+              <button onClick="{{ deleteEvent }}" style="padding:12px 16px;border-radius:14px;border:1.5px solid {{ theme.dangerBorder }};background:transparent;color:{{ theme.danger }};font-size:13.5px;font-weight:700;cursor:pointer;">{{ t.delete }}</button>
+            </sc-if>
+            <div style="flex:1;"></div>
+            <button onClick="{{ closeModal }}" style="padding:12px 18px;border-radius:14px;border:1.5px solid {{ theme.border }};background:transparent;color:{{ theme.text }};font-size:13.5px;font-weight:700;cursor:pointer;">{{ t.cancel }}</button>
+            <button onClick="{{ saveEvent }}" style="padding:12px 22px;border-radius:14px;border:none;background:{{ theme.brandGrad }};color:#fff;font-size:13.5px;font-weight:800;cursor:pointer;box-shadow:0 7px 18px {{ theme.brandShadow }};">{{ t.save }}</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:&quot;100%&quot;,&quot;height&quot;:&quot;100%&quot;},&quot;theme&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;lavender&quot;,&quot;mint&quot;,&quot;strawberry&quot;,&quot;caramel&quot;,&quot;ocean&quot;,&quot;midnight&quot;],&quot;default&quot;:&quot;lavender&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Appearance&quot;},&quot;language&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;vi&quot;,&quot;en&quot;,&quot;zh&quot;,&quot;ja&quot;],&quot;default&quot;:&quot;vi&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Appearance&quot;},&quot;showDecor&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Appearance&quot;},&quot;snapMinutes&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;5&quot;,&quot;10&quot;,&quot;15&quot;,&quot;30&quot;],&quot;default&quot;:&quot;15&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Behavior&quot;}}">
+class Component extends DCLogic {
+  constructor(props){
+    super(props);
+    this.HOUR_H = 56;
+    this.START_MIN = 360;
+    this.END_MIN = 1380;
+    this.CATS = ['work','health','learning','personal','social','meal'];
+    this.CAT_COLOR = { work:'#7b83ff', health:'#2fc39a', learning:'#4bb4f0', personal:'#b47cf0', social:'#ff7eb6', meal:'#ff9d5c' };
+    this.CAT_EMOJI = { work:'💼', health:'🌿', learning:'📚', personal:'🌸', social:'💗', meal:'🍰' };
+    const today = new Date(); today.setHours(0,0,0,0);
+    const mon = this.monday(today);
+    const W = (typeof window!=='undefined'? window.innerWidth : 1024);
+    let saved = null;
+    try { const raw = localStorage.getItem('cuteWeekly.v1'); if(raw) saved = JSON.parse(raw); } catch(e){}
+    const defStickers = [
+      {id:'seed1',kind:'emoji',ch:'🌟',x:Math.round(W*0.60),y:150,size:52,rot:-9},
+      {id:'seed2',kind:'emoji',ch:'☁️',x:Math.round(W*0.78),y:120,size:60,rot:7},
+      {id:'seed3',kind:'emoji',ch:'🎀',x:Math.round(W*0.46),y:520,size:48,rot:11}
+    ];
+    this.state = {
+      lang: (saved&&saved.lang) || props.language || 'vi',
+      theme: (saved&&saved.theme) || props.theme || 'lavender',
+      snap: Number(props.snapMinutes) || 15,
+      anchor: this.iso(mon),
+      selected: this.iso(today),
+      miniY: today.getFullYear(),
+      miniM: today.getMonth(),
+      sidebarOpen: true,
+      activeCats: {work:true,health:true,learning:true,personal:true,social:true,meal:true},
+      events: this.seed(mon),
+      drag: null,
+      stickers: (saved&&Array.isArray(saved.stickers)) ? saved.stickers : defStickers,
+      selSticker: null,
+      placing: {show:false},
+      trayOpen: false,
+      themeOpen: false,
+      modal: { open:false, isEdit:false, draft:null }
+    };
+    this._evDrag = null;
+    this._stDrag = null;
+    this._place = null;
+  }
+  componentDidMount(){
+    this._mv = (e)=>this.onMove(e);
+    this._up = (e)=>this.onUp(e);
+    this._kd = (e)=>{ if(e.key==='Escape') this.setState({selSticker:null,themeOpen:false,trayOpen:false,placing:{show:false},modal:{...this.state.modal,open:false}}); };
+    window.addEventListener('pointermove', this._mv);
+    window.addEventListener('pointerup', this._up);
+    window.addEventListener('keydown', this._kd);
+    this._tick = setInterval(()=>this.forceUpdate(), 60000);
+  }
+  componentWillUnmount(){
+    window.removeEventListener('pointermove', this._mv);
+    window.removeEventListener('pointerup', this._up);
+    window.removeEventListener('keydown', this._kd);
+    clearInterval(this._tick);
+  }
+  componentDidUpdate(pp,ps){
+    if(ps.theme!==this.state.theme||ps.lang!==this.state.lang||ps.stickers!==this.state.stickers) this.persist();
+  }
+  persist(){ try{ localStorage.setItem('cuteWeekly.v1', JSON.stringify({theme:this.state.theme,lang:this.state.lang,stickers:this.state.stickers})); }catch(e){} }
+
+  /* ---------- date helpers ---------- */
+  pad(n){ return String(n).padStart(2,'0'); }
+  iso(d){ return d.getFullYear()+'-'+this.pad(d.getMonth()+1)+'-'+this.pad(d.getDate()); }
+  parse(s){ const p=s.split('-'); return new Date(+p[0],+p[1]-1,+p[2]); }
+  addDays(d,n){ const x=new Date(d); x.setDate(x.getDate()+n); return x; }
+  monday(d){ const x=new Date(d); const wd=(x.getDay()+6)%7; return this.addDays(x,-wd); }
+  fmtTime(m){ return this.pad(Math.floor(m/60))+':'+this.pad(m%60); }
+
+  /* ---------- color helpers ---------- */
+  hx2rgb(h){ h=h.replace('#',''); return {r:parseInt(h.slice(0,2),16),g:parseInt(h.slice(2,4),16),b:parseInt(h.slice(4,6),16)}; }
+  rgba(h,a){ const c=this.hx2rgb(h); return 'rgba('+c.r+','+c.g+','+c.b+','+a+')'; }
+  mix(h1,h2,t){ const a=this.hx2rgb(h1),b=this.hx2rgb(h2); const r=Math.round(a.r+(b.r-a.r)*t),g=Math.round(a.g+(b.g-a.g)*t),bl=Math.round(a.b+(b.b-a.b)*t); return 'rgb('+r+','+g+','+bl+')'; }
+
+  /* ---------- cute SVG shapes ---------- */
+  svgURI(shape,color){
+    const s={
+      cloud:'<g fill="@"><ellipse cx="34" cy="60" rx="22" ry="17"/><ellipse cx="58" cy="52" rx="27" ry="22"/><ellipse cx="80" cy="60" rx="17" ry="14"/><rect x="30" y="56" width="54" height="20" rx="10"/></g>',
+      star:'<path d="M50 8 L60 37 L92 38 L66 57 L76 89 L50 70 L24 89 L34 57 L8 38 L40 37 Z" fill="@"/>',
+      sparkle:'<path d="M50 6 Q56 44 94 50 Q56 56 50 94 Q44 56 6 50 Q44 44 50 6 Z" fill="@"/>',
+      heart:'<path d="M50 84 C16 58 10 35 24 24 C36 15 49 22 50 33 C51 22 64 15 76 24 C90 35 84 58 50 84 Z" fill="@"/>',
+      moon:'<path d="M66 10 A40 40 0 1 0 66 90 A32 32 0 1 1 66 10 Z" fill="@"/>',
+      leaf:'<path d="M50 92 C18 70 20 28 50 8 C80 28 82 70 50 92 Z" fill="@"/>',
+      flower:'<g fill="@"><circle cx="50" cy="24" r="15"/><circle cx="24" cy="44" r="15"/><circle cx="34" cy="74" r="15"/><circle cx="66" cy="74" r="15"/><circle cx="76" cy="44" r="15"/></g><circle cx="50" cy="50" r="12" fill="~"/>',
+      rainbow:'<g fill="none" stroke-width="9"><path d="M12 78 a38 38 0 0 1 76 0" stroke="#ff9db0"/><path d="M24 78 a26 26 0 0 1 52 0" stroke="#ffd08a"/><path d="M36 78 a14 14 0 0 1 28 0" stroke="#9ecbff"/></g>',
+      bubble:'<circle cx="50" cy="50" r="38" fill="none" stroke="@" stroke-width="7"/>',
+      dot:'<circle cx="50" cy="50" r="28" fill="@"/>'
+    };
+    let inner = s[shape]||s.star;
+    inner = inner.split('@').join(color||'#ff9ec4').split('~').join('#fff4bf');
+    const svg = "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'>"+inner+"</svg>";
+    return 'url("data:image/svg+xml,'+encodeURIComponent(svg)+'")';
+  }
+
+  /* ---------- seed events ---------- */
+  seed(mon){
+    const T=(a,b,c,d)=>({vi:a,en:b,zh:c,ja:d});
+    const D=(i,s,dur,cat,title)=>({ id:'s'+i+'-'+s+'-'+cat+Math.random().toString(36).slice(2,6), date:this.iso(this.addDays(mon,i)), startMin:s, durMin:dur, cat, title });
+    const run=T('Chạy bộ','Morning run','晨跑','ランニング'), gym=T('Tập gym','Gym','健身','ジム'),
+      stand=T('Họp standup','Standup','站会','朝会'), deep=T('Tập trung sâu','Deep work','专注工作','集中作業'),
+      lunch=T('Ăn trưa','Lunch','午餐','昼食'), email=T('Xử lý email','Emails','处理邮件','メール'),
+      read=T('Đọc sách','Reading','阅读','読書'), dr=T('Duyệt thiết kế','Design review','设计评审','デザインレビュー'),
+      course=T('Học khóa học','Online course','在线课程','オンライン講座'), cf=T('Gọi bạn bè','Call a friend','朋友通话','友人と通話'),
+      med=T('Thiền','Meditation','冥想','瞑想'), dent=T('Nha sĩ','Dentist','牙医','歯医者'),
+      cook=T('Nấu bữa tối','Cook dinner','做晚饭','夕食作り'), sync=T('Họp nhóm','Team sync','团队同步','チーム会議'),
+      focus=T('Khối tập trung','Focus block','专注时段','集中タイム'), lang=T('Lớp ngoại ngữ','Language class','语言课','語学レッスン'),
+      demo=T('Demo sprint','Sprint demo','冲刺演示','スプリントデモ'), hh=T('Gặp gỡ bạn bè','Happy hour','欢乐时光','ハッピーアワー'),
+      lr=T('Chạy dài','Long run','长跑','ロング走'), gro=T('Đi chợ','Groceries','买菜','買い物'),
+      br=T('Brunch','Brunch','早午餐','ブランチ'), mv=T('Xem phim','Movie night','看电影','映画'),
+      yoga=T('Yoga','Yoga','瑜伽','ヨガ'), mp=T('Chuẩn bị bữa ăn','Meal prep','备餐','作り置き'),
+      fam=T('Gọi gia đình','Family call','家庭通话','家族と通話'), plan=T('Lập kế hoạch tuần','Plan the week','周计划','週の計画');
+    let i=0; const E=[];
+    E.push(D(i,390,45,'health',run), D(i,540,30,'work',stand), D(i,570,120,'work',deep), D(i,720,60,'meal',lunch), D(i,840,60,'work',email), D(i,1200,60,'learning',read));
+    i=1; E.push(D(i,420,60,'health',gym), D(i,600,60,'work',dr), D(i,720,60,'meal',lunch), D(i,1080,90,'learning',course), D(i,1260,45,'social',cf));
+    i=2; E.push(D(i,390,30,'health',med), D(i,540,180,'work',deep), D(i,750,60,'meal',lunch), D(i,960,60,'personal',dent), D(i,1140,60,'meal',cook));
+    i=3; E.push(D(i,390,45,'health',run), D(i,570,30,'work',sync), D(i,600,120,'work',focus), D(i,720,60,'meal',lunch), D(i,1140,90,'learning',lang));
+    i=4; E.push(D(i,540,30,'work',stand), D(i,720,60,'meal',lunch), D(i,900,60,'work',demo), D(i,1080,120,'social',hh));
+    i=5; E.push(D(i,420,90,'health',lr), D(i,600,60,'personal',gro), D(i,720,90,'social',br), D(i,1200,120,'personal',mv));
+    i=6; E.push(D(i,480,60,'health',yoga), D(i,660,90,'meal',mp), D(i,900,60,'social',fam), D(i,1080,60,'personal',plan), D(i,1260,60,'learning',read));
+    return E;
+  }
+
+  /* ---------- i18n ---------- */
+  strings(){
+    return {
+      vi:{appName:'Lịch Tuần',appSub:'Kế hoạch dễ thương',footer:'Chúc một tuần thật vui ♡',today:'Hôm nay',newEvent:'Sự kiện mới',categories:'Danh mục',save:'Lưu',cancel:'Hủy',delete:'Xóa',date:'Ngày',start:'Bắt đầu',duration:'Thời lượng',category:'Danh mục',titlePh:'Tên sự kiện…',minShort:'ph',add:'Thêm sự kiện',edit:'Sửa sự kiện',
+        stickers:'Nhãn dán',stickerTitle:'Kho nhãn dán',dragHint:'Kéo icon thả ra màn hình nha! ✨',clearAll:'Xóa hết',themeTitle:'Chọn giao diện dễ thương',themeSub:'Đổi bất cứ lúc nào — cái nào cũng cute ♡',
+        dow:['T2','T3','T4','T5','T6','T7','CN'], miniDow:['2','3','4','5','6','7','CN'],
+        catL:{work:'Công việc',health:'Sức khỏe',learning:'Học tập',personal:'Cá nhân',social:'Xã hội',meal:'Bữa ăn'},
+        mon:['thg 1','thg 2','thg 3','thg 4','thg 5','thg 6','thg 7','thg 8','thg 9','thg 10','thg 11','thg 12']},
+      en:{appName:'Weekly',appSub:'Cutie planner',footer:'Have a lovely week ♡',today:'Today',newEvent:'New event',categories:'Categories',save:'Save',cancel:'Cancel',delete:'Delete',date:'Date',start:'Start',duration:'Duration',category:'Category',titlePh:'Event title…',minShort:'m',add:'Add event',edit:'Edit event',
+        stickers:'Stickers',stickerTitle:'Sticker box',dragHint:'Drag any icon onto the screen! ✨',clearAll:'Clear all',themeTitle:'Pick a cute theme',themeSub:'Switch anytime — all adorable ♡',
+        dow:['Mon','Tue','Wed','Thu','Fri','Sat','Sun'], miniDow:['M','T','W','T','F','S','S'],
+        catL:{work:'Work',health:'Health',learning:'Learning',personal:'Personal',social:'Social',meal:'Meals'},
+        mon:['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']},
+      zh:{appName:'周历',appSub:'可爱计划',footer:'祝你一周愉快 ♡',today:'今天',newEvent:'新建',categories:'分类',save:'保存',cancel:'取消',delete:'删除',date:'日期',start:'开始',duration:'时长',category:'分类',titlePh:'事件名称…',minShort:'分',add:'添加事件',edit:'编辑事件',
+        stickers:'贴纸',stickerTitle:'贴纸盒',dragHint:'把图标拖到屏幕上吧！✨',clearAll:'清空',themeTitle:'选择可爱主题',themeSub:'随时切换 — 都很可爱 ♡',
+        dow:['周一','周二','周三','周四','周五','周六','周日'], miniDow:['一','二','三','四','五','六','日'],
+        catL:{work:'工作',health:'健康',learning:'学习',personal:'个人',social:'社交',meal:'用餐'},
+        mon:['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月']},
+      ja:{appName:'週間',appSub:'かわいい手帳',footer:'すてきな一週間を ♡',today:'今日',newEvent:'新規',categories:'カテゴリ',save:'保存',cancel:'キャンセル',delete:'削除',date:'日付',start:'開始',duration:'時間',category:'カテゴリ',titlePh:'予定のタイトル…',minShort:'分',add:'予定を追加',edit:'予定を編集',
+        stickers:'ステッカー',stickerTitle:'ステッカー箱',dragHint:'アイコンを画面にドラッグ！✨',clearAll:'全部消す',themeTitle:'かわいいテーマを選ぶ',themeSub:'いつでも変更OK — 全部かわいい ♡',
+        dow:['月','火','水','木','金','土','日'], miniDow:['月','火','水','木','金','土','日'],
+        catL:{work:'仕事',health:'健康',learning:'学習',personal:'個人',social:'ソーシャル',meal:'食事'},
+        mon:['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月']}
+    };
+  }
+  evTitle(t,lang){ return (t && typeof t==='object') ? (t[lang]||t.en) : t; }
+
+  /* ---------- themes ---------- */
+  themeDef(key){
+    const P = {
+      lavender:{name:{vi:'Oải hương',en:'Lavender',zh:'薰衣草',ja:'ラベンダー'},icon:'💜',accent:'#8b7be8',grad:'linear-gradient(135deg,#9b86f0,#e089c6)',
+        appBg:'linear-gradient(160deg,#f4eefc,#fbf0f8)',mainBg:'#faf6ff',panel:'#ffffff',text:'#4c4468',muted:'#a79fc6',
+        border:'#efe8fb',borderStrong:'#e6def7',chip:'#f4eefc',inputBg:'#f8f3ff',modalBg:'#ffffff',gridLine:'#f1eafb',nowLine:'#ff8ec6',dark:false,
+        sideGrad:'linear-gradient(175deg,#c7b6f4,#b49bef 58%,#c9a6ea)',
+        decor:['cloud','star','heart','sparkle','moon'],decorColors:['#e3d7ff','#ffd4ea','#fff0b8','#dcd0ff']},
+      mint:{name:{vi:'Bạc hà',en:'Matcha',zh:'抹茶',ja:'まっちゃ'},icon:'🍵',accent:'#2fb58c',grad:'linear-gradient(135deg,#37bd93,#7bd6a6)',
+        appBg:'linear-gradient(160deg,#ecfaf1,#f2f9e9)',mainBg:'#f6fdf8',panel:'#ffffff',text:'#325247',muted:'#9ac2b0',
+        border:'#e2f3ea',borderStrong:'#d5ecdf',chip:'#eef9f1',inputBg:'#f2fbf5',modalBg:'#ffffff',gridLine:'#eaf6ee',nowLine:'#ff9a6b',dark:false,
+        sideGrad:'linear-gradient(175deg,#8fd8b4,#6cc79a 58%,#a7d98f)',
+        decor:['leaf','flower','sparkle','dot','cloud'],decorColors:['#c8f0dc','#d9f2c4','#fff0b8','#bfeee0']},
+      strawberry:{name:{vi:'Dâu tây',en:'Strawberry',zh:'草莓',ja:'いちご'},icon:'🍓',accent:'#ff6fa5',grad:'linear-gradient(135deg,#ff6fa5,#ff9ec2)',
+        appBg:'linear-gradient(160deg,#fff0f5,#fff2ee)',mainBg:'#fff8fa',panel:'#ffffff',text:'#6e4051',muted:'#d69bb2',
+        border:'#fbe4ec',borderStrong:'#f7d7e2',chip:'#fdeef3',inputBg:'#fff2f6',modalBg:'#ffffff',gridLine:'#fbe6ee',nowLine:'#ff5d7a',dark:false,
+        sideGrad:'linear-gradient(175deg,#ffa6c6,#ff86ac 58%,#ffb3b0)',
+        decor:['flower','heart','sparkle','star','dot'],decorColors:['#ffd4e2','#ffe0ec','#fff0c0','#ffd9cf']},
+      caramel:{name:{vi:'Caramel',en:'Caramel',zh:'焦糖',ja:'キャラメル'},icon:'🧸',accent:'#d5904f',grad:'linear-gradient(135deg,#e0a05f,#d98a53)',
+        appBg:'linear-gradient(160deg,#fbf2e6,#fdf4e8)',mainBg:'#fdf7ef',panel:'#fffdf9',text:'#5f4a34',muted:'#c3a684',
+        border:'#f2e6d3',borderStrong:'#ecdcc4',chip:'#f8efe0',inputBg:'#fbf4e9',modalBg:'#fffdf9',gridLine:'#f4e9d8',nowLine:'#e8724b',dark:false,
+        sideGrad:'linear-gradient(175deg,#e6bd8c,#d99e63 58%,#e6b17a)',
+        decor:['star','heart','sparkle','dot','cloud'],decorColors:['#f4dcb8','#ffe6c2','#f8d0a0','#ffeccb']},
+      ocean:{name:{vi:'Biển xanh',en:'Ocean',zh:'海洋',ja:'うみ'},icon:'🐋',accent:'#4aa6e8',grad:'linear-gradient(135deg,#4fb0ec,#78c9de)',
+        appBg:'linear-gradient(160deg,#ecf6fd,#eef9fb)',mainBg:'#f5fbff',panel:'#ffffff',text:'#365a70',muted:'#96bdd4',
+        border:'#e0f0fa',borderStrong:'#d2e8f5',chip:'#ecf6fd',inputBg:'#f1f9fe',modalBg:'#ffffff',gridLine:'#e8f4fc',nowLine:'#ff8ec6',dark:false,
+        sideGrad:'linear-gradient(175deg,#9fd3f4,#6fb9ec 58%,#8fd6e0)',
+        decor:['cloud','sparkle','bubble','star','dot'],decorColors:['#cfe8fb','#d6eefb','#fff2c0','#c9ecf0']},
+      midnight:{name:{vi:'Đêm sao',en:'Starry night',zh:'星夜',ja:'星空'},icon:'🌙',accent:'#9a8bff',grad:'linear-gradient(135deg,#7b7bf0,#b57be0)',
+        appBg:'#12132a',mainBg:'#161834',panel:'#1c1f3d',text:'#e9e9fb',muted:'#8b8fc0',
+        border:'rgba(255,255,255,.09)',borderStrong:'rgba(255,255,255,.14)',chip:'rgba(255,255,255,.07)',inputBg:'#12142e',modalBg:'#1c1f3d',gridLine:'rgba(255,255,255,.06)',nowLine:'#ff8ec6',dark:true,
+        sideGrad:'linear-gradient(175deg,#262c58,#1b1f45 58%,#2c2560)',
+        decor:['star','sparkle','moon','dot','heart'],decorColors:['#ffe08a','#b9a9ff','#6b6fb0','#8a7fd8']}
+    };
+    return P[key] || P.lavender;
+  }
+  theme(){
+    const d=this.themeDef(this.state.theme); const acc=d.accent;
+    const c1=d.decorColors[0]||acc, c2=d.decorColors[1]||c1, c3=d.decorColors[2]||c1;
+    const dotA=d.dark?0.14:0.10;
+    const pageBg=
+      'radial-gradient(circle at 14% 18%, '+this.rgba(c1, d.dark?0.55:0.95)+', transparent 42%),'+
+      'radial-gradient(circle at 86% 12%, '+this.rgba(c2, d.dark?0.45:0.85)+', transparent 40%),'+
+      'radial-gradient(circle at 78% 88%, '+this.rgba(c1, d.dark?0.4:0.8)+', transparent 44%),'+
+      'radial-gradient(circle at 8% 82%, '+this.rgba(c3, d.dark?0.4:0.8)+', transparent 42%),'+
+      'radial-gradient('+this.rgba(acc, dotA)+' 2px, transparent 2px) 0 0/26px 26px,'+
+      d.appBg;
+    return Object.assign({}, d, {
+      accent:acc, brandGrad:d.grad, brandShadow:this.rgba(acc, d.dark?0.5:0.32),
+      pageBg,
+      windowShadow:'0 34px 90px '+this.rgba(acc, d.dark?0.55:0.24)+', 0 10px 30px rgba(0,0,0,'+(d.dark?0.45:0.09)+')',
+      todayTint:this.rgba(acc, d.dark?0.16:0.08),
+      gridLines:'repeating-linear-gradient(to bottom,'+d.gridLine+','+d.gridLine+' 1px,transparent 1px,transparent '+this.HOUR_H+'px)',
+      danger:'#ff5d7a', dangerBorder:'rgba(255,93,122,.4)',
+      sidebarText:'#ffffff', sidebarStrong:'#ffffff', sidebarMuted:'rgba(255,255,255,0.78)',
+      sidebarCard:'rgba(255,255,255,0.16)', sidebarBorder:'rgba(255,255,255,0.26)'
+    });
+  }
+  eventBox(cat,th){
+    const color=this.CAT_COLOR[cat];
+    if(th.dark){
+      return {bg:this.mix(color,'#1c1f3d',0.62),fg:this.mix(color,'#ffffff',0.72),border:'1px solid '+this.rgba(color,0.5),shadow:'0 5px 14px rgba(0,0,0,.4)',radius:'14px',accentColor:color,padL:12};
+    }
+    return {bg:this.mix(color,'#ffffff',0.85),fg:this.mix(color,'#3a2f52',0.22),border:'1px solid '+this.rgba(color,0.3),shadow:'0 4px 12px '+this.rgba(color,0.2),radius:'14px',accentColor:color,padL:12};
+  }
+
+  /* ---------- actions ---------- */
+  setLang(l){ this.setState({lang:l}); }
+  setTheme(k){ this.setState({theme:k, themeOpen:false}); }
+  openTheme(){ this.setState({themeOpen:true}); }
+  closeTheme(){ this.setState({themeOpen:false}); }
+  toggleTray(){ this.setState(s=>({trayOpen:!s.trayOpen})); }
+  toggleSidebar(){ this.setState(s=>({sidebarOpen:!s.sidebarOpen})); }
+  toggleCat(k){ this.setState(s=>({activeCats:{...s.activeCats,[k]:!s.activeCats[k]}})); }
+  prevWeek(){ this.setState(s=>({anchor:this.iso(this.addDays(this.parse(s.anchor),-7))})); }
+  nextWeek(){ this.setState(s=>({anchor:this.iso(this.addDays(this.parse(s.anchor),7))})); }
+  goToday(){ const t=new Date(); t.setHours(0,0,0,0); this.setState({anchor:this.iso(this.monday(t)),selected:this.iso(t),miniY:t.getFullYear(),miniM:t.getMonth()}); }
+  miniPrev(){ this.setState(s=>{ let m=s.miniM-1,y=s.miniY; if(m<0){m=11;y--;} return {miniM:m,miniY:y}; }); }
+  miniNext(){ this.setState(s=>{ let m=s.miniM+1,y=s.miniY; if(m>11){m=0;y++;} return {miniM:m,miniY:y}; }); }
+  pickDay(isoStr){ const d=this.parse(isoStr); this.setState({selected:isoStr,anchor:this.iso(this.monday(d)),miniY:d.getFullYear(),miniM:d.getMonth()}); }
+
+  /* ---------- modal ---------- */
+  openNew(dateISO,startMin){ this.setState({selSticker:null,modal:{open:true,isEdit:false,draft:{id:'e'+Date.now(),date:dateISO,startMin,durMin:60,cat:'work',title:''}}}); }
+  openEdit(id){ const ev=this.state.events.find(e=>e.id===id); if(!ev)return; this.setState({modal:{open:true,isEdit:true,draft:{id:ev.id,date:ev.date,startMin:ev.startMin,durMin:ev.durMin,cat:ev.cat,title:this.evTitle(ev.title,this.state.lang)}}}); }
+  closeModal(){ this.setState(s=>({modal:{...s.modal,open:false}})); }
+  patchDraft(p){ this.setState(s=>({modal:{...s.modal,draft:{...s.modal.draft,...p}}})); }
+  saveEvent(){
+    const d=this.state.modal.draft; if(!d)return;
+    const title=(d.title&&d.title.trim())?d.title.trim():(this.strings()[this.state.lang].newEvent);
+    const clean={id:d.id,date:d.date,startMin:Math.max(this.START_MIN,Math.min(d.startMin,this.END_MIN-15)),durMin:Math.max(15,Math.min(d.durMin,this.END_MIN-d.startMin)),cat:d.cat,title};
+    this.setState(s=>{ const ex=s.events.some(e=>e.id===d.id); const events= ex ? s.events.map(e=>e.id===d.id?clean:e) : [...s.events,clean]; return {events,modal:{...s.modal,open:false}}; });
+  }
+  deleteEvent(){ const id=this.state.modal.draft.id; this.setState(s=>({events:s.events.filter(e=>e.id!==id),modal:{...s.modal,open:false}})); }
+  onCreateCell(e,dateISO){
+    const rect=e.currentTarget.getBoundingClientRect(); const y=e.clientY-rect.top;
+    let m=this.START_MIN+Math.round((y/this.HOUR_H*60)/30)*30;
+    m=Math.max(this.START_MIN,Math.min(m,this.END_MIN-60));
+    this.openNew(dateISO,m);
+  }
+
+  /* ---------- event drag ---------- */
+  startDrag(e,id,mode){
+    e.stopPropagation();
+    const ev=this.state.events.find(x=>x.id===id); if(!ev)return;
+    const dayIdx=Math.round((this.parse(ev.date)-this.parse(this.state.anchor))/86400000);
+    this._evDrag={id,mode,x0:e.clientX,y0:e.clientY,moved:false,origStart:ev.startMin,origDur:ev.durMin,origDay:dayIdx};
+  }
+
+  /* ---------- sticker actions ---------- */
+  startPlace(item,e){ e.preventDefault(); this._place={item}; this.setState({placing:{show:true,x:e.clientX,y:e.clientY,item}}); }
+  addSticker(item,x,y){
+    const id='k'+Date.now()+Math.random().toString(36).slice(2,5);
+    const st={id,kind:item.kind,ch:item.ch,shape:item.shape,color:item.color,x,y,size:58,rot:(Math.random()*24-12)};
+    this.setState(s=>({stickers:[...s.stickers,st],selSticker:id}));
+  }
+  startStickerDrag(e,id,mode){
+    e.stopPropagation(); e.preventDefault();
+    const st=this.state.stickers.find(x=>x.id===id); if(!st)return;
+    this._stDrag={id,mode,x0:e.clientX,y0:e.clientY,ox:st.x,oy:st.y,osize:st.size,moved:false};
+    this.setState({selSticker:id});
+  }
+  deleteSticker(e,id){ e.stopPropagation(); e.preventDefault(); this.setState(s=>({stickers:s.stickers.filter(k=>k.id!==id),selSticker:null})); }
+  clearStickers(){ this.setState({stickers:[],selSticker:null}); }
+
+  /* ---------- global pointer ---------- */
+  onMove(e){
+    if(this._place){ this.setState(s=>({placing:{...s.placing,x:e.clientX,y:e.clientY}})); return; }
+    if(this._stDrag){
+      const d=this._stDrag; const dx=e.clientX-d.x0, dy=e.clientY-d.y0;
+      if(Math.abs(dx)>3||Math.abs(dy)>3) d.moved=true;
+      this.setState(s=>({stickers:s.stickers.map(k=>{
+        if(k.id!==d.id)return k;
+        if(d.mode==='resize'){ let sz=Math.max(26,Math.min(240,d.osize+(dx+dy)/2)); return {...k,size:sz}; }
+        return {...k,x:d.ox+dx,y:d.oy+dy};
+      })}));
+      return;
+    }
+    if(this._evDrag){
+      const d=this._evDrag; const dx=e.clientX-d.x0, dy=e.clientY-d.y0;
+      if(Math.abs(dx)>4||Math.abs(dy)>4) d.moved=true;
+      if(d.moved) this.setState({drag:{id:d.id,dx,dy,mode:d.mode}});
+    }
+  }
+  onUp(e){
+    if(this._place){ const it=this._place.item; this._place=null; const p=this.state.placing; this.addSticker(it,p.x,p.y); this.setState({placing:{show:false}}); return; }
+    if(this._stDrag){ this._stDrag=null; return; }
+    const d=this._evDrag; if(!d)return; this._evDrag=null;
+    if(!d.moved){ this.setState({drag:null}); this.openEdit(d.id); return; }
+    const dx=e.clientX-d.x0, dy=e.clientY-d.y0; const snap=this.state.snap;
+    const dMin=Math.round((dy/this.HOUR_H*60)/snap)*snap;
+    const colW=this.gridEl?this.gridEl.getBoundingClientRect().width/7:120;
+    this.setState(s=>{
+      const events=s.events.map(ev=>{
+        if(ev.id!==d.id)return ev;
+        if(d.mode==='resize'){ let dur=Math.max(15,d.origDur+dMin); dur=Math.min(dur,this.END_MIN-ev.startMin); return {...ev,durMin:dur}; }
+        const dCols=Math.round(dx/colW); const nDay=Math.max(0,Math.min(6,d.origDay+dCols));
+        let st=Math.max(this.START_MIN,Math.min(d.origStart+dMin,this.END_MIN-ev.durMin));
+        return {...ev,date:this.iso(this.addDays(this.parse(s.anchor),nDay)),startMin:st};
+      });
+      return {events,drag:null};
+    });
+  }
+
+  renderVals(){
+    const S=this.state, lang=S.lang, th=this.theme(), t=this.strings()[lang];
+    const mon=this.parse(S.anchor);
+    const todayISO=this.iso(new Date());
+    const nowD=new Date(); const nowMin=nowD.getHours()*60+nowD.getMinutes();
+    const totalH=(this.END_MIN-this.START_MIN)/60*this.HOUR_H;
+    const decorOn=this.props.showDecor!==false;
+
+    const langMeta=[{code:'vi',label:'VI'},{code:'en',label:'EN'},{code:'zh',label:'中'},{code:'ja',label:'日'}];
+    const langs=langMeta.map(l=>({label:l.label,onClick:()=>this.setLang(l.code),
+      bg:l.code===lang?'#ffffff':'rgba(255,255,255,.16)',color:l.code===lang?th.accent:'#ffffff'}));
+
+    // week days + events
+    const evByDay=[[],[],[],[],[],[],[]];
+    S.events.forEach(ev=>{ if(!S.activeCats[ev.cat])return; const di=Math.round((this.parse(ev.date)-mon)/86400000); if(di>=0&&di<7) evByDay[di].push(ev); });
+    const dragV=S.drag; const days=[];
+    for(let i=0;i<7;i++){
+      const dt=this.addDays(mon,i), diso=this.iso(dt), isToday=diso===todayISO;
+      const evs=evByDay[i].sort((a,b)=>a.startMin-b.startMin).map(ev=>{
+        const box=this.eventBox(ev.cat,th);
+        let top=(ev.startMin-this.START_MIN)/60*this.HOUR_H;
+        let h=ev.durMin/60*this.HOUR_H;
+        const dragging=dragV&&dragV.id===ev.id; let extra='';
+        if(dragging){ if(dragV.mode==='resize'){ h=Math.max(14,h+dragV.dy); } else { extra='transform:translate('+dragV.dx+'px,'+dragV.dy+'px);'; } }
+        const boxStr='position:absolute;left:4px;right:4px;top:'+top+'px;height:'+(h-2)+'px;'+
+          'padding:6px 8px 6px '+box.padL+'px;border-radius:'+box.radius+';overflow:hidden;'+
+          'background:'+box.bg+';color:'+box.fg+';border:'+box.border+';'+
+          'box-shadow:'+(dragging?'0 16px 34px rgba(0,0,0,0.3)':box.shadow)+';'+
+          'cursor:'+(dragging?'grabbing':'grab')+';user-select:none;touch-action:none;z-index:'+(dragging?40:10)+';'+extra;
+        const end=ev.startMin+ev.durMin;
+        return {id:ev.id,box:boxStr,accent:true,accentColor:box.accentColor,emoji:this.CAT_EMOJI[ev.cat],
+          title:this.evTitle(ev.title,lang),showTime:ev.durMin>=45,
+          timeLabel:this.fmtTime(ev.startMin)+' – '+this.fmtTime(end),
+          onDown:(e)=>this.startDrag(e,ev.id,'move'), onResize:(e)=>this.startDrag(e,ev.id,'resize')};
+      });
+      const showNow=isToday&&nowMin>=this.START_MIN&&nowMin<=this.END_MIN;
+      days.push({dow:t.dow[i],dayNum:dt.getDate(),
+        dowColor:isToday?th.accent:th.muted,
+        numColor:isToday?'#fff':th.text, numBg:isToday?th.brandGrad:'transparent',
+        numShadow:isToday?'0 5px 13px '+th.brandShadow:'none',
+        colBg:isToday?th.todayTint:'transparent',
+        onCreate:(e)=>this.onCreateCell(e,diso),
+        now:{show:showNow,top:((nowMin-this.START_MIN)/60*this.HOUR_H)+'px'}, events:evs});
+    }
+
+    const hours=[]; for(let h=6;h<=23;h++) hours.push({label:this.pad(h)+':00',top:((h-6)*this.HOUR_H)+'px'});
+    const end=this.addDays(mon,6);
+    const weekRange=this.fmtRange(lang,t,mon,end);
+    const mini=this.buildMini(lang,t,th);
+
+    const counts={}; this.CATS.forEach(c=>counts[c]=0);
+    S.events.forEach(ev=>{ const di=Math.round((this.parse(ev.date)-mon)/86400000); if(di>=0&&di<7) counts[ev.cat]++; });
+    const cats=this.CATS.map(k=>({label:t.catL[k],emoji:this.CAT_EMOJI[k],count:counts[k],opacity:S.activeCats[k]?1:0.42,onClick:()=>this.toggleCat(k)}));
+
+    // decor
+    const mainPlace=[{x:'4%',y:'11%',s:80,o:.55,r:-8},{x:'91%',y:'8%',s:60,o:.5,r:12},{x:'96%',y:'40%',s:50,o:.45,r:0},{x:'85%',y:'82%',s:70,o:.45,r:-6},{x:'6%',y:'84%',s:64,o:.48,r:8},{x:'50%',y:'4%',s:44,o:.4,r:0},{x:'71%',y:'6%',s:36,o:.5,r:10},{x:'26%',y:'6%',s:34,o:.48,r:-10},{x:'97%',y:'62%',s:42,o:.42,r:6},{x:'3%',y:'46%',s:38,o:.42,r:0},{x:'50%',y:'95%',s:34,o:.4,r:14},{x:'16%',y:'95%',s:30,o:.4,r:-6},{x:'82%',y:'52%',s:32,o:.4,r:8}];
+    const decorMain= decorOn ? mainPlace.map((p,i)=>{ const shape=th.decor[i%th.decor.length]; const col=th.decorColors[i%th.decorColors.length]; const anim=(shape==='star'||shape==='sparkle')?'animation:twinkle '+(3+i%3)+'s ease-in-out infinite '+(i*0.3)+'s;':'animation:floatY '+(5+i%4)+'s ease-in-out infinite '+(i*0.4)+'s;'; return {style:'position:absolute;left:'+p.x+';top:'+p.y+';width:'+p.s+'px;height:'+p.s+'px;opacity:'+p.o+';transform:translate(-50%,-50%) rotate('+p.r+'deg);background:'+this.svgURI(shape,col)+' center/contain no-repeat;'+anim}; }) : [];
+    const sidePlace=[{x:'82%',y:'6%',s:40,o:.5,r:-6},{x:'14%',y:'4%',s:26,o:.45,r:8},{x:'90%',y:'34%',s:22,o:.5,r:0},{x:'8%',y:'52%',s:30,o:.4,r:10},{x:'86%',y:'70%',s:34,o:.4,r:-8},{x:'20%',y:'90%',s:28,o:.42,r:6}];
+    const sideSprites=['cloud','star','sparkle','heart','cloud','star'];
+    const decorSide= sidePlace.map((p,i)=>{ const shape=sideSprites[i%sideSprites.length]; const anim=(shape==='star'||shape==='sparkle')?'animation:twinkle '+(3+i%3)+'s ease-in-out infinite '+(i*0.3)+'s;':'animation:floatY '+(5+i%3)+'s ease-in-out infinite '+(i*0.35)+'s;'; return {style:'position:absolute;left:'+p.x+';top:'+p.y+';width:'+p.s+'px;height:'+p.s+'px;opacity:'+p.o+';transform:translate(-50%,-50%) rotate('+p.r+'deg);background:'+this.svgURI(shape,'rgba(255,255,255,0.85)')+' center/contain no-repeat;'+anim}; });
+
+    // theme list
+    const themeKeys=['lavender','mint','strawberry','caramel','ocean','midnight'];
+    const themeList=themeKeys.map(k=>{ const d=this.themeDef(k); return {key:k,name:d.name[lang]||d.name.en,icon:d.icon,grad:d.sideGrad,accent:d.accent,active:k===S.theme,ring:k===S.theme?d.accent:th.border,onClick:()=>this.setTheme(k)}; });
+    const curDef=this.themeDef(S.theme);
+    const currentThemeName=curDef.name[lang]||curDef.name.en;
+
+    // stickers
+    const stickers=S.stickers.map(k=>{
+      const sel=k.id===S.selSticker;
+      const wrap='position:fixed;left:'+k.x+'px;top:'+k.y+'px;width:'+k.size+'px;height:'+k.size+'px;transform:translate(-50%,-50%) rotate('+k.rot+'deg);pointer-events:auto;cursor:grab;user-select:none;touch-action:none;z-index:'+(sel?70:62)+';display:grid;place-items:center;';
+      let inner,isSvg=false,isEmoji=false,ch='';
+      if(k.kind==='svg'){ isSvg=true; inner='width:100%;height:100%;background:'+this.svgURI(k.shape,k.color)+' center/contain no-repeat;filter:drop-shadow(0 3px 5px rgba(0,0,0,.16));'; }
+      else { isEmoji=true; ch=k.ch; inner='font-size:'+(k.size*0.82)+'px;line-height:1;filter:drop-shadow(0 3px 5px rgba(0,0,0,.18));'; }
+      const ring= sel? 'position:absolute;inset:-9px;border:2px dashed '+th.accent+';border-radius:16px;pointer-events:none;' : 'display:none;';
+      return {id:k.id,wrap,inner,ring,isSvg,isEmoji,ch,selected:sel,
+        onDown:(e)=>this.startStickerDrag(e,k.id,'move'), onDelete:(e)=>this.deleteSticker(e,k.id), onResize:(e)=>this.startStickerDrag(e,k.id,'resize')};
+    });
+
+    // placing ghost
+    const Pg=S.placing; let placing={show:false};
+    if(Pg&&Pg.show&&Pg.item){ const it=Pg.item; const sz=58; let inner,isSvg=false,isEmoji=false,ch='';
+      if(it.kind==='svg'){ isSvg=true; inner='width:100%;height:100%;background:'+this.svgURI(it.shape,it.color)+' center/contain no-repeat;'; }
+      else { isEmoji=true; ch=it.ch; inner='font-size:'+(sz*0.82)+'px;line-height:1;'; }
+      placing={show:true,isSvg,isEmoji,ch,wrap:'position:fixed;left:'+Pg.x+'px;top:'+Pg.y+'px;width:'+sz+'px;height:'+sz+'px;transform:translate(-50%,-50%);opacity:.85;pointer-events:none;z-index:130;display:grid;place-items:center;',inner};
+    }
+
+    // tray items
+    const shapes=[{shape:'heart',color:'#ff7eb6'},{shape:'star',color:'#ffd15c'},{shape:'cloud',color:'#a9c8ff'},{shape:'flower',color:'#ff9ec4'},{shape:'rainbow',color:''},{shape:'sparkle',color:'#c9a2ff'},{shape:'moon',color:'#ffcf6a'},{shape:'leaf',color:'#5fd0a0'},{shape:'bubble',color:'#7fd0e6'},{shape:'dot',color:'#ffb3c7'},{shape:'heart',color:'#ff5d7a'},{shape:'star',color:'#8b7be8'}];
+    const emos=['🌸','🌷','🌻','🌼','🌈','⭐','✨','💖','💕','💗','🎀','🧸','🐻','🐰','🐱','🐶','🐼','🐣','🦄','☁️','🌙','☀️','🍓','🍰','🧁','🍪','🍵','☕','🎧','📚','✏️','💡','🍀','🐾','🦋','💐','🫧','🍡','🌟','🩷'];
+    const trayItems=[
+      ...shapes.map((x,i)=>({isSvg:true,isEmoji:false,ch:'',preview:'width:30px;height:30px;background:'+this.svgURI(x.shape,x.color)+' center/contain no-repeat;',onDown:(e)=>this.startPlace({kind:'svg',shape:x.shape,color:x.color},e)})),
+      ...emos.map(ch=>({isSvg:false,isEmoji:true,ch,preview:'',onDown:(e)=>this.startPlace({kind:'emoji',ch},e)}))
+    ];
+
+    // modal
+    const M=S.modal; let modal={open:false};
+    if(M.open){
+      const mcats=this.CATS.map(k=>{ const sel=M.draft.cat===k, col=this.CAT_COLOR[k];
+        return {label:t.catL[k],emoji:this.CAT_EMOJI[k],onClick:()=>this.patchDraft({cat:k}),
+          bg:sel?this.rgba(col,0.14):'transparent',border:sel?col:th.border,
+          color:sel?(th.dark?'#fff':this.mix(col,'#000',0.12)):th.muted}; });
+      modal={open:true,isEdit:M.isEdit,draft:M.draft,cats:mcats,title:M.isEdit?t.edit:t.add,headColor:th.brandGrad};
+    }
+
+    const startOptions=[]; for(let m=this.START_MIN;m<=this.END_MIN-15;m+=15) startOptions.push({value:m,label:this.fmtTime(m)});
+    const durOptions=[15,30,45,60,90,120,150,180,240,300].map(m=>({value:m,label:this.fmtDur(m,t)}));
+
+    // user (placeholder for future login)
+    const userName='Khách';
+    const parts=userName.trim().split(/\s+/);
+    const initials=(parts.length>1? parts[0][0]+parts[parts.length-1][0] : userName.slice(0,2)).toUpperCase();
+    const user={name:userName,initials,avatarGrad:th.brandGrad};
+
+    return {
+      theme:th,t,langs,days,hours,mini,cats,modal,startOptions,durOptions,
+      user, openUser:()=>{},
+      decorMain,decorSide,themeList,currentThemeName,stickers,placing,trayItems,
+      themeOpen:S.themeOpen, trayOpen:S.trayOpen,
+      weekRange, totalHpx:totalH+'px', sidebarW:S.sidebarOpen?'328px':'0px',
+      setGridRef:(el)=>{this.gridEl=el;},
+      toggleSidebar:()=>this.toggleSidebar(),
+      prevWeek:()=>this.prevWeek(), nextWeek:()=>this.nextWeek(), goToday:()=>this.goToday(),
+      openTheme:()=>this.openTheme(), closeTheme:()=>this.closeTheme(),
+      toggleTray:()=>this.toggleTray(), clearStickers:()=>this.clearStickers(),
+      newEvent:()=>{ const t2=new Date(); t2.setHours(0,0,0,0); const d= this.iso(t2)>=S.anchor?this.iso(t2):S.anchor; this.openNew(d,540); },
+      closeModal:()=>this.closeModal(), stop:(e)=>e.stopPropagation(),
+      onTitle:(e)=>this.patchDraft({title:e.target.value}),
+      onDate:(e)=>{ if(e.target.value) this.patchDraft({date:e.target.value}); },
+      onStart:(e)=>this.patchDraft({startMin:Number(e.target.value)}),
+      onDur:(e)=>this.patchDraft({durMin:Number(e.target.value)}),
+      saveEvent:()=>this.saveEvent(), deleteEvent:()=>this.deleteEvent()
+    };
+  }
+
+  fmtDur(m,t){ if(m<60) return m+' '+t.minShort; const h=Math.floor(m/60), r=m%60; return r===0? h+'h' : h+'h'+this.pad(r); }
+  fmtRange(lang,t,a,b){
+    const sm=a.getMonth(),em=b.getMonth(),y=a.getFullYear(),sd=a.getDate(),ed=b.getDate();
+    if(lang==='zh'||lang==='ja') return y+'年'+(sm+1)+'月'+sd+'日 – '+(sm===em?'':(em+1)+'月')+ed+'日';
+    if(lang==='en') return sm===em? t.mon[sm]+' '+sd+' – '+ed+', '+y : t.mon[sm]+' '+sd+' – '+t.mon[em]+' '+ed+', '+y;
+    return sm===em? sd+' – '+ed+' '+t.mon[sm]+', '+y : sd+' '+t.mon[sm]+' – '+ed+' '+t.mon[em]+', '+y;
+  }
+  buildMini(lang,t,th){
+    const S=this.state; const y=S.miniY,m=S.miniM;
+    const first=new Date(y,m,1); const startOff=(first.getDay()+6)%7;
+    const gridStart=this.addDays(first,-startOff);
+    const todayISO=this.iso(new Date()); const weekMon=this.parse(S.anchor);
+    const label= (lang==='zh'||lang==='ja')? (y+'年'+(m+1)+'月') : (t.mon[m]+' '+y);
+    const cells=[];
+    for(let i=0;i<42;i++){
+      const dt=this.addDays(gridStart,i), diso=this.iso(dt), inMonth=dt.getMonth()===m;
+      const isToday=diso===todayISO;
+      const inWeek=(dt-weekMon)>=0&&(dt-weekMon)<7*86400000;
+      const isSel=diso===S.selected;
+      let bg='transparent',color=inMonth?'#ffffff':'rgba(255,255,255,.42)',weight=inMonth?'600':'400';
+      if(inWeek){ bg='rgba(255,255,255,.16)'; }
+      if(isSel){ bg='#ffffff'; color=th.accent; weight='700'; }
+      else if(isToday){ color='#fff'; weight='800'; }
+      cells.push({day:dt.getDate(),bg,color,weight,onClick:()=>this.pickDay(diso)});
+    }
+    return {label,dow:t.miniDow,cells,prev:()=>this.miniPrev(),next:()=>this.miniNext()};
+  }
+}
+</script>
+</body>
+</html>

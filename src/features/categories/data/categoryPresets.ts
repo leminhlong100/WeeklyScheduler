@@ -1,0 +1,33 @@
+export const CATEGORY_COLOR_PRESETS = [
+  '#7b83ff',
+  '#2fc39a',
+  '#4bb4f0',
+  '#b47cf0',
+  '#ff7eb6',
+  '#ff9d5c',
+  '#ff6fa5',
+  '#5fd0a0',
+  '#e0a05f',
+  '#8b7be8',
+  '#4aa6e8',
+  '#ff5d7a',
+]
+
+export const CATEGORY_EMOJI_PRESETS = [
+  '💼',
+  '🌿',
+  '📚',
+  '🌸',
+  '💗',
+  '🍰',
+  '🎯',
+  '🏃',
+  '🎮',
+  '🎨',
+  '📝',
+  '✈️',
+  '🧘',
+  '🛒',
+  '☕',
+  '🐾',
+]
