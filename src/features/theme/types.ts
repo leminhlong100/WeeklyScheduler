@@ -11,6 +11,12 @@ export const THEME_KEYS: ThemeKey[] = [
   'caramel',
   'ocean',
   'midnight',
+  'peach',
+  'lemon',
+  'grape',
+  'cottoncandy',
+  'sakura',
+  'panda',
 ]
 
 /** Static design tokens for one theme, ported from the design's `themeDef()`. */

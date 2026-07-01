@@ -5,7 +5,19 @@
  */
 
 export type Locale = 'vi' | 'en' | 'zh' | 'ja'
-export type ThemeKey = 'lavender' | 'mint' | 'strawberry' | 'caramel' | 'ocean' | 'midnight'
+export type ThemeKey =
+  | 'lavender'
+  | 'mint'
+  | 'strawberry'
+  | 'caramel'
+  | 'ocean'
+  | 'midnight'
+  | 'peach'
+  | 'lemon'
+  | 'grape'
+  | 'cottoncandy'
+  | 'sakura'
+  | 'panda'
 
 export interface Database {
   public: {
