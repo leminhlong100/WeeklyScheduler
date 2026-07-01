@@ -6,9 +6,9 @@ const STORAGE_KEY = 'weeklyScheduler.stickers'
 function seedStickers(): PlacedSticker[] {
   const width = typeof window === 'undefined' ? 1024 : window.innerWidth
   return [
-    { id: 'seed-1', item: { kind: 'emoji', ch: '🌟' }, x: Math.round(width * 0.6), y: 150, size: 52, rot: -9 },
-    { id: 'seed-2', item: { kind: 'emoji', ch: '☁️' }, x: Math.round(width * 0.78), y: 120, size: 60, rot: 7 },
-    { id: 'seed-3', item: { kind: 'emoji', ch: '🎀' }, x: Math.round(width * 0.46), y: 520, size: 48, rot: 11 },
+    { id: 'seed-1', item: { kind: 'emoji', ch: '🌟', category: 'nature' }, x: Math.round(width * 0.6), y: 150, size: 52, rot: -9 },
+    { id: 'seed-2', item: { kind: 'emoji', ch: '☁️', category: 'nature' }, x: Math.round(width * 0.78), y: 120, size: 60, rot: 7 },
+    { id: 'seed-3', item: { kind: 'emoji', ch: '🎀', category: 'love' }, x: Math.round(width * 0.46), y: 520, size: 48, rot: 11 },
   ]
 }
 
