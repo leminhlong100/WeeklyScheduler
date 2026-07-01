@@ -25,7 +25,7 @@ export function StickerLayer({
   onDelete,
 }: StickerLayerProps) {
   return (
-    <div className="pointer-events-none absolute inset-0 z-[60]">
+    <div className="pointer-events-none fixed inset-0 z-[60]">
       {stickers.map((sticker) => {
         const selected = editing && sticker.id === selectedId
         return (

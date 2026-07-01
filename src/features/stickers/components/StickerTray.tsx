@@ -10,7 +10,9 @@ interface StickerTrayProps {
   t: Dictionary
   theme: DerivedTheme
   open: boolean
+  editMode: boolean
   onToggleOpen: () => void
+  onToggleEditMode: () => void
   onItemPointerDown: (item: TrayItem, e: PointerEvent) => void
   onClearAll: () => void
 }
@@ -24,7 +26,16 @@ const CATEGORY_LABEL_KEY: Record<StickerCategory, keyof Dictionary> = {
   shapes: 'stickerCatShapes',
 }
 
-export function StickerTray({ t, theme, open, onToggleOpen, onItemPointerDown, onClearAll }: StickerTrayProps) {
+export function StickerTray({
+  t,
+  theme,
+  open,
+  editMode,
+  onToggleOpen,
+  onToggleEditMode,
+  onItemPointerDown,
+  onClearAll,
+}: StickerTrayProps) {
   const [category, setCategory] = useState<StickerCategory>(STICKER_CATEGORIES[0].id)
   const items = STICKER_TRAY_ITEMS.filter((item) => item.category === category)
 
@@ -88,10 +99,25 @@ export function StickerTray({ t, theme, open, onToggleOpen, onItemPointerDown, o
         </div>
       )}
 
-      <GradientButton onClick={onToggleOpen} className="h-14 gap-2.5 rounded-[20px] px-[22px] text-[15px]">
-        <span className="text-xl leading-none">🌈</span>
-        {t.stickers}
-      </GradientButton>
+      <div className="flex gap-3">
+        <button
+          type="button"
+          onClick={onToggleEditMode}
+          className="flex h-14 items-center gap-2.5 rounded-[20px] border-[1.5px] px-[22px] text-[15px] font-extrabold shadow-lg"
+          style={{
+            borderColor: editMode ? theme.accent : theme.border,
+            background: editMode ? theme.accent : theme.panel,
+            color: editMode ? '#fff' : theme.text,
+          }}
+        >
+          <span className="text-xl leading-none">✏️</span>
+          {t.editStickers}
+        </button>
+        <GradientButton onClick={onToggleOpen} className="h-14 gap-2.5 rounded-[20px] px-[22px] text-[15px]">
+          <span className="text-xl leading-none">🌈</span>
+          {t.stickers}
+        </GradientButton>
+      </div>
     </div>
   )
 }

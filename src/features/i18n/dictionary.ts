@@ -5,7 +5,6 @@
 export interface Dictionary {
   appName: string
   appSub: string
-  footer: string
 
   today: string
   newEvent: string
@@ -24,6 +23,7 @@ export interface Dictionary {
   duplicate: string
 
   stickers: string
+  editStickers: string
   stickerTitle: string
   dragHint: string
   clearAll: string

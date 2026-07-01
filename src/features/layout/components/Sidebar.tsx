@@ -44,7 +44,7 @@ export function Sidebar({
     >
       <DecorBackground theme={theme} variant="sidebar" />
 
-      <div className="scrollbar-hidden relative z-10 flex h-full w-[288px] flex-col gap-5 overflow-y-auto overflow-x-hidden px-5 py-[22px] pb-7">
+      <div className="relative z-10 flex h-full w-[288px] flex-col justify-center gap-5 px-5 py-[22px] pb-7">
         <div className="flex items-center gap-[11px]">
           <div
             className="grid h-11 w-11 flex-shrink-0 place-items-center rounded-[15px] text-2xl shadow-lg"
@@ -98,9 +98,6 @@ export function Sidebar({
             {t.manageCategories}
           </button>
         </div>
-
-        <div className="flex-1" />
-        <div className="text-center text-[11.5px] font-semibold text-white/78">{t.footer}</div>
       </div>
     </aside>
   )

@@ -3,7 +3,6 @@ import type { Dictionary } from '../dictionary'
 export const ja: Dictionary = {
   appName: '週間',
   appSub: 'かわいい手帳',
-  footer: 'すてきな一週間を ♡',
 
   today: '今日',
   newEvent: '新規',
@@ -22,6 +21,7 @@ export const ja: Dictionary = {
   duplicate: '複製',
 
   stickers: 'ステッカー',
+  editStickers: 'アイコン編集',
   stickerTitle: 'ステッカー箱',
   dragHint: 'アイコンを画面にドラッグ！✨',
   clearAll: '全部消す',

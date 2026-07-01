@@ -3,7 +3,6 @@ import type { Dictionary } from '../dictionary'
 export const zh: Dictionary = {
   appName: '周历',
   appSub: '可爱计划',
-  footer: '祝你一周愉快 ♡',
 
   today: '今天',
   newEvent: '新建',
@@ -22,6 +21,7 @@ export const zh: Dictionary = {
   duplicate: '复制',
 
   stickers: '贴纸',
+  editStickers: '编辑图标',
   stickerTitle: '贴纸盒',
   dragHint: '把图标拖到屏幕上吧！✨',
   clearAll: '清空',

@@ -3,7 +3,6 @@ import type { Dictionary } from '../dictionary'
 export const en: Dictionary = {
   appName: 'Weekly',
   appSub: 'Cutie planner',
-  footer: 'Have a lovely week ♡',
 
   today: 'Today',
   newEvent: 'New event',
@@ -22,6 +21,7 @@ export const en: Dictionary = {
   duplicate: 'Duplicate',
 
   stickers: 'Stickers',
+  editStickers: 'Edit icons',
   stickerTitle: 'Sticker box',
   dragHint: 'Drag any icon onto the screen! ✨',
   clearAll: 'Clear all',

@@ -3,7 +3,6 @@ import type { Dictionary } from '../dictionary'
 export const vi: Dictionary = {
   appName: 'Lịch Tuần',
   appSub: 'Kế hoạch dễ thương',
-  footer: 'Chúc một tuần thật vui ♡',
 
   today: 'Hôm nay',
   newEvent: 'Sự kiện mới',
@@ -22,6 +21,7 @@ export const vi: Dictionary = {
   duplicate: 'Nhân bản',
 
   stickers: 'Nhãn dán',
+  editStickers: 'Sửa icon',
   stickerTitle: 'Kho nhãn dán',
   dragHint: 'Kéo icon thả ra màn hình nha! ✨',
   clearAll: 'Xóa hết',

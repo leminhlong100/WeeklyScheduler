@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState, type PointerEvent as ReactPointerEvent, type RefObject } from 'react'
+import { useCallback, useEffect, useRef, useState, type PointerEvent as ReactPointerEvent } from 'react'
 import type { PlacedSticker, TrayItem } from '../types'
 
 export interface PlacingGhostState {
@@ -20,7 +20,6 @@ interface DragState {
 }
 
 interface UseStickerPointerInteractionsOptions {
-  boardRef: RefObject<HTMLDivElement | null>
   addSticker: (item: TrayItem, x: number, y: number) => void
   moveSticker: (id: string, x: number, y: number) => void
   resizeSticker: (id: string, size: number) => void
@@ -29,7 +28,6 @@ interface UseStickerPointerInteractionsOptions {
 
 /** Drag-to-place from the tray, and drag-to-move/resize an existing sticker. */
 export function useStickerPointerInteractions({
-  boardRef,
   addSticker,
   moveSticker,
   resizeSticker,
@@ -70,12 +68,9 @@ export function useStickerPointerInteractions({
         const item = placingItemRef.current
         placingItemRef.current = null
         setPlacing(null)
-        // Stickers are stored relative to the scrollable board, not the
-        // viewport, so they scroll together with the schedule underneath.
-        const boardRect = boardRef.current?.getBoundingClientRect()
-        const x = e.clientX - (boardRect?.left ?? 0)
-        const y = e.clientY - (boardRect?.top ?? 0)
-        addStickerRef.current(item, x, y)
+        // Stickers are positioned relative to the viewport so they can be
+        // dragged anywhere on screen, not just within the schedule grid.
+        addStickerRef.current(item, e.clientX, e.clientY)
         return
       }
       dragRef.current = null
@@ -87,7 +82,7 @@ export function useStickerPointerInteractions({
       window.removeEventListener('pointermove', handleMove)
       window.removeEventListener('pointerup', handleUp)
     }
-  }, [boardRef])
+  }, [])
 
   const startPlace = useCallback((item: TrayItem, e: ReactPointerEvent) => {
     e.preventDefault()
