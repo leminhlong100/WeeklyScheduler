@@ -32,6 +32,7 @@ export function TaskBlock({ task, theme, dragOffset, onPointerDownMove, onPointe
   return (
     <div
       onPointerDown={onPointerDownMove}
+      onClick={(e) => e.stopPropagation()}
       className="absolute right-1 left-1 touch-none overflow-hidden rounded-[14px] py-1.5 pr-2 pl-3 select-none"
       style={{
         top,

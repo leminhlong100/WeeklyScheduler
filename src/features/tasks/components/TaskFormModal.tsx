@@ -187,13 +187,17 @@ export function TaskFormModal({ draft, weekStartISO, onClose }: TaskFormModalPro
                 control={form.control}
                 name="startMinute"
                 render={({ field }) => (
-                  <Select value={String(field.value)} onValueChange={(v) => field.onChange(Number(v))}>
+                  <Select
+                    items={startOptions.map((o) => ({ value: String(o.value), label: o.label }))}
+                    value={String(field.value)}
+                    onValueChange={(v) => field.onChange(Number(v))}
+                  >
                     <SelectTrigger className="w-full">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
                       {startOptions.map((o) => (
-                        <SelectItem key={o.value} value={String(o.value)}>
+                        <SelectItem key={o.value} value={String(o.value)} label={o.label}>
                           {o.label}
                         </SelectItem>
                       ))}
@@ -210,13 +214,17 @@ export function TaskFormModal({ draft, weekStartISO, onClose }: TaskFormModalPro
                 control={form.control}
                 name="durationMinute"
                 render={({ field }) => (
-                  <Select value={String(field.value)} onValueChange={(v) => field.onChange(Number(v))}>
+                  <Select
+                    items={durationOptions.map((o) => ({ value: String(o.value), label: o.label }))}
+                    value={String(field.value)}
+                    onValueChange={(v) => field.onChange(Number(v))}
+                  >
                     <SelectTrigger className="w-full">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
                       {durationOptions.map((o) => (
-                        <SelectItem key={o.value} value={String(o.value)}>
+                        <SelectItem key={o.value} value={String(o.value)} label={o.label}>
                           {o.label}
                         </SelectItem>
                       ))}
