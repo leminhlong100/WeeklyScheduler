@@ -1,12 +1,13 @@
 import { useMemo, useRef } from 'react'
 import type { Dayjs } from 'dayjs'
+import { toast } from 'sonner'
 import type { DerivedTheme } from '@/features/theme/types'
 import type { Dictionary } from '@/features/i18n/dictionary'
 import { addDays, parseISODate, todayISO as getTodayISO, toISODate } from '@/lib/utils/date'
 import { CREATE_SNAP_MINUTES, DEFAULT_SNAP_MINUTES, GRID_END_MINUTE, GRID_START_MINUTE, HOUR_HEIGHT_PX } from '@/constants/grid'
 import type { Category } from '@/features/categories/api/categoriesApi'
 import type { Task } from '../api/tasksApi'
-import { useUpdateTask } from '../hooks/useTaskMutations'
+import { useCreateTask, useDeleteTask, useUpdateTask } from '../hooks/useTaskMutations'
 import { useTaskDragResize, type TaskOrigin } from '../hooks/useTaskDragResize'
 import { useNowMinutes } from '../hooks/useNowMinutes'
 import { minutesToTopPx } from '../utils/gridMath'
@@ -39,7 +40,10 @@ export function WeekGrid({
   const gridRef = useRef<HTMLDivElement>(null)
   const nowMinutes = useNowMinutes()
   const todayISO = getTodayISO()
-  const updateTask = useUpdateTask(toISODate(weekStart))
+  const weekStartISO = toISODate(weekStart)
+  const updateTask = useUpdateTask(weekStartISO)
+  const createTask = useCreateTask(weekStartISO)
+  const deleteTask = useDeleteTask(weekStartISO)
 
   const categoryById = useMemo(() => new Map(categories.map((c) => [c.id, c])), [categories])
 
@@ -97,6 +101,31 @@ export function WeekGrid({
     onClickTask: onRequestEdit,
   })
 
+  const handleDuplicateTask = (id: string) => {
+    const task = tasks.find((tk) => tk.id === id)
+    if (!task) return
+    createTask.mutate(
+      {
+        title: task.title,
+        categoryId: task.category_id,
+        taskDate: task.task_date,
+        startMinute: task.start_minute,
+        durationMinute: task.duration_minute,
+      },
+      {
+        onSuccess: () => toast.success(t.taskDuplicated),
+        onError: () => toast.error(t.somethingWentWrong),
+      },
+    )
+  }
+
+  const handleDeleteTask = (id: string) => {
+    deleteTask.mutate(id, {
+      onSuccess: () => toast.success(t.taskDeleted),
+      onError: () => toast.error(t.somethingWentWrong),
+    })
+  }
+
   const handleCreateAt = (dayIndex: number, clientY: number, boundingTop: number) => {
     const y = clientY - boundingTop
     let minute =
@@ -121,6 +150,8 @@ export function WeekGrid({
               dragPreview={preview}
               onCreateAt={(clientY, boundingTop) => handleCreateAt(dayIndex, clientY, boundingTop)}
               onStartDrag={startDrag}
+              onDuplicateTask={handleDuplicateTask}
+              onDeleteTask={handleDeleteTask}
             />
           ))}
         </div>

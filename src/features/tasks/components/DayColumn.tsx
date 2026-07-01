@@ -14,6 +14,8 @@ interface DayColumnProps {
   dragPreview: DragPreview | null
   onCreateAt: (clientY: number, boundingTop: number) => void
   onStartDrag: (e: ReactPointerEvent, id: string, mode: DragMode) => void
+  onDuplicateTask: (id: string) => void
+  onDeleteTask: (id: string) => void
 }
 
 export function DayColumn({
@@ -24,6 +26,8 @@ export function DayColumn({
   dragPreview,
   onCreateAt,
   onStartDrag,
+  onDuplicateTask,
+  onDeleteTask,
 }: DayColumnProps) {
   return (
     <div
@@ -46,6 +50,8 @@ export function DayColumn({
           dragOffset={dragPreview?.id === task.id ? dragPreview : null}
           onPointerDownMove={(e) => onStartDrag(e, task.id, 'move')}
           onPointerDownResize={(e) => onStartDrag(e, task.id, 'resize')}
+          onDuplicate={() => onDuplicateTask(task.id)}
+          onDelete={() => onDeleteTask(task.id)}
         />
       ))}
     </div>

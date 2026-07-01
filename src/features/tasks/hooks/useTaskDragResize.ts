@@ -118,6 +118,9 @@ export function useTaskDragResize({
 
   const startDrag = useCallback(
     (e: PointerEvent, id: string, mode: DragMode) => {
+      // Right/middle mouse buttons shouldn't start a move/resize drag or
+      // count as a click-to-edit — right click opens the context menu instead.
+      if (e.pointerType === 'mouse' && e.button !== 0) return
       e.stopPropagation()
       const origin = getTaskOrigin(id)
       if (!origin) return
