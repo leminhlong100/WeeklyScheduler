@@ -187,7 +187,12 @@ export function TaskFormModal({ draft, weekStartISO, onClose }: TaskFormModalPro
             htmlFor="title"
             error={translateFieldError(t, form.formState.errors.title?.message)}
           >
-            <Input id="title" placeholder={t.titlePh} {...form.register('title')} />
+            <Input
+              id="title"
+              placeholder={t.titlePh}
+              style={{ background: theme.inputBg, borderColor: theme.border, color: theme.text }}
+              {...form.register('title')}
+            />
           </FormField>
 
           <div>
@@ -210,7 +215,12 @@ export function TaskFormModal({ draft, weekStartISO, onClose }: TaskFormModalPro
 
           {isEdit ? (
             <FormField label={t.date} htmlFor="taskDate">
-              <Input id="taskDate" type="date" {...form.register('taskDate')} />
+              <Input
+                id="taskDate"
+                type="date"
+                style={{ background: theme.inputBg, borderColor: theme.border, color: theme.text }}
+                {...form.register('taskDate')}
+              />
             </FormField>
           ) : (
             <div>
@@ -235,10 +245,13 @@ export function TaskFormModal({ draft, weekStartISO, onClose }: TaskFormModalPro
                     value={String(field.value)}
                     onValueChange={(v) => field.onChange(Number(v))}
                   >
-                    <SelectTrigger className="w-full">
+                    <SelectTrigger
+                      className="w-full"
+                      style={{ background: theme.inputBg, borderColor: theme.border, color: theme.text }}
+                    >
                       <SelectValue />
                     </SelectTrigger>
-                    <SelectContent>
+                    <SelectContent style={{ background: theme.modalBg, borderColor: theme.border, color: theme.text }}>
                       {startOptions.map((o) => (
                         <SelectItem key={o.value} value={String(o.value)} label={o.label}>
                           {o.label}
@@ -262,10 +275,13 @@ export function TaskFormModal({ draft, weekStartISO, onClose }: TaskFormModalPro
                     value={String(field.value)}
                     onValueChange={(v) => field.onChange(Number(v))}
                   >
-                    <SelectTrigger className="w-full">
+                    <SelectTrigger
+                      className="w-full"
+                      style={{ background: theme.inputBg, borderColor: theme.border, color: theme.text }}
+                    >
                       <SelectValue />
                     </SelectTrigger>
-                    <SelectContent>
+                    <SelectContent style={{ background: theme.modalBg, borderColor: theme.border, color: theme.text }}>
                       {durationOptions.map((o) => (
                         <SelectItem key={o.value} value={String(o.value)} label={o.label}>
                           {o.label}
@@ -285,18 +301,29 @@ export function TaskFormModal({ draft, weekStartISO, onClose }: TaskFormModalPro
                 variant="outline"
                 onClick={handleDelete}
                 disabled={isPending}
-                style={{ borderColor: theme.dangerBorder, color: theme.danger }}
+                style={{ background: 'transparent', borderColor: theme.dangerBorder, color: theme.danger }}
               >
                 {t.delete}
               </Button>
             )}
             {isEdit && (
-              <Button type="button" variant="outline" onClick={handleDuplicate} disabled={isPending}>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={handleDuplicate}
+                disabled={isPending}
+                style={{ background: 'transparent', borderColor: theme.border, color: theme.text }}
+              >
                 {t.duplicate}
               </Button>
             )}
             <div className="flex-1" />
-            <Button type="button" variant="outline" onClick={onClose}>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={onClose}
+              style={{ background: 'transparent', borderColor: theme.border, color: theme.text }}
+            >
               {t.cancel}
             </Button>
             <GradientButton type="submit" disabled={isPending}>

@@ -26,7 +26,12 @@ export function CategoryFormFields({ form }: CategoryFormFieldsProps) {
   return (
     <div className="flex flex-col gap-4">
       <FormField label={t.categoryName} htmlFor="name" error={translateFieldError(t, errors.name?.message)}>
-        <Input id="name" placeholder={t.categoryNamePh} {...register('name')} />
+        <Input
+          id="name"
+          placeholder={t.categoryNamePh}
+          style={{ background: theme.inputBg, borderColor: theme.border, color: theme.text }}
+          {...register('name')}
+        />
       </FormField>
 
       <div>

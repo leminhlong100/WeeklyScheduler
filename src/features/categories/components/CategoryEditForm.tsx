@@ -4,6 +4,7 @@ import { toast } from 'sonner'
 import { GradientButton } from '@/components/common/GradientButton'
 import { Button } from '@/components/ui/button'
 import { useTranslation } from '@/features/i18n/LocaleContext'
+import { useTheme } from '@/features/theme/ThemeContext'
 import { categorySchema, type CategoryFormInput } from '../schemas/categorySchema'
 import { useCreateCategory, useUpdateCategory } from '../hooks/useCategoryMutations'
 import type { Category } from '../api/categoriesApi'
@@ -17,6 +18,7 @@ interface CategoryEditFormProps {
 
 export function CategoryEditForm({ category, onDone }: CategoryEditFormProps) {
   const { t } = useTranslation()
+  const { theme } = useTheme()
   const createCategory = useCreateCategory()
   const updateCategory = useUpdateCategory()
   const isEdit = !!category
@@ -52,7 +54,12 @@ export function CategoryEditForm({ category, onDone }: CategoryEditFormProps) {
     <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-4">
       <CategoryFormFields form={form} />
       <div className="flex justify-end gap-2">
-        <Button type="button" variant="outline" onClick={onDone}>
+        <Button
+          type="button"
+          variant="outline"
+          onClick={onDone}
+          style={{ background: 'transparent', borderColor: theme.border, color: theme.text }}
+        >
           {t.cancel}
         </Button>
         <GradientButton type="submit" disabled={isPending}>

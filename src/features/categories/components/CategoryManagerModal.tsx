@@ -71,7 +71,13 @@ export function CategoryManagerModal({ open, onOpenChange }: CategoryManagerModa
                 </p>
               )}
             </div>
-            <Button type="button" variant="outline" onClick={() => setEditTarget('new')} className="gap-1.5">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setEditTarget('new')}
+              className="gap-1.5"
+              style={{ background: 'transparent', borderColor: theme.border, color: theme.text }}
+            >
               <PlusIcon className="size-4" />
               {t.addCategory}
             </Button>
