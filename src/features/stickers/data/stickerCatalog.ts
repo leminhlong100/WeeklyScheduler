@@ -35,7 +35,7 @@ const SHAPE_ITEMS: TrayItem[] = [
   { kind: 'svg', shape: 'dot', color: '#a9c8ff', category: 'shapes' },
 ]
 
-const EMOJI_BY_CATEGORY: Record<Exclude<StickerCategory, 'shapes'>, string[]> = {
+const EMOJI_BY_CATEGORY: Record<Exclude<StickerCategory, 'shapes' | 'custom'>, string[]> = {
   love: ['💖', '💕', '💗', '💓', '💞', '💘', '💝', '❤️', '🧡', '💛', '💚', '💙', '💜', '🤎', '🤍', '🖤', '💌', '🎀'],
   nature: ['🌸', '🌷', '🌻', '🌼', '🌹', '🌈', '⭐', '✨', '🌙', '☀️', '☁️', '🌟', '🍀', '🌿', '🌊', '❄️', '🔥', '💧'],
   animals: ['🐻', '🐰', '🐱', '🐶', '🐼', '🐣', '🦄', '🐥', '🐹', '🐨', '🦋', '🐝', '🐞', '🐢', '🦊', '🐟', '🦉', '🐬'],
@@ -44,7 +44,7 @@ const EMOJI_BY_CATEGORY: Record<Exclude<StickerCategory, 'shapes'>, string[]> = 
 }
 
 const EMOJI_ITEMS: TrayItem[] = (
-  Object.entries(EMOJI_BY_CATEGORY) as [Exclude<StickerCategory, 'shapes'>, string[]][]
+  Object.entries(EMOJI_BY_CATEGORY) as [Exclude<StickerCategory, 'shapes' | 'custom'>, string[]][]
 ).flatMap(([category, chars]) => chars.map((ch) => ({ kind: 'emoji', ch, category }) as const))
 
 export const STICKER_TRAY_ITEMS: TrayItem[] = [...EMOJI_ITEMS, ...SHAPE_ITEMS]
