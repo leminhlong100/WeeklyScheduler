@@ -4,6 +4,8 @@ import { clampDurationMinute, clampStartMinute, pxDeltaToSnappedMinutes } from '
 
 export type DragMode = 'move' | 'resize'
 
+const DOUBLE_CLICK_MS = 400
+
 export interface TaskOrigin {
   dayIndex: number
   startMinute: number
@@ -33,6 +35,7 @@ interface UseTaskDragResizeOptions {
   onMove: (id: string, next: { dayIndex: number; startMinute: number }) => void
   onResize: (id: string, next: { durationMinute: number }) => void
   onClickTask: (id: string) => void
+  onDoubleClickTask: (id: string) => void
 }
 
 /**
@@ -49,17 +52,21 @@ export function useTaskDragResize({
   onMove,
   onResize,
   onClickTask,
+  onDoubleClickTask,
 }: UseTaskDragResizeOptions) {
   const [preview, setPreview] = useState<DragPreview | null>(null)
   const dragRef = useRef<DragState | null>(null)
+  const lastClickRef = useRef<{ id: string; time: number } | null>(null)
+  const pendingClickTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   // "Latest ref" pattern: the window listeners below are attached once, so
   // they read these refs (kept fresh via effect, not during render) instead
-  // of stale closures over `onMove`/`onResize`/`onClickTask`.
+  // of stale closures over `onMove`/`onResize`/`onClickTask`/`onDoubleClickTask`.
   const snapRef = useRef(snapMinutes)
   const onMoveRef = useRef(onMove)
   const onResizeRef = useRef(onResize)
   const onClickRef = useRef(onClickTask)
+  const onDoubleClickRef = useRef(onDoubleClickTask)
   void weekStart // week boundary changes remount the grid, which resets any in-flight drag anyway
 
   useEffect(() => {
@@ -67,7 +74,14 @@ export function useTaskDragResize({
     onMoveRef.current = onMove
     onResizeRef.current = onResize
     onClickRef.current = onClickTask
-  }, [snapMinutes, onMove, onResize, onClickTask])
+    onDoubleClickRef.current = onDoubleClickTask
+  }, [snapMinutes, onMove, onResize, onClickTask, onDoubleClickTask])
+
+  useEffect(() => {
+    return () => {
+      if (pendingClickTimeoutRef.current) clearTimeout(pendingClickTimeoutRef.current)
+    }
+  }, [])
 
   useEffect(() => {
     function handleMove(e: globalThis.PointerEvent) {
@@ -86,7 +100,22 @@ export function useTaskDragResize({
       setPreview(null)
 
       if (!drag.moved) {
-        onClickRef.current(drag.id)
+        const now = Date.now()
+        const last = lastClickRef.current
+        if (last && last.id === drag.id && now - last.time < DOUBLE_CLICK_MS) {
+          lastClickRef.current = null
+          if (pendingClickTimeoutRef.current) {
+            clearTimeout(pendingClickTimeoutRef.current)
+            pendingClickTimeoutRef.current = null
+          }
+          onDoubleClickRef.current(drag.id)
+        } else {
+          lastClickRef.current = { id: drag.id, time: now }
+          pendingClickTimeoutRef.current = setTimeout(() => {
+            pendingClickTimeoutRef.current = null
+            onClickRef.current(drag.id)
+          }, DOUBLE_CLICK_MS)
+        }
         return
       }
 

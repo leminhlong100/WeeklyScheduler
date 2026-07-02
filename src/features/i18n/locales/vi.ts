@@ -19,6 +19,13 @@ export const vi: Dictionary = {
   addEvent: 'Thêm sự kiện',
   editEvent: 'Sửa sự kiện',
   duplicate: 'Nhân bản',
+  copyLastWeek: 'Copy tuần trước',
+  repeatOnDays: 'Lặp lại vào các ngày',
+
+  note: 'Ghi chú',
+  noteAddItemPh: 'Thêm việc cần làm…',
+  editNote: 'Sửa ghi chú',
+  closeNote: 'Đóng ghi chú',
 
   stickers: 'Nhãn dán',
   editStickers: 'Sửa icon',
@@ -33,6 +40,8 @@ export const vi: Dictionary = {
   stickerCatFood: 'Đồ ăn',
   stickerCatObjects: 'Đồ dùng',
   stickerCatShapes: 'Hình khối',
+  stickerCatCustom: 'Của tôi',
+  addCustomSticker: 'Thêm nhãn dán của riêng bạn',
 
   manageCategories: 'Quản lý danh mục',
   addCategory: 'Thêm danh mục',
@@ -73,6 +82,8 @@ export const vi: Dictionary = {
   taskUpdated: 'Đã cập nhật sự kiện',
   taskDeleted: 'Đã xóa sự kiện',
   taskDuplicated: 'Đã nhân bản sự kiện',
+  weekCopied: 'Đã copy lịch trình tuần trước',
+  noTasksLastWeek: 'Tuần trước không có sự kiện nào để copy',
   categoryCreated: 'Đã tạo danh mục',
   categoryUpdated: 'Đã cập nhật danh mục',
   categoryDeleted: 'Đã xóa danh mục',

@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react'
-import { PlusIcon } from 'lucide-react'
+import { CopyIcon, PlusIcon } from 'lucide-react'
 import type { Dictionary } from '@/features/i18n/dictionary'
 import type { DerivedTheme } from '@/features/theme/types'
 import { GradientButton } from '@/components/common/GradientButton'
@@ -15,6 +15,8 @@ interface HeaderProps {
   onToday: () => void
   onOpenTheme: () => void
   onNewEvent: () => void
+  onCopyLastWeek: () => void
+  copyLastWeekPending: boolean
   userMenu: ReactNode
 }
 
@@ -24,19 +26,22 @@ function ChromeButton({
   className,
   children,
   title,
+  disabled,
 }: {
   onClick: () => void
   theme: DerivedTheme
   className?: string
   children: ReactNode
   title?: string
+  disabled?: boolean
 }) {
   return (
     <button
       type="button"
       onClick={onClick}
       title={title}
-      className={`grid h-10 flex-shrink-0 place-items-center rounded-[13px] border-[1.5px] text-[13px] font-bold ${className ?? 'w-10'}`}
+      disabled={disabled}
+      className={`flex h-10 flex-shrink-0 items-center justify-center rounded-[13px] border-[1.5px] text-[13px] font-bold disabled:cursor-not-allowed disabled:opacity-50 ${className ?? 'w-10'}`}
       style={{ borderColor: theme.border, background: theme.chip, color: theme.text }}
     >
       {children}
@@ -55,6 +60,8 @@ export function Header({
   onToday,
   onOpenTheme,
   onNewEvent,
+  onCopyLastWeek,
+  copyLastWeekPending,
   userMenu,
 }: HeaderProps) {
   return (
@@ -78,6 +85,15 @@ export function Header({
         </ChromeButton>
         <ChromeButton onClick={onToday} theme={theme} className="ml-1 w-auto px-4">
           {t.today}
+        </ChromeButton>
+        <ChromeButton
+          onClick={onCopyLastWeek}
+          theme={theme}
+          disabled={copyLastWeekPending}
+          className="w-auto gap-1.5 px-4"
+        >
+          <CopyIcon className="size-4" />
+          {t.copyLastWeek}
         </ChromeButton>
       </div>
 

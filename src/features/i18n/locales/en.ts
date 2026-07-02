@@ -19,6 +19,13 @@ export const en: Dictionary = {
   addEvent: 'Add event',
   editEvent: 'Edit event',
   duplicate: 'Duplicate',
+  copyLastWeek: 'Copy last week',
+  repeatOnDays: 'Repeat on days',
+
+  note: 'Note',
+  noteAddItemPh: 'Add a to-do…',
+  editNote: 'Edit note',
+  closeNote: 'Close note',
 
   stickers: 'Stickers',
   editStickers: 'Edit icons',
@@ -33,6 +40,8 @@ export const en: Dictionary = {
   stickerCatFood: 'Food',
   stickerCatObjects: 'Objects',
   stickerCatShapes: 'Shapes',
+  stickerCatCustom: 'My stickers',
+  addCustomSticker: 'Add your own sticker',
 
   manageCategories: 'Manage categories',
   addCategory: 'Add category',
@@ -73,6 +82,8 @@ export const en: Dictionary = {
   taskUpdated: 'Event updated',
   taskDeleted: 'Event deleted',
   taskDuplicated: 'Event duplicated',
+  weekCopied: "Last week's schedule copied",
+  noTasksLastWeek: 'No events to copy from last week',
   categoryCreated: 'Category created',
   categoryUpdated: 'Category updated',
   categoryDeleted: 'Category deleted',

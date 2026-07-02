@@ -1,3 +1,7 @@
+import type { TaskNoteItem } from '@/lib/supabase/database.types'
+
+export type { TaskNoteItem }
+
 /** A task joined with its category's display info (emoji/color), or safe defaults if uncategorized. */
 export interface TaskWithCategory {
   id: string
@@ -8,6 +12,7 @@ export interface TaskWithCategory {
   categoryId: string | null
   categoryEmoji: string
   categoryColor: string
+  notes: TaskNoteItem[]
 }
 
 export const UNCATEGORIZED_EMOJI = '📌'

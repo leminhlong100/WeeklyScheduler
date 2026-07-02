@@ -19,6 +19,17 @@ export function StickerVisual({ item, size }: StickerVisualProps) {
       />
     )
   }
+  if (item.kind === 'image') {
+    return (
+      <img
+        src={item.src}
+        alt=""
+        draggable={false}
+        className="h-full w-full object-contain"
+        style={{ filter: 'drop-shadow(0 3px 5px rgba(0,0,0,.18))' }}
+      />
+    )
+  }
   return (
     <div style={{ fontSize: size * 0.82, lineHeight: 1, filter: 'drop-shadow(0 3px 5px rgba(0,0,0,.18))' }}>
       {item.ch}

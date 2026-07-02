@@ -1,4 +1,4 @@
-import { useMemo, useRef } from 'react'
+import { useMemo, useRef, useState } from 'react'
 import type { Dayjs } from 'dayjs'
 import { toast } from 'sonner'
 import type { DerivedTheme } from '@/features/theme/types'
@@ -11,7 +11,7 @@ import { useCreateTask, useDeleteTask, useUpdateTask } from '../hooks/useTaskMut
 import { useTaskDragResize, type TaskOrigin } from '../hooks/useTaskDragResize'
 import { useNowMinutes } from '../hooks/useNowMinutes'
 import { minutesToTopPx } from '../utils/gridMath'
-import { UNCATEGORIZED_COLOR, UNCATEGORIZED_EMOJI, type TaskWithCategory } from '../types'
+import { UNCATEGORIZED_COLOR, UNCATEGORIZED_EMOJI, type TaskNoteItem, type TaskWithCategory } from '../types'
 import { HourRuler } from './HourRuler'
 import { DayHeaderRow, type DayHeaderInfo } from './DayHeaderRow'
 import { DayColumn } from './DayColumn'
@@ -44,6 +44,7 @@ export function WeekGrid({
   const updateTask = useUpdateTask(weekStartISO)
   const createTask = useCreateTask(weekStartISO)
   const deleteTask = useDeleteTask(weekStartISO)
+  const [openNoteTaskId, setOpenNoteTaskId] = useState<string | null>(null)
 
   const categoryById = useMemo(() => new Map(categories.map((c) => [c.id, c])), [categories])
 
@@ -71,6 +72,7 @@ export function WeekGrid({
         categoryId: task.category_id,
         categoryEmoji: category?.emoji ?? UNCATEGORIZED_EMOJI,
         categoryColor: category?.color ?? UNCATEGORIZED_COLOR,
+        notes: task.notes ?? [],
       })
     }
     return byDay.map((day) => [...day].sort((a, b) => a.startMinute - b.startMinute))
@@ -98,7 +100,8 @@ export function WeekGrid({
     onResize: (id, { durationMinute }) => {
       updateTask.mutate({ id, patch: { duration_minute: durationMinute } })
     },
-    onClickTask: onRequestEdit,
+    onClickTask: (id) => setOpenNoteTaskId(id),
+    onDoubleClickTask: onRequestEdit,
   })
 
   const handleDuplicateTask = (id: string) => {
@@ -124,6 +127,11 @@ export function WeekGrid({
       onSuccess: () => toast.success(t.taskDeleted),
       onError: () => toast.error(t.somethingWentWrong),
     })
+    setOpenNoteTaskId((current) => (current === id ? null : current))
+  }
+
+  const handleSaveNotes = (taskId: string, notes: TaskNoteItem[]) => {
+    updateTask.mutate({ id: taskId, patch: { notes } })
   }
 
   const handleCreateAt = (dayIndex: number, clientY: number, boundingTop: number) => {
@@ -146,12 +154,17 @@ export function WeekGrid({
               theme={theme}
               tasks={tasksByDay[dayIndex]}
               isToday={day.isToday}
+              dayIndex={dayIndex}
+              nowMinutes={day.isToday ? nowMinutes : null}
               nowTopPx={day.isToday ? minutesToTopPx(nowMinutes) : null}
               dragPreview={preview}
+              openNoteTaskId={openNoteTaskId}
               onCreateAt={(clientY, boundingTop) => handleCreateAt(dayIndex, clientY, boundingTop)}
               onStartDrag={startDrag}
               onDuplicateTask={handleDuplicateTask}
               onDeleteTask={handleDeleteTask}
+              onCloseNote={() => setOpenNoteTaskId(null)}
+              onSaveNotes={handleSaveNotes}
             />
           ))}
         </div>

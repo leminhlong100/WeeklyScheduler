@@ -19,6 +19,13 @@ export const zh: Dictionary = {
   addEvent: '添加事件',
   editEvent: '编辑事件',
   duplicate: '复制',
+  copyLastWeek: '复制上周',
+  repeatOnDays: '重复日期',
+
+  note: '备注',
+  noteAddItemPh: '添加待办事项…',
+  editNote: '编辑备注',
+  closeNote: '关闭备注',
 
   stickers: '贴纸',
   editStickers: '编辑图标',
@@ -33,6 +40,8 @@ export const zh: Dictionary = {
   stickerCatFood: '食物',
   stickerCatObjects: '物品',
   stickerCatShapes: '形状',
+  stickerCatCustom: '我的贴纸',
+  addCustomSticker: '添加你自己的贴纸',
 
   manageCategories: '管理分类',
   addCategory: '添加分类',
@@ -73,6 +82,8 @@ export const zh: Dictionary = {
   taskUpdated: '事件已更新',
   taskDeleted: '事件已删除',
   taskDuplicated: '事件已复制',
+  weekCopied: '已复制上周的日程',
+  noTasksLastWeek: '上周没有可复制的事件',
   categoryCreated: '分类已创建',
   categoryUpdated: '分类已更新',
   categoryDeleted: '分类已删除',

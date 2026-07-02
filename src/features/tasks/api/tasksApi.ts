@@ -27,6 +27,13 @@ export async function createTask(input: TaskInsert): Promise<Task> {
   return data
 }
 
+export async function bulkCreateTasks(inputs: TaskInsert[]): Promise<Task[]> {
+  if (inputs.length === 0) return []
+  const { data, error } = await supabase.from('tasks').insert(inputs).select('*')
+  if (error) throw error
+  return data
+}
+
 export async function updateTask(id: string, patch: TaskUpdate): Promise<Task> {
   const { data, error } = await supabase.from('tasks').update(patch).eq('id', id).select('*').single()
   if (error) throw error

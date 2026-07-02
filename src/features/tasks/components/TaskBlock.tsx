@@ -11,6 +11,7 @@ import type { DragMode } from '../hooks/useTaskDragResize'
 interface TaskBlockProps {
   task: TaskWithCategory
   theme: DerivedTheme
+  isCurrent: boolean
   dragOffset: { dxPx: number; dyPx: number; mode: DragMode } | null
   onPointerDownMove: (e: PointerEvent) => void
   onPointerDownResize: (e: PointerEvent) => void
@@ -21,6 +22,7 @@ interface TaskBlockProps {
 export function TaskBlock({
   task,
   theme,
+  isCurrent,
   dragOffset,
   onPointerDownMove,
   onPointerDownResize,
@@ -28,7 +30,7 @@ export function TaskBlock({
   onDelete,
 }: TaskBlockProps) {
   const { t } = useTranslation()
-  const box = taskBoxStyle(task.categoryColor, theme)
+  const box = taskBoxStyle(task.categoryColor, theme, isCurrent)
   const top = minutesToTopPx(task.startMinute)
   let height = durationToHeightPx(task.durationMinute)
   let transform: string | undefined
@@ -82,8 +84,21 @@ export function TaskBlock({
         />
       </ContextMenuTrigger>
       <ContextMenuContent>
-        <ContextMenuItem onClick={onDuplicate}>{t.duplicate}</ContextMenuItem>
-        <ContextMenuItem variant="destructive" onClick={onDelete}>
+        <ContextMenuItem
+          onClick={(e) => {
+            e.stopPropagation()
+            onDuplicate()
+          }}
+        >
+          {t.duplicate}
+        </ContextMenuItem>
+        <ContextMenuItem
+          variant="destructive"
+          onClick={(e) => {
+            e.stopPropagation()
+            onDelete()
+          }}
+        >
           {t.delete}
         </ContextMenuItem>
       </ContextMenuContent>

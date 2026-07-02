@@ -15,7 +15,7 @@ interface DayHeaderRowProps {
 export function DayHeaderRow({ days, theme }: DayHeaderRowProps) {
   return (
     <div
-      className="sticky top-0 z-[6] flex border-b"
+      className="sticky top-0 z-30 flex border-b"
       style={{ background: theme.panel, borderColor: theme.borderStrong }}
     >
       <div className="w-16 flex-shrink-0" />

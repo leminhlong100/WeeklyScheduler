@@ -13,6 +13,7 @@ export const STICKER_CATEGORIES: StickerCategoryInfo[] = [
   { id: 'food', emoji: '🍓' },
   { id: 'objects', emoji: '✏️' },
   { id: 'shapes', emoji: '⭐' },
+  { id: 'custom', emoji: '📌' },
 ]
 
 const SHAPE_ITEMS: TrayItem[] = [

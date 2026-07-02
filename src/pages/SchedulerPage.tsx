@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
+import { toast } from 'sonner'
 import { useTranslation } from '@/features/i18n/LocaleContext'
 import { useTheme } from '@/features/theme/ThemeContext'
 import { ThemePickerModal } from '@/features/theme/components/ThemePickerModal'
@@ -11,6 +12,7 @@ import { useCategories } from '@/features/categories/hooks/useCategories'
 import { useActiveCategoryFilter } from '@/features/categories/hooks/useActiveCategoryFilter'
 import { CategoryManagerModal } from '@/features/categories/components/CategoryManagerModal'
 import { useTasksForWeek } from '@/features/tasks/hooks/useTasksForWeek'
+import { useCopyPreviousWeek } from '@/features/tasks/hooks/useTaskMutations'
 import { WeekGrid } from '@/features/tasks/components/WeekGrid'
 import { TaskFormModal, type TaskDraft } from '@/features/tasks/components/TaskFormModal'
 import { StickersOverlay } from '@/features/stickers/components/StickersOverlay'
@@ -40,6 +42,7 @@ export function SchedulerPage() {
   const { data: categories = [] } = useCategories()
   const { isActive, toggle } = useActiveCategoryFilter()
   const { data: tasks = [] } = useTasksForWeek(weekStart)
+  const copyPreviousWeek = useCopyPreviousWeek(weekStart)
 
   const [sidebarOpen, setSidebarOpen] = useState(true)
   const [themePickerOpen, setThemePickerOpen] = useState(false)
@@ -77,6 +80,16 @@ export function SchedulerPage() {
     const todayISO = toISODate(new Date())
     const taskDate = todayISO >= weekStartISO ? todayISO : weekStartISO
     setTaskDraft({ taskDate, startMinute: 540 })
+  }
+
+  const handleCopyLastWeek = () => {
+    copyPreviousWeek.mutate(undefined, {
+      onSuccess: (created) => {
+        if (created.length === 0) toast(t.noTasksLastWeek)
+        else toast.success(t.weekCopied)
+      },
+      onError: () => toast.error(t.somethingWentWrong),
+    })
   }
 
   return (
@@ -120,6 +133,8 @@ export function SchedulerPage() {
           onToday={goToday}
           onOpenTheme={() => setThemePickerOpen(true)}
           onNewEvent={openNewEventFromHeader}
+          onCopyLastWeek={handleCopyLastWeek}
+          copyLastWeekPending={copyPreviousWeek.isPending}
           userMenu={<UserMenu />}
         />
       }

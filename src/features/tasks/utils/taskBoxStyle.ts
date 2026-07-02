@@ -9,7 +9,15 @@ export interface TaskBoxStyle {
 }
 
 /** Tints a category's accent color into a soft task-block background/text pair. */
-export function taskBoxStyle(color: string, theme: DerivedTheme): TaskBoxStyle {
+export function taskBoxStyle(color: string, theme: DerivedTheme, isCurrent = false): TaskBoxStyle {
+  if (isCurrent) {
+    return {
+      bg: color,
+      fg: '#ffffff',
+      border: `1.5px solid ${mixColors(color, '#ffffff', 0.35)}`,
+      shadow: `0 0 0 2px ${rgba(color, 0.35)}, 0 10px 24px ${rgba(color, 0.45)}`,
+    }
+  }
   if (theme.dark) {
     return {
       bg: mixColors(color, '#1c1f3d', 0.62),

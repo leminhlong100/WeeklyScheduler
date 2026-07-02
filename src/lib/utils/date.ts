@@ -14,10 +14,14 @@ export function addDays(d: Dayjs, days: number): Dayjs {
   return d.add(days, 'day')
 }
 
+/** `d`'s position in a Mon-first week: Mon=0..Sun=6. */
+export function weekdayMondayIndex(d: Dayjs): number {
+  return (d.day() + 6) % 7 // Sun=0..Sat=6 -> Mon=0..Sun=6
+}
+
 /** Monday of the ISO week containing `d` (week starts Monday, ends Sunday). */
 export function startOfWeekMonday(d: Dayjs): Dayjs {
-  const weekday = (d.day() + 6) % 7 // Sun=0..Sat=6 -> Mon=0..Sun=6
-  return addDays(d, -weekday).startOf('day')
+  return addDays(d, -weekdayMondayIndex(d)).startOf('day')
 }
 
 export function isSameDate(a: Dayjs, b: Dayjs): boolean {

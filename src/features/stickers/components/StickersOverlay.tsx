@@ -2,6 +2,7 @@ import { useState, type ReactNode } from 'react'
 import type { Dictionary } from '@/features/i18n/dictionary'
 import type { DerivedTheme } from '@/features/theme/types'
 import { useStickers } from '../hooks/useStickers'
+import { useCustomStickers } from '../hooks/useCustomStickers'
 import { useStickerPointerInteractions } from '../hooks/useStickerPointerInteractions'
 import { StickerLayer } from './StickerLayer'
 import { PlacingGhost } from './PlacingGhost'
@@ -32,6 +33,7 @@ export function StickersOverlay({ t, theme, children }: StickersOverlayProps) {
     deleteSticker,
     clearAll,
   } = useStickers()
+  const { customItems, addCustomSticker, removeCustomSticker } = useCustomStickers()
   const { placing, startPlace, startStickerDrag } = useStickerPointerInteractions({
     addSticker,
     moveSticker,
@@ -80,6 +82,9 @@ export function StickersOverlay({ t, theme, children }: StickersOverlayProps) {
         onToggleEditMode={toggleEditMode}
         onItemPointerDown={startPlace}
         onClearAll={clearAll}
+        customItems={customItems}
+        onAddCustom={addCustomSticker}
+        onRemoveCustom={removeCustomSticker}
       />
     </>
   )

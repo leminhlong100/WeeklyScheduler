@@ -4,6 +4,12 @@
  * and this file will still slot in as `Database` for the client below.
  */
 
+export interface TaskNoteItem {
+  id: string
+  text: string
+  done: boolean
+}
+
 export type Locale = 'vi' | 'en' | 'zh' | 'ja'
 export type ThemeKey =
   | 'lavender'
@@ -83,6 +89,7 @@ export interface Database {
           task_date: string
           start_minute: number
           duration_minute: number
+          notes: TaskNoteItem[]
           created_at: string
           updated_at: string
         }
@@ -94,6 +101,7 @@ export interface Database {
           task_date: string
           start_minute: number
           duration_minute: number
+          notes?: TaskNoteItem[]
         }
         Update: {
           category_id?: string | null
@@ -101,6 +109,7 @@ export interface Database {
           task_date?: string
           start_minute?: number
           duration_minute?: number
+          notes?: TaskNoteItem[]
         }
         Relationships: []
       }

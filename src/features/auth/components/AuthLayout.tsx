@@ -22,6 +22,7 @@ export function AuthLayout({ title, subtitle, children, footer }: AuthLayoutProp
           background: theme.panel,
           borderColor: theme.borderStrong,
           boxShadow: theme.windowShadow,
+          color: theme.text,
         }}
       >
         <div className="mb-6 flex items-center gap-3">

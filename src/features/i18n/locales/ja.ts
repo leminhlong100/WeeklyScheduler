@@ -19,6 +19,13 @@ export const ja: Dictionary = {
   addEvent: '予定を追加',
   editEvent: '予定を編集',
   duplicate: '複製',
+  copyLastWeek: '先週をコピー',
+  repeatOnDays: '繰り返す曜日',
+
+  note: 'メモ',
+  noteAddItemPh: 'やることを追加…',
+  editNote: 'メモを編集',
+  closeNote: 'メモを閉じる',
 
   stickers: 'ステッカー',
   editStickers: 'アイコン編集',
@@ -33,6 +40,8 @@ export const ja: Dictionary = {
   stickerCatFood: '食べ物',
   stickerCatObjects: '文房具',
   stickerCatShapes: '図形',
+  stickerCatCustom: 'マイステッカー',
+  addCustomSticker: '自分のステッカーを追加',
 
   manageCategories: 'カテゴリ管理',
   addCategory: 'カテゴリを追加',
@@ -73,6 +82,8 @@ export const ja: Dictionary = {
   taskUpdated: '予定を更新しました',
   taskDeleted: '予定を削除しました',
   taskDuplicated: '予定を複製しました',
+  weekCopied: '先週の予定をコピーしました',
+  noTasksLastWeek: '先週にコピーできる予定がありません',
   categoryCreated: 'カテゴリを作成しました',
   categoryUpdated: 'カテゴリを更新しました',
   categoryDeleted: 'カテゴリを削除しました',

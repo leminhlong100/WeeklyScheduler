@@ -21,6 +21,13 @@ export interface Dictionary {
   addEvent: string
   editEvent: string
   duplicate: string
+  copyLastWeek: string
+  repeatOnDays: string
+
+  note: string
+  noteAddItemPh: string
+  editNote: string
+  closeNote: string
 
   stickers: string
   editStickers: string
@@ -35,6 +42,8 @@ export interface Dictionary {
   stickerCatFood: string
   stickerCatObjects: string
   stickerCatShapes: string
+  stickerCatCustom: string
+  addCustomSticker: string
 
   manageCategories: string
   addCategory: string
@@ -75,6 +84,8 @@ export interface Dictionary {
   taskUpdated: string
   taskDeleted: string
   taskDuplicated: string
+  weekCopied: string
+  noTasksLastWeek: string
   categoryCreated: string
   categoryUpdated: string
   categoryDeleted: string
