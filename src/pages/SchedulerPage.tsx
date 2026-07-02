@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { toast } from 'sonner'
+import { useIsMobile } from '@/hooks/useMediaQuery'
 import { useTranslation } from '@/features/i18n/LocaleContext'
 import { useTheme } from '@/features/theme/ThemeContext'
 import { ThemePickerModal } from '@/features/theme/components/ThemePickerModal'
@@ -44,10 +45,22 @@ export function SchedulerPage() {
   const { data: tasks = [] } = useTasksForWeek(weekStart)
   const copyPreviousWeek = useCopyPreviousWeek(weekStart)
 
-  const [sidebarOpen, setSidebarOpen] = useState(true)
+  const isMobile = useIsMobile()
+  const [sidebarOpen, setSidebarOpen] = useState(!isMobile)
   const [themePickerOpen, setThemePickerOpen] = useState(false)
   const [categoryManagerOpen, setCategoryManagerOpen] = useState(false)
   const [taskDraft, setTaskDraft] = useState<TaskDraft | null>(null)
+
+  // The sidebar behaves as a push panel on desktop but an off-canvas drawer
+  // on mobile — flip its default open state whenever the breakpoint changes
+  // (e.g. device rotation) so it isn't left covering the screen or hidden.
+  // Adjusted during render (not an effect) per React's guidance for state
+  // that depends on a prop change, to avoid an extra committed render.
+  const [prevIsMobile, setPrevIsMobile] = useState(isMobile)
+  if (isMobile !== prevIsMobile) {
+    setPrevIsMobile(isMobile)
+    setSidebarOpen(!isMobile)
+  }
 
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
@@ -76,6 +89,11 @@ export function SchedulerPage() {
     [categories, tasks, isActive],
   )
 
+  const handlePickDay = (iso: string) => {
+    pickDay(iso)
+    if (isMobile) setSidebarOpen(false)
+  }
+
   const openNewEventFromHeader = () => {
     const todayISO = toISODate(new Date())
     const taskDate = todayISO >= weekStartISO ? todayISO : weekStartISO
@@ -102,6 +120,7 @@ export function SchedulerPage() {
           t={t}
           locale={locale}
           onLocaleChange={setLocale}
+          onClose={() => setSidebarOpen(false)}
           categories={sidebarCategories}
           onToggleCategory={toggle}
           onManageCategories={() => setCategoryManagerOpen(true)}
@@ -116,7 +135,7 @@ export function SchedulerPage() {
               selected={selected}
               onPrevMonth={miniPrevMonth}
               onNextMonth={miniNextMonth}
-              onPickDay={pickDay}
+              onPickDay={handlePickDay}
             />
           }
         />
@@ -142,6 +161,7 @@ export function SchedulerPage() {
       <StickersOverlay t={t} theme={theme}>
         <WeekGrid
           weekStart={weekStart}
+          selected={selected}
           tasks={tasks}
           categories={categories}
           isCategoryActive={isActive}

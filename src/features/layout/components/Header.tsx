@@ -66,17 +66,26 @@ export function Header({
 }: HeaderProps) {
   return (
     <header
-      className="relative z-[3] flex flex-shrink-0 flex-wrap items-center gap-[13px] border-b px-[22px] py-[15px]"
+      className="relative z-[3] flex flex-shrink-0 flex-wrap items-center gap-2 border-b px-3 py-2.5 sm:gap-[13px] sm:px-[22px] sm:py-[15px]"
       style={{ borderColor: theme.border, background: theme.panel }}
     >
-      <ChromeButton onClick={onToggleSidebar} theme={theme} title="Menu">
+      <ChromeButton onClick={onToggleSidebar} theme={theme} className="order-1 w-10 sm:order-1" title="Menu">
         <div
           className="h-0.5 w-[15px] rounded-full"
           style={{ background: 'currentColor', boxShadow: '0 5px 0 currentColor, 0 -5px 0 currentColor' }}
         />
       </ChromeButton>
 
-      <div className="flex items-center gap-1.5">
+      <div
+        className="font-heading order-2 flex-1 text-[15px] font-extrabold whitespace-nowrap sm:order-3 sm:flex-initial sm:text-[21px]"
+        style={{ color: theme.text }}
+      >
+        {weekRangeLabel}
+      </div>
+
+      <div className="order-3 sm:hidden">{userMenu}</div>
+
+      <div className="order-5 flex w-full items-center gap-1.5 overflow-x-auto pb-0.5 sm:order-2 sm:w-auto sm:overflow-visible">
         <ChromeButton onClick={onPrevWeek} theme={theme} className="w-10 text-lg">
           ‹
         </ChromeButton>
@@ -90,35 +99,34 @@ export function Header({
           onClick={onCopyLastWeek}
           theme={theme}
           disabled={copyLastWeekPending}
-          className="w-auto gap-1.5 px-4"
+          className="w-auto gap-1.5 px-3 sm:px-4"
         >
           <CopyIcon className="size-4" />
-          {t.copyLastWeek}
+          <span className="hidden sm:inline">{t.copyLastWeek}</span>
         </ChromeButton>
       </div>
 
-      <div className="font-heading text-[21px] font-extrabold whitespace-nowrap" style={{ color: theme.text }}>
-        {weekRangeLabel}
-      </div>
-
-      <div className="flex-1" />
+      <div className="order-4 hidden flex-1 sm:block" />
 
       <button
         type="button"
         onClick={onOpenTheme}
-        className="flex h-10 items-center gap-2 rounded-2xl border-[1.5px] px-[15px] text-[13.5px] font-bold"
+        className="order-6 flex h-10 w-10 flex-shrink-0 items-center justify-center gap-2 rounded-2xl border-[1.5px] text-[13.5px] font-bold sm:order-5 sm:w-auto sm:px-[15px]"
         style={{ borderColor: theme.border, background: theme.chip, color: theme.text }}
       >
         <span className="text-base leading-none">🎨</span>
-        {currentThemeName}
+        <span className="hidden sm:inline">{currentThemeName}</span>
       </button>
 
-      <GradientButton onClick={onNewEvent} className="h-10 gap-1.5 px-[18px] text-[13.5px]">
+      <GradientButton
+        onClick={onNewEvent}
+        className="order-7 h-10 gap-1.5 px-3 text-[13.5px] sm:order-6 sm:px-[18px]"
+      >
         <PlusIcon className="size-4" />
-        {t.newEvent}
+        <span className="hidden sm:inline">{t.newEvent}</span>
       </GradientButton>
 
-      {userMenu}
+      <div className="order-8 hidden sm:order-7 sm:block">{userMenu}</div>
     </header>
   )
 }

@@ -2,6 +2,7 @@ import { useRef, useState, type ChangeEvent, type PointerEvent } from 'react'
 import { toast } from 'sonner'
 import type { Dictionary } from '@/features/i18n/dictionary'
 import type { DerivedTheme } from '@/features/theme/types'
+import { cn } from '@/lib/utils'
 import { GradientButton } from '@/components/common/GradientButton'
 import { STICKER_CATEGORIES, STICKER_TRAY_ITEMS } from '../data/stickerCatalog'
 import type { StickerCategory, TrayImageItem, TrayItem } from '../types'
@@ -57,10 +58,10 @@ export function StickerTray({
   }
 
   return (
-    <div className="fixed right-[22px] bottom-[22px] z-[92] flex flex-col items-end gap-2.5">
+    <div className="fixed right-3 bottom-3 z-[92] flex flex-col items-end gap-2.5 sm:right-[22px] sm:bottom-[22px]">
       {open && (
         <div
-          className="flex h-[68vh] w-[264px] flex-col overflow-hidden rounded-[20px] border-[1.5px] p-[14px] shadow-2xl"
+          className="flex h-[60vh] w-[calc(100vw-24px)] max-w-[264px] flex-col overflow-hidden rounded-[20px] border-[1.5px] p-[14px] shadow-2xl sm:h-[68vh]"
           style={{ background: theme.panel, borderColor: theme.border }}
         >
           <div className="mb-1.5 flex shrink-0 items-center justify-between">
@@ -150,19 +151,25 @@ export function StickerTray({
         <button
           type="button"
           onClick={onToggleEditMode}
-          className="flex h-10 items-center gap-1.5 rounded-2xl border-[1.5px] px-[15px] text-[12.5px] font-extrabold shadow-lg"
+          className={cn(
+            'flex h-11 items-center justify-center gap-1.5 rounded-full border-[1.5px] font-extrabold shadow-lg transition-all',
+            editMode ? 'px-[15px] text-[12.5px]' : 'w-11',
+          )}
           style={{
             borderColor: editMode ? theme.accent : theme.border,
             background: editMode ? theme.accent : theme.panel,
             color: editMode ? '#fff' : theme.text,
           }}
         >
-          <span className="text-[15px] leading-none">✏️</span>
-          {t.editStickers}
+          <span className="text-[17px] leading-none">✏️</span>
+          {editMode && t.editStickers}
         </button>
-        <GradientButton onClick={onToggleOpen} className="h-10 gap-1.5 rounded-2xl px-[15px] text-[12.5px]">
-          <span className="text-[15px] leading-none">🌈</span>
-          {t.stickers}
+        <GradientButton
+          onClick={onToggleOpen}
+          className={cn('h-11 justify-center gap-1.5 rounded-full transition-all', open ? 'px-[15px] text-[12.5px]' : 'w-11')}
+        >
+          <span className="text-[17px] leading-none">🌈</span>
+          {open && t.stickers}
         </GradientButton>
       </div>
     </div>

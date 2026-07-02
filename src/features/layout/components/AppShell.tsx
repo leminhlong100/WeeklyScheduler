@@ -13,7 +13,7 @@ interface AppShellProps {
 export function AppShell({ theme, sidebar, header, children }: AppShellProps) {
   return (
     <div
-      className="scrollbar-hidden relative flex min-h-screen w-full items-center justify-center overflow-auto p-[26px]"
+      className="scrollbar-hidden relative flex h-[100dvh] w-full items-center justify-center overflow-auto p-0 sm:p-[26px]"
       style={{
         background: theme.pageBg,
         color: theme.text,
@@ -23,7 +23,7 @@ export function AppShell({ theme, sidebar, header, children }: AppShellProps) {
       <DecorBackground theme={theme} variant="main" />
 
       <div
-        className="relative z-[1] flex h-[calc(100vh-52px)] w-full max-w-[1460px] flex-col overflow-hidden rounded-[26px]"
+        className="relative z-[1] flex h-[100dvh] w-full max-w-full flex-col overflow-hidden rounded-none sm:h-[calc(100vh-52px)] sm:max-w-[1460px] sm:rounded-[26px]"
         style={{
           background: theme.panel,
           border: `1.5px solid ${theme.borderStrong}`,

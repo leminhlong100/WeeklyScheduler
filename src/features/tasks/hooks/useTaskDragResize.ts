@@ -31,6 +31,10 @@ interface UseTaskDragResizeOptions {
   weekStart: Dayjs
   snapMinutes: number
   gridRef: RefObject<HTMLDivElement | null>
+  /** Number of day columns spanning `gridRef`'s width — used to translate horizontal drag distance into a day change. */
+  columns?: number
+  /** When true, dragging never changes which day a task belongs to (e.g. a single-day mobile view has nowhere to drag it to). */
+  lockDay?: boolean
   getTaskOrigin: (id: string) => TaskOrigin | undefined
   onMove: (id: string, next: { dayIndex: number; startMinute: number }) => void
   onResize: (id: string, next: { durationMinute: number }) => void
@@ -48,6 +52,8 @@ export function useTaskDragResize({
   weekStart,
   snapMinutes,
   gridRef,
+  columns = 7,
+  lockDay = false,
   getTaskOrigin,
   onMove,
   onResize,
@@ -63,6 +69,8 @@ export function useTaskDragResize({
   // they read these refs (kept fresh via effect, not during render) instead
   // of stale closures over `onMove`/`onResize`/`onClickTask`/`onDoubleClickTask`.
   const snapRef = useRef(snapMinutes)
+  const columnsRef = useRef(columns)
+  const lockDayRef = useRef(lockDay)
   const onMoveRef = useRef(onMove)
   const onResizeRef = useRef(onResize)
   const onClickRef = useRef(onClickTask)
@@ -71,11 +79,13 @@ export function useTaskDragResize({
 
   useEffect(() => {
     snapRef.current = snapMinutes
+    columnsRef.current = columns
+    lockDayRef.current = lockDay
     onMoveRef.current = onMove
     onResizeRef.current = onResize
     onClickRef.current = onClickTask
     onDoubleClickRef.current = onDoubleClickTask
-  }, [snapMinutes, onMove, onResize, onClickTask, onDoubleClickTask])
+  }, [snapMinutes, columns, lockDay, onMove, onResize, onClickTask, onDoubleClickTask])
 
   useEffect(() => {
     return () => {
@@ -129,10 +139,13 @@ export function useTaskDragResize({
         return
       }
 
-      const gridEl = gridRef.current
-      const colWidth = gridEl ? gridEl.getBoundingClientRect().width / 7 : 1
-      const dayDelta = Math.round(dxPx / colWidth)
-      const dayIndex = Math.max(0, Math.min(6, drag.dayIndex + dayDelta))
+      let dayIndex = drag.dayIndex
+      if (!lockDayRef.current) {
+        const gridEl = gridRef.current
+        const colWidth = gridEl ? gridEl.getBoundingClientRect().width / columnsRef.current : 1
+        const dayDelta = Math.round(dxPx / colWidth)
+        dayIndex = Math.max(0, Math.min(6, drag.dayIndex + dayDelta))
+      }
       const startMinute = clampStartMinute(drag.startMinute + deltaMinutes, drag.durationMinute)
       onMoveRef.current(drag.id, { dayIndex, startMinute })
     }

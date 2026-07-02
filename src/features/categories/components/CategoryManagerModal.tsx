@@ -42,7 +42,7 @@ export function CategoryManagerModal({ open, onOpenChange }: CategoryManagerModa
     <Dialog open={open} onOpenChange={(next) => (next ? onOpenChange(true) : close())}>
       <DialogContent
         showCloseButton={false}
-        className="max-w-[440px] rounded-[26px] border-[1.5px] p-6"
+        className="max-h-[85vh] w-[calc(100%-2rem)] max-w-[440px] overflow-y-auto rounded-[26px] border-[1.5px] p-5 sm:p-6"
         style={{ background: theme.modalBg, borderColor: theme.border, color: theme.text }}
       >
         <DialogTitle className="font-heading text-xl font-extrabold" style={{ color: theme.text }}>

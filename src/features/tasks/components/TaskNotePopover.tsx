@@ -3,6 +3,7 @@ import { Pencil, Plus, Trash2, X } from 'lucide-react'
 import { GradientButton } from '@/components/common/GradientButton'
 import { Input } from '@/components/ui/input'
 import { useTranslation } from '@/features/i18n/LocaleContext'
+import { useIsMobile } from '@/hooks/useMediaQuery'
 import type { DerivedTheme } from '@/features/theme/types'
 import { rgba } from '@/lib/utils/color'
 import { minutesToTopPx } from '../utils/gridMath'
@@ -28,6 +29,7 @@ interface TaskNotePopoverProps {
  */
 export function TaskNotePopover({ task, theme, side, onClose, onSave }: TaskNotePopoverProps) {
   const { t } = useTranslation()
+  const isMobile = useIsMobile()
   const [items, setItems] = useState<TaskNoteItem[]>(task.notes)
   const [isEditing, setIsEditing] = useState(false)
 
@@ -59,12 +61,22 @@ export function TaskNotePopover({ task, theme, side, onClose, onSave }: TaskNote
   const tailStyle: CSSProperties =
     side === 'right' ? { left: -7, top: 18 } : { right: -7, top: 18 }
 
-  return (
-    <div
-      className="absolute z-[100] w-[270px] rounded-[18px] border-[1.5px] p-3.5"
-      style={{
+  const positionStyle: CSSProperties = isMobile
+    ? { left: 12, right: 12, bottom: 12 }
+    : {
         top: minutesToTopPx(task.startMinute),
         [side === 'right' ? 'left' : 'right']: 'calc(100% + 14px)',
+      }
+
+  return (
+    <div
+      className={
+        isMobile
+          ? 'fixed z-[100] w-auto max-w-[400px] rounded-[18px] border-[1.5px] p-3.5 shadow-2xl'
+          : 'absolute z-[100] w-[270px] rounded-[18px] border-[1.5px] p-3.5'
+      }
+      style={{
+        ...positionStyle,
         background: theme.modalBg,
         borderColor: theme.border,
         boxShadow: theme.windowShadow,
@@ -73,10 +85,12 @@ export function TaskNotePopover({ task, theme, side, onClose, onSave }: TaskNote
       onClick={(e) => e.stopPropagation()}
       onPointerDown={(e) => e.stopPropagation()}
     >
-      <div
-        className="absolute size-3.5 rotate-45 border-[1.5px]"
-        style={{ background: theme.modalBg, borderColor: theme.border, ...tailStyle }}
-      />
+      {!isMobile && (
+        <div
+          className="absolute size-3.5 rotate-45 border-[1.5px]"
+          style={{ background: theme.modalBg, borderColor: theme.border, ...tailStyle }}
+        />
+      )}
 
       <div className="relative flex items-center justify-between gap-2">
         <div className="min-w-0 truncate text-[13px] font-extrabold" style={{ color: theme.text }}>

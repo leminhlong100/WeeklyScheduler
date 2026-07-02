@@ -3,6 +3,7 @@ import type { Dayjs } from 'dayjs'
 import { toast } from 'sonner'
 import type { DerivedTheme } from '@/features/theme/types'
 import type { Dictionary } from '@/features/i18n/dictionary'
+import { useIsMobile } from '@/hooks/useMediaQuery'
 import { addDays, parseISODate, todayISO as getTodayISO, toISODate } from '@/lib/utils/date'
 import { CREATE_SNAP_MINUTES, DEFAULT_SNAP_MINUTES, GRID_END_MINUTE, GRID_START_MINUTE, HOUR_HEIGHT_PX } from '@/constants/grid'
 import type { Category } from '@/features/categories/api/categoriesApi'
@@ -18,6 +19,7 @@ import { DayColumn } from './DayColumn'
 
 interface WeekGridProps {
   weekStart: Dayjs
+  selected: Dayjs
   tasks: Task[]
   categories: Category[]
   isCategoryActive: (categoryId: string) => boolean
@@ -29,6 +31,7 @@ interface WeekGridProps {
 
 export function WeekGrid({
   weekStart,
+  selected,
   tasks,
   categories,
   isCategoryActive,
@@ -37,6 +40,7 @@ export function WeekGrid({
   onRequestCreate,
   onRequestEdit,
 }: WeekGridProps) {
+  const isMobile = useIsMobile()
   const gridRef = useRef<HTMLDivElement>(null)
   const nowMinutes = useNowMinutes()
   const todayISO = getTodayISO()
@@ -55,6 +59,19 @@ export function WeekGrid({
       return { key: iso, dow: t.dow[i], dayNum: date.date(), isToday: iso === todayISO }
     })
   }, [weekStart, t.dow, todayISO])
+
+  // Keeps the mobile single-day view in sync with the mini-calendar's
+  // selected day. Adjusted during render (not an effect) per React's
+  // guidance for state that depends on a prop change.
+  const selectedDayKey = `${selected.valueOf()}-${weekStart.valueOf()}`
+  const [mobileDayIndex, setMobileDayIndex] = useState(() =>
+    Math.max(0, Math.min(6, selected.diff(weekStart, 'day'))),
+  )
+  const [prevSelectedDayKey, setPrevSelectedDayKey] = useState(selectedDayKey)
+  if (selectedDayKey !== prevSelectedDayKey) {
+    setPrevSelectedDayKey(selectedDayKey)
+    setMobileDayIndex(Math.max(0, Math.min(6, selected.diff(weekStart, 'day'))))
+  }
 
   const tasksByDay = useMemo<TaskWithCategory[][]>(() => {
     const byDay: TaskWithCategory[][] = Array.from({ length: 7 }, () => [])
@@ -90,6 +107,8 @@ export function WeekGrid({
     weekStart,
     snapMinutes: DEFAULT_SNAP_MINUTES,
     gridRef,
+    columns: isMobile ? 1 : 7,
+    lockDay: isMobile,
     getTaskOrigin,
     onMove: (id, { dayIndex, startMinute }) => {
       updateTask.mutate({
@@ -140,6 +159,67 @@ export function WeekGrid({
       GRID_START_MINUTE + Math.round((y / HOUR_HEIGHT_PX / CREATE_SNAP_MINUTES) * 60) * CREATE_SNAP_MINUTES
     minute = Math.max(GRID_START_MINUTE, Math.min(minute, GRID_END_MINUTE - 60))
     onRequestCreate(toISODate(addDays(weekStart, dayIndex)), minute)
+  }
+
+  if (isMobile) {
+    return (
+      <div>
+        <div
+          className="sticky top-0 z-30 flex gap-1.5 overflow-x-auto border-b px-2.5 py-2 scrollbar-hidden"
+          style={{ background: theme.panel, borderColor: theme.borderStrong }}
+        >
+          {days.map((day, dayIndex) => {
+            const active = dayIndex === mobileDayIndex
+            return (
+              <button
+                key={day.key}
+                type="button"
+                onClick={() => setMobileDayIndex(dayIndex)}
+                className="flex flex-shrink-0 flex-col items-center gap-0.5 rounded-2xl px-2.5 py-1.5"
+                style={{
+                  background: active ? theme.brandGrad : 'transparent',
+                  boxShadow: active ? `0 5px 13px ${theme.brandShadow}` : 'none',
+                }}
+              >
+                <span
+                  className="text-[10px] font-extrabold uppercase tracking-wide"
+                  style={{ color: active ? 'rgba(255,255,255,0.85)' : theme.muted }}
+                >
+                  {day.dow}
+                </span>
+                <span
+                  className="font-heading text-[15px] font-extrabold"
+                  style={{ color: active ? '#fff' : day.isToday ? theme.accent : theme.text }}
+                >
+                  {day.dayNum}
+                </span>
+              </button>
+            )
+          })}
+        </div>
+        <div className="relative flex">
+          <HourRuler theme={theme} />
+          <div ref={gridRef} className="relative min-w-0 flex-1">
+            <DayColumn
+              theme={theme}
+              tasks={tasksByDay[mobileDayIndex]}
+              isToday={days[mobileDayIndex].isToday}
+              dayIndex={mobileDayIndex}
+              nowMinutes={days[mobileDayIndex].isToday ? nowMinutes : null}
+              nowTopPx={days[mobileDayIndex].isToday ? minutesToTopPx(nowMinutes) : null}
+              dragPreview={preview}
+              openNoteTaskId={openNoteTaskId}
+              onCreateAt={(clientY, boundingTop) => handleCreateAt(mobileDayIndex, clientY, boundingTop)}
+              onStartDrag={startDrag}
+              onDuplicateTask={handleDuplicateTask}
+              onDeleteTask={handleDeleteTask}
+              onCloseNote={() => setOpenNoteTaskId(null)}
+              onSaveNotes={handleSaveNotes}
+            />
+          </div>
+        </div>
+      </div>
+    )
   }
 
   return (

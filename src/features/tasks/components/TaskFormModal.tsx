@@ -168,13 +168,13 @@ export function TaskFormModal({ draft, weekStartISO, onClose }: TaskFormModalPro
     <Dialog open onOpenChange={(next) => !next && onClose()}>
       <DialogContent
         showCloseButton={false}
-        className="max-w-[440px] overflow-hidden rounded-[26px] border-[1.5px] p-0"
+        className="w-[calc(100%-2rem)] max-w-[440px] overflow-hidden rounded-[26px] border-[1.5px] p-0"
         style={{ background: theme.modalBg, borderColor: theme.border, color: theme.text }}
       >
         <div className="h-2" style={{ background: theme.brandGrad }} />
         <form
           onSubmit={form.handleSubmit(onSubmit)}
-          className="flex flex-col gap-4 px-6 py-5"
+          className="flex max-h-[85vh] flex-col gap-4 overflow-y-auto px-5 py-5 sm:px-6"
         >
           <div className="flex items-center justify-between">
             <DialogTitle className="font-heading text-xl font-extrabold" style={{ color: theme.text }}>
@@ -294,7 +294,7 @@ export function TaskFormModal({ draft, weekStartISO, onClose }: TaskFormModalPro
             </div>
           </div>
 
-          <div className="mt-1 flex items-center gap-3">
+          <div className="mt-1 flex flex-wrap items-center gap-2 sm:gap-3">
             {isEdit && (
               <Button
                 type="button"
