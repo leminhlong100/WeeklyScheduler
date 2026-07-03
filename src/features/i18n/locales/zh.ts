@@ -31,6 +31,8 @@ export const zh: Dictionary = {
   editStickers: '编辑图标',
   stickerTitle: '贴纸盒',
   dragHint: '把图标拖到屏幕上吧！✨',
+  tapHint: '点一下图标就能贴到屏幕上！✨',
+  stickerDone: '完成',
   clearAll: '清空',
   themeTitle: '选择可爱主题',
   themeSub: '随时切换 — 都很可爱 ♡',

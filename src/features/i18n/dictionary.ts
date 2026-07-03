@@ -33,6 +33,10 @@ export interface Dictionary {
   editStickers: string
   stickerTitle: string
   dragHint: string
+  /** Mobile variant of dragHint — touch taps to place instead of dragging. */
+  tapHint: string
+  /** Mobile floating pill that exits sticker edit mode after the tray auto-closes. */
+  stickerDone: string
   clearAll: string
   themeTitle: string
   themeSub: string

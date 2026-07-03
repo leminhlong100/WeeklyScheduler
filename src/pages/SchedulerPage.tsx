@@ -212,6 +212,7 @@ export function SchedulerPage() {
         editMode={stickerEditMode}
         trayOpen={stickerTrayOpen}
         onCloseTray={closeStickerTray}
+        onTrayAutoClose={() => setStickerTrayOpen(false)}
         onToggleDesktopPanel={toggleStickerPanel}
       >
         <WeekGrid

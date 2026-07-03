@@ -31,6 +31,8 @@ export const en: Dictionary = {
   editStickers: 'Edit icons',
   stickerTitle: 'Sticker box',
   dragHint: 'Drag any icon onto the screen! ✨',
+  tapHint: 'Tap an icon to place it! ✨',
+  stickerDone: 'Done',
   clearAll: 'Clear all',
   themeTitle: 'Pick a cute theme',
   themeSub: 'Switch anytime — all adorable ♡',

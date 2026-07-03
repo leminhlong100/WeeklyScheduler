@@ -1,12 +1,13 @@
 import { useEffect, useState, type ReactNode } from 'react'
 import { createPortal } from 'react-dom'
+import { CheckIcon } from 'lucide-react'
 import { toast } from 'sonner'
 import type { Dictionary } from '@/features/i18n/dictionary'
 import type { DerivedTheme } from '@/features/theme/types'
 import { cn } from '@/lib/utils'
 import { GradientButton } from '@/components/common/GradientButton'
 import { STICKER_CATEGORIES } from '../data/stickerCatalog'
-import type { StickerCategory } from '../types'
+import type { StickerCategory, TrayItem } from '../types'
 import { useStickers } from '../hooks/useStickers'
 import { useCustomStickers } from '../hooks/useCustomStickers'
 import { useStickerPointerInteractions } from '../hooks/useStickerPointerInteractions'
@@ -22,6 +23,8 @@ interface StickersOverlayProps {
   editMode: boolean
   trayOpen: boolean
   onCloseTray: () => void
+  /** Closes the tray but keeps edit mode on — used after a tap places a sticker, so its handles stay usable. */
+  onTrayAutoClose: () => void
   onToggleDesktopPanel: () => void
 }
 
@@ -44,6 +47,7 @@ export function StickersOverlay({
   editMode,
   trayOpen,
   onCloseTray,
+  onTrayAutoClose,
   onToggleDesktopPanel,
 }: StickersOverlayProps) {
   const [category, setCategory] = useState<StickerCategory>(STICKER_CATEGORIES[0].id)
@@ -80,6 +84,14 @@ export function StickersOverlay({
     return result
   }
 
+  // Touch flow: tap places the sticker mid-screen (slightly above center so
+  // the hand/action bar doesn't hide it) and closes the tray — but keeps
+  // edit mode on, so the new sticker's handles are immediately usable.
+  const handleItemTap = (item: TrayItem) => {
+    addSticker(item, Math.round(window.innerWidth / 2), Math.round(window.innerHeight * 0.38))
+    onTrayAutoClose()
+  }
+
   return (
     <>
       {children}
@@ -107,12 +119,26 @@ export function StickersOverlay({
               onCategoryChange={setCategory}
               onClose={onCloseTray}
               onItemPointerDown={startPlace}
+              onItemTap={handleItemTap}
               onClearAll={clearAll}
               customItems={customItems}
               isSyncingCustom={isSyncing}
               onAddCustom={handleAddCustom}
               onRemoveCustom={removeCustomSticker}
             />
+          )}
+          {/* Mobile-only "done" pill: after a tap-place auto-closes the tray,
+              edit mode intentionally stays on so the new sticker can be
+              adjusted — this is the visible way out of it (the tray's own X
+              exits edit mode, but the tray is closed in that state). */}
+          {editMode && !trayOpen && (
+            <GradientButton
+              onClick={onToggleDesktopPanel}
+              className="flex h-11 items-center gap-1.5 rounded-full px-4 text-[13px] sm:hidden"
+            >
+              <CheckIcon className="size-4" />
+              {t.stickerDone}
+            </GradientButton>
           )}
           {/* Mobile drives this from the header's "..." menu instead — a floating
               FAB here would be too easy to tap by accident while scrolling.

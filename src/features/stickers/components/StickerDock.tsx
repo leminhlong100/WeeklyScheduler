@@ -2,6 +2,7 @@ import { useRef, type ChangeEvent, type PointerEvent } from 'react'
 import { XIcon } from 'lucide-react'
 import type { Dictionary } from '@/features/i18n/dictionary'
 import type { DerivedTheme } from '@/features/theme/types'
+import { useIsMobile } from '@/hooks/useMediaQuery'
 import { STICKER_CATEGORIES, STICKER_TRAY_ITEMS } from '../data/stickerCatalog'
 import type { StickerCategory, TrayImageItem, TrayItem } from '../types'
 import { StickerVisual } from './StickerVisual'
@@ -12,7 +13,10 @@ interface StickerDockProps {
   category: StickerCategory
   onCategoryChange: (category: StickerCategory) => void
   onClose: () => void
+  /** Mouse/pen only — starts the drag-to-place gesture. Touch scrolls the grid instead. */
   onItemPointerDown: (item: TrayItem, e: PointerEvent) => void
+  /** Touch only — a tap places the sticker mid-screen so the grid stays swipe-scrollable. */
+  onItemTap: (item: TrayItem) => void
   onClearAll: () => void
   customItems: TrayImageItem[]
   isSyncingCustom: boolean
@@ -43,6 +47,7 @@ export function StickerDock({
   onCategoryChange,
   onClose,
   onItemPointerDown,
+  onItemTap,
   onClearAll,
   customItems,
   isSyncingCustom,
@@ -50,6 +55,11 @@ export function StickerDock({
   onRemoveCustom,
 }: StickerDockProps) {
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const isMobile = useIsMobile()
+  // click events don't reliably expose pointerType across browsers, so the
+  // preceding pointerdown records it — that's how tap-to-place stays
+  // touch-only while mouse keeps drag-to-place.
+  const lastPointerTypeRef = useRef('')
   const items = category === 'custom' ? customItems : STICKER_TRAY_ITEMS.filter((item) => item.category === category)
 
   const handleFileChange = async (e: ChangeEvent<HTMLInputElement>) => {
@@ -90,7 +100,7 @@ export function StickerDock({
         </div>
       </div>
       <div className="mb-[11px] shrink-0 text-[11px] font-semibold" style={{ color: theme.muted }}>
-        {t.dragHint}
+        {isMobile ? t.tapHint : t.dragHint}
       </div>
       <div className="flex min-h-0 flex-1 gap-[10px]">
         <div className="flex w-[62px] shrink-0 flex-col gap-[5px] overflow-y-auto pr-0.5">
@@ -121,7 +131,7 @@ export function StickerDock({
                 type="button"
                 onClick={() => fileInputRef.current?.click()}
                 title={t.addCustomSticker}
-                className="grid aspect-square touch-none place-items-center rounded-[13px] border-[1.5px] border-dashed text-[20px]"
+                className="grid aspect-square place-items-center rounded-[13px] border-[1.5px] border-dashed text-[20px]"
                 style={{ borderColor: theme.border, background: theme.chip, color: theme.muted }}
               >
                 +
@@ -129,10 +139,19 @@ export function StickerDock({
             )}
             {items.map((item, i) => (
               <div key={category === 'custom' ? (item as TrayImageItem).id : i} className="relative">
+                {/* No touch-action:none here — a touch on an item must stay
+                    pannable so the grid can swipe-scroll; only an actual tap
+                    (no scroll, so the browser still fires click) places. */}
                 <button
                   type="button"
-                  onPointerDown={(e) => onItemPointerDown(item, e)}
-                  className="grid aspect-square w-full touch-none place-items-center rounded-[13px] border-[1.5px] text-[22px]"
+                  onPointerDown={(e) => {
+                    lastPointerTypeRef.current = e.pointerType
+                    if (e.pointerType !== 'touch') onItemPointerDown(item, e)
+                  }}
+                  onClick={() => {
+                    if (lastPointerTypeRef.current === 'touch') onItemTap(item)
+                  }}
+                  className="grid aspect-square w-full place-items-center rounded-[13px] border-[1.5px] text-[22px]"
                   style={{ borderColor: theme.border, background: theme.chip, color: theme.text }}
                 >
                   <StickerVisual item={item} size={26} />

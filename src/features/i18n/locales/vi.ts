@@ -31,6 +31,8 @@ export const vi: Dictionary = {
   editStickers: 'Sửa icon',
   stickerTitle: 'Kho nhãn dán',
   dragHint: 'Kéo icon thả ra màn hình nha! ✨',
+  tapHint: 'Chạm icon để dán ra màn hình nha! ✨',
+  stickerDone: 'Xong',
   clearAll: 'Xóa hết',
   themeTitle: 'Chọn giao diện dễ thương',
   themeSub: 'Đổi bất cứ lúc nào — cái nào cũng cute ♡',

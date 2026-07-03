@@ -31,6 +31,8 @@ export const ja: Dictionary = {
   editStickers: 'アイコン編集',
   stickerTitle: 'ステッカー箱',
   dragHint: 'アイコンを画面にドラッグ！✨',
+  tapHint: 'アイコンをタップして貼ろう！✨',
+  stickerDone: '完了',
   clearAll: '全部消す',
   themeTitle: 'かわいいテーマを選ぶ',
   themeSub: 'いつでも変更OK — 全部かわいい ♡',
