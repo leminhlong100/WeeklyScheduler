@@ -5,6 +5,10 @@ import { clampDurationMinute, clampStartMinute, pxDeltaToSnappedMinutes } from '
 export type DragMode = 'move' | 'resize'
 
 const DOUBLE_CLICK_MS = 400
+/** How long a touch must be held before it picks up a task, instead of scrolling the page. */
+const LONG_PRESS_MS = 350
+/** Movement (px) during the long-press wait that cancels pickup and lets the gesture scroll instead. */
+const PENDING_CANCEL_PX = 10
 
 export interface TaskOrigin {
   dayIndex: number
@@ -25,6 +29,16 @@ interface DragState extends TaskOrigin {
   pointerStartX: number
   pointerStartY: number
   moved: boolean
+  pointerType: string
+}
+
+interface PendingLongPress {
+  id: string
+  mode: DragMode
+  pointerStartX: number
+  pointerStartY: number
+  origin: TaskOrigin
+  timer: ReturnType<typeof setTimeout>
 }
 
 interface UseTaskDragResizeOptions {
@@ -47,6 +61,12 @@ interface UseTaskDragResizeOptions {
  * blocks. Mirrors the design's global-pointer approach: a single set of
  * window listeners tracks the active drag, and a `preview` offset is
  * rendered as a CSS transform until pointer-up commits the final value.
+ *
+ * Touch pointers get an extra pickup step: a finger down on a task doesn't
+ * grab it immediately (that would fight the page's vertical scroll) — it
+ * only activates after a short long-press, and cancels back to a plain tap
+ * if the finger moves before then. Mouse/pen keep the original
+ * immediate-drag behavior, including the click/double-click timing.
  */
 export function useTaskDragResize({
   weekStart,
@@ -62,6 +82,7 @@ export function useTaskDragResize({
 }: UseTaskDragResizeOptions) {
   const [preview, setPreview] = useState<DragPreview | null>(null)
   const dragRef = useRef<DragState | null>(null)
+  const pendingRef = useRef<PendingLongPress | null>(null)
   const lastClickRef = useRef<{ id: string; time: number } | null>(null)
   const pendingClickTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
@@ -87,14 +108,30 @@ export function useTaskDragResize({
     onDoubleClickRef.current = onDoubleClickTask
   }, [snapMinutes, columns, lockDay, onMove, onResize, onClickTask, onDoubleClickTask])
 
-  useEffect(() => {
-    return () => {
-      if (pendingClickTimeoutRef.current) clearTimeout(pendingClickTimeoutRef.current)
+  const clearPending = useCallback(() => {
+    if (pendingRef.current) {
+      clearTimeout(pendingRef.current.timer)
+      pendingRef.current = null
     }
   }, [])
 
   useEffect(() => {
+    return () => {
+      if (pendingClickTimeoutRef.current) clearTimeout(pendingClickTimeoutRef.current)
+      clearPending()
+    }
+  }, [clearPending])
+
+  useEffect(() => {
     function handleMove(e: globalThis.PointerEvent) {
+      const pending = pendingRef.current
+      if (pending) {
+        const dx = e.clientX - pending.pointerStartX
+        const dy = e.clientY - pending.pointerStartY
+        if (Math.abs(dx) > PENDING_CANCEL_PX || Math.abs(dy) > PENDING_CANCEL_PX) clearPending()
+        return
+      }
+
       const drag = dragRef.current
       if (!drag) return
       const dxPx = e.clientX - drag.pointerStartX
@@ -104,12 +141,26 @@ export function useTaskDragResize({
     }
 
     function handleUp(e: globalThis.PointerEvent) {
+      const pending = pendingRef.current
+      if (pending) {
+        // Released before the long-press fired — a plain tap, not a drag.
+        clearPending()
+        onClickRef.current(pending.id)
+        return
+      }
+
       const drag = dragRef.current
       if (!drag) return
       dragRef.current = null
       setPreview(null)
 
       if (!drag.moved) {
+        if (drag.pointerType === 'touch') {
+          // Touch never waits for a possible second tap — there's no
+          // double-tap-to-edit affordance on mobile.
+          onClickRef.current(drag.id)
+          return
+        }
         const now = Date.now()
         const last = lastClickRef.current
         if (last && last.id === drag.id && now - last.time < DOUBLE_CLICK_MS) {
@@ -150,32 +201,75 @@ export function useTaskDragResize({
       onMoveRef.current(drag.id, { dayIndex, startMinute })
     }
 
+    function handleCancel() {
+      clearPending()
+      dragRef.current = null
+      setPreview(null)
+    }
+
     window.addEventListener('pointermove', handleMove)
     window.addEventListener('pointerup', handleUp)
+    window.addEventListener('pointercancel', handleCancel)
     return () => {
       window.removeEventListener('pointermove', handleMove)
       window.removeEventListener('pointerup', handleUp)
+      window.removeEventListener('pointercancel', handleCancel)
     }
-  }, [gridRef])
+  }, [gridRef, clearPending])
 
   const startDrag = useCallback(
     (e: PointerEvent, id: string, mode: DragMode) => {
       // Right/middle mouse buttons shouldn't start a move/resize drag or
       // count as a click-to-edit — right click opens the context menu instead.
       if (e.pointerType === 'mouse' && e.button !== 0) return
-      e.stopPropagation()
       const origin = getTaskOrigin(id)
       if (!origin) return
+
+      if (e.pointerType === 'touch') {
+        // Don't stopPropagation/preventDefault here — until the long-press
+        // fires, the gesture should still behave like a normal page scroll.
+        const pointerStartX = e.clientX
+        const pointerStartY = e.clientY
+        clearPending()
+        pendingRef.current = {
+          id,
+          mode,
+          pointerStartX,
+          pointerStartY,
+          origin,
+          timer: setTimeout(() => {
+            const pending = pendingRef.current
+            if (pending && pending.id === id) {
+              pendingRef.current = null
+              dragRef.current = {
+                id: pending.id,
+                mode: pending.mode,
+                pointerStartX: pending.pointerStartX,
+                pointerStartY: pending.pointerStartY,
+                moved: false,
+                pointerType: 'touch',
+                ...pending.origin,
+              }
+              navigator.vibrate?.(15)
+              setPreview({ id: pending.id, mode: pending.mode, dxPx: 0, dyPx: 0 })
+            }
+          }, LONG_PRESS_MS),
+        }
+        return
+      }
+
+      e.stopPropagation()
       dragRef.current = {
         id,
         mode,
         pointerStartX: e.clientX,
         pointerStartY: e.clientY,
         moved: false,
+        pointerType: e.pointerType,
         ...origin,
       }
     },
-    [getTaskOrigin],
+    [getTaskOrigin, clearPending],
   )
 
   return { preview, startDrag }

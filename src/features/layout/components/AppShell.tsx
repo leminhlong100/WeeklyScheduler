@@ -6,11 +6,13 @@ interface AppShellProps {
   theme: DerivedTheme
   sidebar: ReactNode
   header: ReactNode
+  /** Mobile-only bottom action bar, rendered below the scrollable content. */
+  bottomBar?: ReactNode
   children: ReactNode
 }
 
 /** The rounded "window card" chrome: page background decor, sidebar + main column. */
-export function AppShell({ theme, sidebar, header, children }: AppShellProps) {
+export function AppShell({ theme, sidebar, header, bottomBar, children }: AppShellProps) {
   return (
     <div
       className="scrollbar-hidden relative flex h-[100dvh] w-full items-center justify-center overflow-auto p-0 sm:p-[26px]"
@@ -35,6 +37,7 @@ export function AppShell({ theme, sidebar, header, children }: AppShellProps) {
           <main className="relative flex min-w-0 flex-1 flex-col" style={{ background: theme.mainBg }}>
             {header}
             <div className="relative z-[50] min-h-0 flex-1 overflow-auto">{children}</div>
+            {bottomBar}
           </main>
         </div>
       </div>

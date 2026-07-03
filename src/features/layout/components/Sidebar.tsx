@@ -50,7 +50,7 @@ export function Sidebar({
         <div
           onClick={onClose}
           className={cn(
-            'fixed inset-0 z-30 bg-black/45 transition-opacity duration-300 md:hidden',
+            'fixed inset-0 z-[65] bg-black/45 transition-opacity duration-300 md:hidden',
             open ? 'pointer-events-auto opacity-100' : 'pointer-events-none opacity-0',
           )}
         />
@@ -61,7 +61,7 @@ export function Sidebar({
         className={cn(
           'overflow-hidden text-white',
           isMobile
-            ? 'fixed inset-y-0 left-0 z-40 w-[85vw] max-w-[300px] shadow-2xl transition-transform duration-300'
+            ? 'fixed inset-y-0 left-0 z-[70] w-[85vw] max-w-[300px] shadow-2xl transition-transform duration-300'
             : 'relative flex-shrink-0 transition-[width] duration-300',
           isMobile && (open ? 'translate-x-0' : '-translate-x-full'),
         )}

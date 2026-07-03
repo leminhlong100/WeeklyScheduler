@@ -1,4 +1,4 @@
-import { useState, type ReactNode } from 'react'
+import { useEffect, useState, type ReactNode } from 'react'
 import { createPortal } from 'react-dom'
 import { toast } from 'sonner'
 import type { Dictionary } from '@/features/i18n/dictionary'
@@ -18,6 +18,11 @@ interface StickersOverlayProps {
   t: Dictionary
   theme: DerivedTheme
   children: ReactNode
+  /** Lifted up to SchedulerPage so the mobile "..." menu can also drive these. */
+  editMode: boolean
+  trayOpen: boolean
+  onCloseTray: () => void
+  onToggleDesktopPanel: () => void
 }
 
 /**
@@ -26,10 +31,21 @@ interface StickersOverlayProps {
  * viewport's right edge (outside the calendar, not a layout sibling of it),
  * so it floats over the page background instead of resizing or covering the
  * schedule grid.
+ *
+ * The catalog toggle and edit-mode toggle only render here as a single
+ * merged floating button, on desktop — on mobile they live in the header's
+ * "..." menu instead, so they can't be tapped by accident while scrolling
+ * the calendar.
  */
-export function StickersOverlay({ t, theme, children }: StickersOverlayProps) {
-  const [trayOpen, setTrayOpen] = useState(false)
-  const [editMode, setEditMode] = useState(false)
+export function StickersOverlay({
+  t,
+  theme,
+  children,
+  editMode,
+  trayOpen,
+  onCloseTray,
+  onToggleDesktopPanel,
+}: StickersOverlayProps) {
   const [category, setCategory] = useState<StickerCategory>(STICKER_CATEGORIES[0].id)
   const {
     stickers,
@@ -52,23 +68,11 @@ export function StickersOverlay({ t, theme, children }: StickersOverlayProps) {
     onSelect: setSelectedId,
   })
 
-  const toggleTrayOpen = () => {
-    setTrayOpen((wasOpen) => {
-      // Opening the catalog also turns on edit mode, so a freshly-dropped
-      // sticker can be nudged into place right away.
-      if (!wasOpen) setEditMode(true)
-      return !wasOpen
-    })
-  }
-
-  // Turning edit mode off saves (stickers already persist to localStorage on
-  // every change) and clears the current selection focus.
-  const toggleEditMode = () => {
-    setEditMode((wasEditing) => {
-      if (wasEditing) setSelectedId(null)
-      return !wasEditing
-    })
-  }
+  // Leaving edit mode clears the current selection focus, regardless of
+  // which control (desktop button or mobile menu) turned it off.
+  useEffect(() => {
+    if (!editMode) setSelectedId(null)
+  }, [editMode, setSelectedId])
 
   const handleAddCustom = async (files: File[]) => {
     const result = await addCustomStickers(files)
@@ -100,7 +104,7 @@ export function StickersOverlay({ t, theme, children }: StickersOverlayProps) {
               theme={theme}
               category={category}
               onCategoryChange={setCategory}
-              onClose={() => setTrayOpen(false)}
+              onClose={onCloseTray}
               onItemPointerDown={startPlace}
               onClearAll={clearAll}
               customItems={customItems}
@@ -109,31 +113,18 @@ export function StickersOverlay({ t, theme, children }: StickersOverlayProps) {
               onRemoveCustom={removeCustomSticker}
             />
           )}
-          <div className="flex gap-2">
-            <button
-              type="button"
-              onClick={toggleEditMode}
-              className={cn(
-                'flex h-11 items-center justify-center gap-1.5 rounded-full border-[1.5px] font-extrabold shadow-lg transition-all',
-                editMode ? 'px-[15px] text-[12.5px]' : 'w-11',
-              )}
-              style={{
-                borderColor: editMode ? theme.accent : theme.border,
-                background: editMode ? theme.accent : theme.panel,
-                color: editMode ? '#fff' : theme.text,
-              }}
-            >
-              <span className="text-[17px] leading-none">✏️</span>
-              {editMode && t.editStickers}
-            </button>
-            <GradientButton
-              onClick={toggleTrayOpen}
-              className={cn('h-11 justify-center gap-1.5 rounded-full transition-all', trayOpen ? 'px-[15px] text-[12.5px]' : 'w-11')}
-            >
-              <span className="text-[17px] leading-none">🌈</span>
-              {trayOpen && t.stickers}
-            </GradientButton>
-          </div>
+          {/* Mobile drives this from the header's "..." menu instead — a floating
+              FAB here would be too easy to tap by accident while scrolling. */}
+          <GradientButton
+            onClick={onToggleDesktopPanel}
+            className={cn(
+              'hidden h-11 justify-center gap-1.5 rounded-full transition-all sm:flex',
+              trayOpen ? 'px-[15px] text-[12.5px]' : 'w-11',
+            )}
+          >
+            <span className="text-[17px] leading-none">🌈</span>
+            {trayOpen && t.stickers}
+          </GradientButton>
         </div>,
         document.body,
       )}

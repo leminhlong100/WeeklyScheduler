@@ -17,7 +17,7 @@ export function ThemePickerModal({ open, onOpenChange }: ThemePickerModalProps) 
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
         showCloseButton={false}
-        className="max-h-[85vh] w-[calc(100%-2rem)] max-w-[540px] overflow-y-auto rounded-[28px] border-[1.5px] p-5 sm:max-w-[540px] sm:p-6"
+        className="max-h-[85dvh] w-full max-w-full overflow-y-auto rounded-t-[28px] rounded-b-none border-[1.5px] p-5 max-sm:pb-[calc(1.25rem+env(safe-area-inset-bottom))] sm:w-[calc(100%-2rem)] sm:max-w-[540px] sm:rounded-[28px] sm:p-6"
         style={{ background: theme.modalBg, borderColor: theme.border, color: theme.text }}
       >
         <DialogTitle

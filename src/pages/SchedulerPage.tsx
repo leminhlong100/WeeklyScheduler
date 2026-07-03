@@ -19,6 +19,7 @@ import { TaskFormModal, type TaskDraft } from '@/features/tasks/components/TaskF
 import { StickersOverlay } from '@/features/stickers/components/StickersOverlay'
 import { AppShell } from '@/features/layout/components/AppShell'
 import { Header } from '@/features/layout/components/Header'
+import { MobileActionBar } from '@/features/layout/components/MobileActionBar'
 import { Sidebar, type CategorySidebarItem } from '@/features/layout/components/Sidebar'
 import { addDays, toISODate } from '@/lib/utils/date'
 
@@ -50,6 +51,8 @@ export function SchedulerPage() {
   const [themePickerOpen, setThemePickerOpen] = useState(false)
   const [categoryManagerOpen, setCategoryManagerOpen] = useState(false)
   const [taskDraft, setTaskDraft] = useState<TaskDraft | null>(null)
+  const [stickerTrayOpen, setStickerTrayOpen] = useState(false)
+  const [stickerEditMode, setStickerEditMode] = useState(false)
 
   // The sidebar behaves as a push panel on desktop but an off-canvas drawer
   // on mobile — flip its default open state whenever the breakpoint changes
@@ -99,6 +102,21 @@ export function SchedulerPage() {
     const taskDate = todayISO >= weekStartISO ? todayISO : weekStartISO
     setTaskDraft({ taskDate, startMinute: 540 })
   }
+
+  const handleSwipeDay = (direction: 1 | -1) => {
+    pickDay(toISODate(addDays(selected, direction)))
+  }
+
+  // Single merged sticker toggle (mobile "..." menu item and desktop's
+  // floating button both use this): catalog and edit mode move together.
+  const toggleStickerPanel = () => {
+    setStickerTrayOpen((wasOpen) => {
+      const opening = !wasOpen
+      setStickerEditMode(opening)
+      return opening
+    })
+  }
+  const closeStickerTray = () => setStickerTrayOpen(false)
 
   const handleCopyLastWeek = () => {
     copyPreviousWeek.mutate(undefined, {
@@ -157,8 +175,30 @@ export function SchedulerPage() {
           userMenu={<UserMenu />}
         />
       }
+      bottomBar={
+        <MobileActionBar
+          theme={theme}
+          t={t}
+          currentThemeName={theme.name[locale]}
+          onPrevWeek={prevWeek}
+          onNextWeek={nextWeek}
+          onToday={goToday}
+          onOpenTheme={() => setThemePickerOpen(true)}
+          onNewEvent={openNewEventFromHeader}
+          onCopyLastWeek={handleCopyLastWeek}
+          copyLastWeekPending={copyPreviousWeek.isPending}
+          onToggleStickerPanel={toggleStickerPanel}
+        />
+      }
     >
-      <StickersOverlay t={t} theme={theme}>
+      <StickersOverlay
+        t={t}
+        theme={theme}
+        editMode={stickerEditMode}
+        trayOpen={stickerTrayOpen}
+        onCloseTray={closeStickerTray}
+        onToggleDesktopPanel={toggleStickerPanel}
+      >
         <WeekGrid
           weekStart={weekStart}
           selected={selected}
@@ -173,6 +213,7 @@ export function SchedulerPage() {
             if (!task) return
             setTaskDraft({ task, taskDate: task.task_date, startMinute: task.start_minute })
           }}
+          onSwipeDay={handleSwipeDay}
         />
       </StickersOverlay>
 

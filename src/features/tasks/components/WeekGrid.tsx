@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from 'react'
+import { useMemo, useRef, useState, type PointerEvent as ReactPointerEvent } from 'react'
 import type { Dayjs } from 'dayjs'
 import { toast } from 'sonner'
 import type { DerivedTheme } from '@/features/theme/types'
@@ -11,11 +11,16 @@ import type { Task } from '../api/tasksApi'
 import { useCreateTask, useDeleteTask, useUpdateTask } from '../hooks/useTaskMutations'
 import { useTaskDragResize, type TaskOrigin } from '../hooks/useTaskDragResize'
 import { useNowMinutes } from '../hooks/useNowMinutes'
+import { useScrollToNow } from '../hooks/useScrollToNow'
 import { minutesToTopPx } from '../utils/gridMath'
 import { UNCATEGORIZED_COLOR, UNCATEGORIZED_EMOJI, type TaskNoteItem, type TaskWithCategory } from '../types'
 import { HourRuler } from './HourRuler'
 import { DayHeaderRow, type DayHeaderInfo } from './DayHeaderRow'
 import { DayColumn } from './DayColumn'
+import { TaskActionSheet } from './TaskActionSheet'
+
+/** Horizontal drag distance (px) that counts as a day-change swipe, not a scroll/tap. */
+const SWIPE_THRESHOLD_PX = 55
 
 interface WeekGridProps {
   weekStart: Dayjs
@@ -27,6 +32,8 @@ interface WeekGridProps {
   t: Dictionary
   onRequestCreate: (taskDate: string, startMinute: number) => void
   onRequestEdit: (taskId: string) => void
+  /** Mobile-only: swipe left/right over the single-day grid to change day (direction: +1 = next, -1 = previous). */
+  onSwipeDay?: (direction: 1 | -1) => void
 }
 
 export function WeekGrid({
@@ -39,6 +46,7 @@ export function WeekGrid({
   t,
   onRequestCreate,
   onRequestEdit,
+  onSwipeDay,
 }: WeekGridProps) {
   const isMobile = useIsMobile()
   const gridRef = useRef<HTMLDivElement>(null)
@@ -49,6 +57,9 @@ export function WeekGrid({
   const createTask = useCreateTask(weekStartISO)
   const deleteTask = useDeleteTask(weekStartISO)
   const [openNoteTaskId, setOpenNoteTaskId] = useState<string | null>(null)
+  const [actionSheetTaskId, setActionSheetTaskId] = useState<string | null>(null)
+  const swipeRef = useRef<{ startX: number; startY: number; onTask: boolean } | null>(null)
+  const suppressClickRef = useRef(false)
 
   const categoryById = useMemo(() => new Map(categories.map((c) => [c.id, c])), [categories])
 
@@ -119,9 +130,14 @@ export function WeekGrid({
     onResize: (id, { durationMinute }) => {
       updateTask.mutate({ id, patch: { duration_minute: durationMinute } })
     },
-    onClickTask: (id) => setOpenNoteTaskId(id),
+    // On mobile a tap opens the consolidated action sheet (edit/notes/duplicate/delete);
+    // desktop keeps the original single-click-for-notes / double-click-for-edit split.
+    onClickTask: (id) => (isMobile ? setActionSheetTaskId(id) : setOpenNoteTaskId(id)),
     onDoubleClickTask: onRequestEdit,
   })
+
+  const isTodayInWeek = days.some((day) => day.isToday)
+  useScrollToNow(gridRef, isTodayInWeek ? minutesToTopPx(nowMinutes) : null)
 
   const handleDuplicateTask = (id: string) => {
     const task = tasks.find((tk) => tk.id === id)
@@ -154,6 +170,7 @@ export function WeekGrid({
   }
 
   const handleCreateAt = (dayIndex: number, clientY: number, boundingTop: number) => {
+    if (suppressClickRef.current) return
     const y = clientY - boundingTop
     let minute =
       GRID_START_MINUTE + Math.round((y / HOUR_HEIGHT_PX / CREATE_SNAP_MINUTES) * 60) * CREATE_SNAP_MINUTES
@@ -161,45 +178,109 @@ export function WeekGrid({
     onRequestCreate(toISODate(addDays(weekStart, dayIndex)), minute)
   }
 
+  const actionSheetTask = actionSheetTaskId
+    ? (tasksByDay.flat().find((task) => task.id === actionSheetTaskId) ?? null)
+    : null
+
+  const closeActionSheet = () => setActionSheetTaskId(null)
+  const handleActionEdit = (id: string) => {
+    closeActionSheet()
+    onRequestEdit(id)
+  }
+  const handleActionOpenNotes = (id: string) => {
+    closeActionSheet()
+    setOpenNoteTaskId(id)
+  }
+  const handleActionDuplicate = (id: string) => {
+    closeActionSheet()
+    handleDuplicateTask(id)
+  }
+  const handleActionDelete = (id: string) => {
+    closeActionSheet()
+    handleDeleteTask(id)
+  }
+
+  const handleSwipeStart = (e: ReactPointerEvent) => {
+    if (e.pointerType === 'mouse') return
+    const onTask = !!(e.target as HTMLElement).closest('[data-task-block]')
+    swipeRef.current = { startX: e.clientX, startY: e.clientY, onTask }
+  }
+  const handleSwipeEnd = (e: ReactPointerEvent) => {
+    const swipe = swipeRef.current
+    swipeRef.current = null
+    if (!swipe || swipe.onTask || !onSwipeDay) return
+    const dx = e.clientX - swipe.startX
+    const dy = e.clientY - swipe.startY
+    if (Math.abs(dx) < SWIPE_THRESHOLD_PX || Math.abs(dx) < Math.abs(dy) * 1.4) return
+    suppressClickRef.current = true
+    setTimeout(() => {
+      suppressClickRef.current = false
+    }, 400)
+    onSwipeDay(dx < 0 ? 1 : -1)
+  }
+  const handleSwipeCancel = () => {
+    swipeRef.current = null
+  }
+
+  const actionSheet = (
+    <TaskActionSheet
+      task={actionSheetTask}
+      onClose={closeActionSheet}
+      onEdit={handleActionEdit}
+      onOpenNotes={handleActionOpenNotes}
+      onDuplicate={handleActionDuplicate}
+      onDelete={handleActionDelete}
+    />
+  )
+
   if (isMobile) {
     return (
       <div>
         <div
-          className="sticky top-0 z-30 flex gap-1.5 overflow-x-auto border-b px-2.5 py-2 scrollbar-hidden"
+          className="sticky top-0 z-30 flex border-b"
           style={{ background: theme.panel, borderColor: theme.borderStrong }}
         >
-          {days.map((day, dayIndex) => {
-            const active = dayIndex === mobileDayIndex
-            return (
-              <button
-                key={day.key}
-                type="button"
-                onClick={() => setMobileDayIndex(dayIndex)}
-                className="flex flex-shrink-0 flex-col items-center gap-0.5 rounded-2xl px-2.5 py-1.5"
-                style={{
-                  background: active ? theme.brandGrad : 'transparent',
-                  boxShadow: active ? `0 5px 13px ${theme.brandShadow}` : 'none',
-                }}
-              >
-                <span
-                  className="text-[10px] font-extrabold uppercase tracking-wide"
-                  style={{ color: active ? 'rgba(255,255,255,0.85)' : theme.muted }}
+          <div className="w-16 flex-shrink-0" />
+          <div className="flex flex-1 gap-1.5 overflow-x-auto px-2.5 py-2 scrollbar-hidden">
+            {days.map((day, dayIndex) => {
+              const active = dayIndex === mobileDayIndex
+              return (
+                <button
+                  key={day.key}
+                  type="button"
+                  onClick={() => setMobileDayIndex(dayIndex)}
+                  className="flex flex-shrink-0 flex-col items-center gap-0.5 rounded-2xl px-2.5 py-1.5"
+                  style={{
+                    background: active ? theme.brandGrad : 'transparent',
+                    boxShadow: active ? `0 5px 13px ${theme.brandShadow}` : 'none',
+                  }}
                 >
-                  {day.dow}
-                </span>
-                <span
-                  className="font-heading text-[15px] font-extrabold"
-                  style={{ color: active ? '#fff' : day.isToday ? theme.accent : theme.text }}
-                >
-                  {day.dayNum}
-                </span>
-              </button>
-            )
-          })}
+                  <span
+                    className="text-[10px] font-extrabold uppercase tracking-wide"
+                    style={{ color: active ? 'rgba(255,255,255,0.85)' : theme.muted }}
+                  >
+                    {day.dow}
+                  </span>
+                  <span
+                    className="font-heading text-[15px] font-extrabold"
+                    style={{ color: active ? '#fff' : day.isToday ? theme.accent : theme.text }}
+                  >
+                    {day.dayNum}
+                  </span>
+                </button>
+              )
+            })}
+          </div>
         </div>
         <div className="relative flex">
           <HourRuler theme={theme} />
-          <div ref={gridRef} className="relative min-w-0 flex-1">
+          <div
+            ref={gridRef}
+            className="relative min-w-0 flex-1"
+            onPointerDown={handleSwipeStart}
+            onPointerUp={handleSwipeEnd}
+            onPointerCancel={handleSwipeCancel}
+          >
             <DayColumn
               theme={theme}
               tasks={tasksByDay[mobileDayIndex]}
@@ -218,6 +299,7 @@ export function WeekGrid({
             />
           </div>
         </div>
+        {actionSheet}
       </div>
     )
   }
@@ -249,6 +331,7 @@ export function WeekGrid({
           ))}
         </div>
       </div>
+      {actionSheet}
     </div>
   )
 }

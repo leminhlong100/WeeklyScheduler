@@ -47,9 +47,10 @@ export function TaskBlock({
   return (
     <ContextMenu>
       <ContextMenuTrigger
+        data-task-block
         onPointerDown={onPointerDownMove}
         onClick={(e) => e.stopPropagation()}
-        className="absolute right-1 left-1 touch-none overflow-hidden rounded-[14px] py-1.5 pr-2 pl-3 select-none"
+        className="absolute right-1 left-1 overflow-hidden rounded-[14px] py-1.5 pr-2 pl-3 select-none"
         style={{
           top,
           height: Math.max(height - 2, 12),
@@ -60,6 +61,10 @@ export function TaskBlock({
           cursor: isDragging ? 'grabbing' : 'grab',
           zIndex: isDragging ? 40 : 10,
           transform,
+          // Idle: let a touch pass through to the page's vertical scroll —
+          // useTaskDragResize only claims the gesture after its long-press
+          // fires. Active: lock it down so the drag doesn't fight scrolling.
+          touchAction: isDragging ? 'none' : 'pan-y',
         }}
       >
         <div
@@ -80,8 +85,11 @@ export function TaskBlock({
             e.stopPropagation()
             onPointerDownResize(e)
           }}
-          className="absolute inset-x-0 bottom-0 h-[9px] cursor-ns-resize"
-        />
+          className="absolute inset-x-0 bottom-0 flex h-[22px] cursor-ns-resize items-end justify-center pb-1"
+          style={{ touchAction: isDragging ? 'none' : 'pan-y' }}
+        >
+          <div className="h-[3px] w-8 rounded-full opacity-45" style={{ background: box.fg }} />
+        </div>
       </ContextMenuTrigger>
       <ContextMenuContent>
         <ContextMenuItem
