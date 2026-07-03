@@ -98,10 +98,13 @@ export function SchedulerPage() {
     if (isMobile) setSidebarOpen(false)
   }
 
+  // "+" creates on the day being viewed — the selected day clamped into the
+  // displayed week (matching how WeekGrid clamps its mobile day index), not
+  // blindly "today": viewing Friday and getting a task on Monday's date is
+  // exactly the surprise this avoids.
   const openNewEventFromHeader = () => {
-    const todayISO = toISODate(new Date())
-    const taskDate = todayISO >= weekStartISO ? todayISO : weekStartISO
-    setTaskDraft({ taskDate, startMinute: 540 })
+    const dayIndex = Math.max(0, Math.min(6, selected.diff(weekStart, 'day')))
+    setTaskDraft({ taskDate: toISODate(addDays(weekStart, dayIndex)), startMinute: 540 })
   }
 
   const handleSwipeDay = (direction: 1 | -1) => {
@@ -226,6 +229,7 @@ export function SchedulerPage() {
             setTaskDraft({ task, taskDate: task.task_date, startMinute: task.start_minute })
           }}
           onSwipeDay={handleSwipeDay}
+          onPickDay={pickDay}
         />
       </StickersOverlay>
 

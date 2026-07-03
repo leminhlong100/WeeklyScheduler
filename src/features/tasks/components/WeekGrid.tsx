@@ -34,6 +34,8 @@ interface WeekGridProps {
   onRequestEdit: (taskId: string) => void
   /** Mobile-only: swipe left/right over the single-day grid to change day (direction: +1 = next, -1 = previous). */
   onSwipeDay?: (direction: 1 | -1) => void
+  /** Mobile-only: a day tab was tapped. Lets the page-level selected day follow, so e.g. the "+" button creates on the day being viewed. */
+  onPickDay?: (iso: string) => void
 }
 
 export function WeekGrid({
@@ -47,6 +49,7 @@ export function WeekGrid({
   onRequestCreate,
   onRequestEdit,
   onSwipeDay,
+  onPickDay,
 }: WeekGridProps) {
   const isMobile = useIsMobile()
   const gridRef = useRef<HTMLDivElement>(null)
@@ -241,7 +244,10 @@ export function WeekGrid({
                 <button
                   key={day.key}
                   type="button"
-                  onClick={() => setMobileDayIndex(dayIndex)}
+                  onClick={() => {
+                    setMobileDayIndex(dayIndex)
+                    onPickDay?.(day.key)
+                  }}
                   className="flex flex-shrink-0 flex-col items-center gap-0.5 rounded-2xl px-2.5 py-1.5 transition-all duration-200 active:scale-95"
                   style={{
                     background: active ? theme.brandGrad : 'transparent',

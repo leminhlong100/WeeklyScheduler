@@ -1,4 +1,4 @@
-import { useState, type CSSProperties } from 'react'
+import { useEffect, useRef, useState, type CSSProperties } from 'react'
 import { createPortal } from 'react-dom'
 import { Pencil, Plus, Trash2, X } from 'lucide-react'
 import { GradientButton } from '@/components/common/GradientButton'
@@ -21,8 +21,11 @@ interface TaskNotePopoverProps {
 /**
  * A checklist "sticky note" anchored beside a task block, positioned with the
  * same grid math as `TaskBlock`/`NowIndicator` rather than a measured DOM
- * rect. Per the mockup this only closes via its own X — no outside-click or
- * Escape dismissal, so edits in progress can't be lost by a stray click.
+ * rect. Per the mockup, desktop only closes via its own X — no outside-click
+ * or Escape dismissal, so edits in progress can't be lost by a stray click.
+ * Mobile allows tap-outside dismissal while just *viewing* (its X is a small
+ * target and taps land everywhere while scrolling), but keeps the guard
+ * during editing.
  *
  * The parent keys this component by `task.id`, so switching to a different
  * task's note remounts it fresh — `items`/`isEditing` only need to seed from
@@ -31,8 +34,23 @@ interface TaskNotePopoverProps {
 export function TaskNotePopover({ task, theme, side, onClose, onSave }: TaskNotePopoverProps) {
   const { t } = useTranslation()
   const isMobile = useIsMobile()
-  const [items, setItems] = useState<TaskNoteItem[]>(task.notes)
-  const [isEditing, setIsEditing] = useState(false)
+  const popoverRef = useRef<HTMLDivElement>(null)
+  // A task with no notes yet opens straight into editing with one blank row
+  // ready to type into — showing an empty read view first just adds a
+  // mandatory tap on the pencil (and another on "+") before typing.
+  const [items, setItems] = useState<TaskNoteItem[]>(() =>
+    task.notes.length > 0 ? task.notes : [{ id: crypto.randomUUID(), text: '', done: false }],
+  )
+  const [isEditing, setIsEditing] = useState(task.notes.length === 0)
+
+  useEffect(() => {
+    if (!isMobile || isEditing) return
+    const onDocPointerDown = (e: globalThis.PointerEvent) => {
+      if (popoverRef.current && !popoverRef.current.contains(e.target as Node)) onClose()
+    }
+    document.addEventListener('pointerdown', onDocPointerDown)
+    return () => document.removeEventListener('pointerdown', onDocPointerDown)
+  }, [isMobile, isEditing, onClose])
 
   const toggleDone = (id: string) => {
     const next = items.map((item) => (item.id === id ? { ...item, done: !item.done } : item))
@@ -73,6 +91,7 @@ export function TaskNotePopover({ task, theme, side, onClose, onSave }: TaskNote
 
   const popover = (
     <div
+      ref={popoverRef}
       className={
         isMobile
           ? 'fixed z-[100] w-auto max-w-[400px] rounded-[18px] border-[1.5px] p-3.5 shadow-2xl'

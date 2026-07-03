@@ -78,6 +78,13 @@ export function useStickerPointerInteractions({
         const item = placingItemRef.current
         placingItemRef.current = null
         setPlacing(null)
+        // Released while still over the dock (e.g. a plain tap on a tray
+        // item): cancel instead of dropping a sticker underneath the dock
+        // panel where it's invisible until the dock closes. Checked via
+        // elementFromPoint, not e.target — touch pointers are implicitly
+        // captured to the tray button, so e.target always says "dock".
+        const under = document.elementFromPoint(e.clientX, e.clientY)
+        if (under?.closest('[data-sticker-dock]')) return
         // Stickers are positioned relative to the viewport so they can be
         // dragged anywhere on screen, not just within the schedule grid.
         addStickerRef.current(item, e.clientX, e.clientY)
@@ -86,11 +93,21 @@ export function useStickerPointerInteractions({
       dragRef.current = null
     }
 
+    // Without this, a browser-cancelled gesture strands the ghost on screen
+    // and leaves dragRef set, so the sticker latches onto the next touch.
+    function handleCancel() {
+      placingItemRef.current = null
+      setPlacing(null)
+      dragRef.current = null
+    }
+
     window.addEventListener('pointermove', handleMove)
     window.addEventListener('pointerup', handleUp)
+    window.addEventListener('pointercancel', handleCancel)
     return () => {
       window.removeEventListener('pointermove', handleMove)
       window.removeEventListener('pointerup', handleUp)
+      window.removeEventListener('pointercancel', handleCancel)
     }
   }, [])
 

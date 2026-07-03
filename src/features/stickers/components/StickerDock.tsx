@@ -61,6 +61,7 @@ export function StickerDock({
 
   return (
     <div
+      data-sticker-dock
       className="flex h-[60vh] w-[calc(100vw-24px)] max-w-[300px] flex-col overflow-hidden rounded-[20px] border-[1.5px] p-[14px] shadow-2xl sm:h-[68vh]"
       style={{ background: theme.panel, borderColor: theme.border }}
     >

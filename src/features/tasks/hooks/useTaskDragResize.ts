@@ -214,13 +214,24 @@ export function useTaskDragResize({
       setPreview(null)
     }
 
+    // The block's touch-action flips to 'none' when a long-press promotes
+    // the touch to a drag, but the browser locked in its pan-y decision at
+    // touchstart — mid-gesture style changes are ignored, so the page would
+    // still scroll under the drag and then kill it with a pointercancel.
+    // Cancelling touchmove manually (non-passive) is what actually stops it.
+    function handleTouchMove(e: globalThis.TouchEvent) {
+      if (dragRef.current && e.cancelable) e.preventDefault()
+    }
+
     window.addEventListener('pointermove', handleMove)
     window.addEventListener('pointerup', handleUp)
     window.addEventListener('pointercancel', handleCancel)
+    window.addEventListener('touchmove', handleTouchMove, { passive: false })
     return () => {
       window.removeEventListener('pointermove', handleMove)
       window.removeEventListener('pointerup', handleUp)
       window.removeEventListener('pointercancel', handleCancel)
+      window.removeEventListener('touchmove', handleTouchMove)
     }
   }, [gridRef, clearPending])
 
