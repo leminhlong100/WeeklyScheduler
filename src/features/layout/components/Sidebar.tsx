@@ -72,10 +72,10 @@ export function Sidebar({
         <div className="relative z-10 flex h-full w-full max-w-[288px] flex-col justify-center gap-5 overflow-y-auto px-5 py-[22px] pb-7">
           <div className="flex items-center gap-[11px]">
             <div
-              className="grid h-11 w-11 flex-shrink-0 place-items-center rounded-[15px] text-2xl shadow-lg"
+              className="grid h-11 w-11 flex-shrink-0 place-items-center overflow-hidden rounded-[15px] shadow-lg"
               style={{ background: 'rgba(255,255,255,.92)' }}
             >
-              🗓️
+              <img src="/favicon.png" alt="" className="h-full w-full object-cover" />
             </div>
             <div className="min-w-0 flex-1">
               <div className="font-heading text-[19px] font-extrabold leading-tight">{t.appName}</div>
