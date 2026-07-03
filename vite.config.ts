@@ -14,7 +14,7 @@ export default defineConfig({
     tailwindcss(),
     VitePWA({
       registerType: 'prompt',
-      includeAssets: ['favicon.svg'],
+      includeAssets: ['favicon.png'],
       manifest: {
         id: '/',
         name: 'Lịch Tuần — Weekly Scheduler',
