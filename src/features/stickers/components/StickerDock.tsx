@@ -113,7 +113,7 @@ export function StickerDock({
             )
           })}
         </div>
-        <div className="min-h-0 flex-1 overflow-y-auto pr-1">
+        <div className="min-h-0 flex-1 overflow-y-auto overflow-x-hidden pt-1 pr-2 pl-0.5">
           <div className="grid grid-cols-3 gap-[7px]">
             {category === 'custom' && (
               <button
