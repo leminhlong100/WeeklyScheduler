@@ -59,7 +59,6 @@ export function WeekGrid({
   const [openNoteTaskId, setOpenNoteTaskId] = useState<string | null>(null)
   const [actionSheetTaskId, setActionSheetTaskId] = useState<string | null>(null)
   const swipeRef = useRef<{ startX: number; startY: number; onTask: boolean } | null>(null)
-  const suppressClickRef = useRef(false)
 
   const categoryById = useMemo(() => new Map(categories.map((c) => [c.id, c])), [categories])
 
@@ -130,9 +129,13 @@ export function WeekGrid({
     onResize: (id, { durationMinute }) => {
       updateTask.mutate({ id, patch: { duration_minute: durationMinute } })
     },
-    // On mobile a tap opens the consolidated action sheet (edit/notes/duplicate/delete);
-    // desktop keeps the original single-click-for-notes / double-click-for-edit split.
-    onClickTask: (id) => (isMobile ? setActionSheetTaskId(id) : setOpenNoteTaskId(id)),
+    // A tap always opens the note popover — on mobile that's the one thing
+    // that was hard to reach before. The action sheet (edit/duplicate/delete)
+    // is reserved for a touch hold-and-release (see onLongPressTask) so it
+    // doesn't compete with the note tap; desktop keeps double-click-for-edit
+    // and its right-click context menu for duplicate/delete.
+    onClickTask: setOpenNoteTaskId,
+    onLongPressTask: setActionSheetTaskId,
     onDoubleClickTask: onRequestEdit,
   })
 
@@ -170,7 +173,6 @@ export function WeekGrid({
   }
 
   const handleCreateAt = (dayIndex: number, clientY: number, boundingTop: number) => {
-    if (suppressClickRef.current) return
     const y = clientY - boundingTop
     let minute =
       GRID_START_MINUTE + Math.round((y / HOUR_HEIGHT_PX / CREATE_SNAP_MINUTES) * 60) * CREATE_SNAP_MINUTES
@@ -186,10 +188,6 @@ export function WeekGrid({
   const handleActionEdit = (id: string) => {
     closeActionSheet()
     onRequestEdit(id)
-  }
-  const handleActionOpenNotes = (id: string) => {
-    closeActionSheet()
-    setOpenNoteTaskId(id)
   }
   const handleActionDuplicate = (id: string) => {
     closeActionSheet()
@@ -212,10 +210,6 @@ export function WeekGrid({
     const dx = e.clientX - swipe.startX
     const dy = e.clientY - swipe.startY
     if (Math.abs(dx) < SWIPE_THRESHOLD_PX || Math.abs(dx) < Math.abs(dy) * 1.4) return
-    suppressClickRef.current = true
-    setTimeout(() => {
-      suppressClickRef.current = false
-    }, 400)
     onSwipeDay(dx < 0 ? 1 : -1)
   }
   const handleSwipeCancel = () => {
@@ -227,7 +221,6 @@ export function WeekGrid({
       task={actionSheetTask}
       onClose={closeActionSheet}
       onEdit={handleActionEdit}
-      onOpenNotes={handleActionOpenNotes}
       onDuplicate={handleActionDuplicate}
       onDelete={handleActionDelete}
     />
@@ -249,20 +242,20 @@ export function WeekGrid({
                   key={day.key}
                   type="button"
                   onClick={() => setMobileDayIndex(dayIndex)}
-                  className="flex flex-shrink-0 flex-col items-center gap-0.5 rounded-2xl px-2.5 py-1.5"
+                  className="flex flex-shrink-0 flex-col items-center gap-0.5 rounded-2xl px-2.5 py-1.5 transition-all duration-200 active:scale-95"
                   style={{
                     background: active ? theme.brandGrad : 'transparent',
                     boxShadow: active ? `0 5px 13px ${theme.brandShadow}` : 'none',
                   }}
                 >
                   <span
-                    className="text-[10px] font-extrabold uppercase tracking-wide"
+                    className="text-[10px] font-extrabold uppercase tracking-wide transition-colors duration-200"
                     style={{ color: active ? 'rgba(255,255,255,0.85)' : theme.muted }}
                   >
                     {day.dow}
                   </span>
                   <span
-                    className="font-heading text-[15px] font-extrabold"
+                    className="font-heading text-[15px] font-extrabold transition-colors duration-200"
                     style={{ color: active ? '#fff' : day.isToday ? theme.accent : theme.text }}
                   >
                     {day.dayNum}
@@ -281,22 +274,25 @@ export function WeekGrid({
             onPointerUp={handleSwipeEnd}
             onPointerCancel={handleSwipeCancel}
           >
-            <DayColumn
-              theme={theme}
-              tasks={tasksByDay[mobileDayIndex]}
-              isToday={days[mobileDayIndex].isToday}
-              dayIndex={mobileDayIndex}
-              nowMinutes={days[mobileDayIndex].isToday ? nowMinutes : null}
-              nowTopPx={days[mobileDayIndex].isToday ? minutesToTopPx(nowMinutes) : null}
-              dragPreview={preview}
-              openNoteTaskId={openNoteTaskId}
-              onCreateAt={(clientY, boundingTop) => handleCreateAt(mobileDayIndex, clientY, boundingTop)}
-              onStartDrag={startDrag}
-              onDuplicateTask={handleDuplicateTask}
-              onDeleteTask={handleDeleteTask}
-              onCloseNote={() => setOpenNoteTaskId(null)}
-              onSaveNotes={handleSaveNotes}
-            />
+            {/* Keyed by day so switching (tap or swipe) plays a fresh fade-in
+                rather than the content silently swapping underneath. */}
+            <div key={mobileDayIndex} className="animate-[sched-fade_180ms_ease]">
+              <DayColumn
+                theme={theme}
+                tasks={tasksByDay[mobileDayIndex]}
+                isToday={days[mobileDayIndex].isToday}
+                dayIndex={mobileDayIndex}
+                nowMinutes={days[mobileDayIndex].isToday ? nowMinutes : null}
+                nowTopPx={days[mobileDayIndex].isToday ? minutesToTopPx(nowMinutes) : null}
+                dragPreview={preview}
+                openNoteTaskId={openNoteTaskId}
+                onStartDrag={startDrag}
+                onDuplicateTask={handleDuplicateTask}
+                onDeleteTask={handleDeleteTask}
+                onCloseNote={() => setOpenNoteTaskId(null)}
+                onSaveNotes={handleSaveNotes}
+              />
+            </div>
           </div>
         </div>
         {actionSheet}

@@ -50,7 +50,7 @@ export function TaskBlock({
         data-task-block
         onPointerDown={onPointerDownMove}
         onClick={(e) => e.stopPropagation()}
-        className="absolute right-1 left-1 overflow-hidden rounded-[14px] py-1.5 pr-2 pl-3 select-none"
+        className="animate-[sched-fade_220ms_ease] absolute right-1 left-1 overflow-hidden rounded-[14px] py-1.5 pr-2 pl-3 select-none"
         style={{
           top,
           height: Math.max(height - 2, 12),
@@ -65,6 +65,12 @@ export function TaskBlock({
           // useTaskDragResize only claims the gesture after its long-press
           // fires. Active: lock it down so the drag doesn't fight scrolling.
           touchAction: isDragging ? 'none' : 'pan-y',
+          // Disabled mid-drag so the block tracks the pointer 1:1; once
+          // dropped, it glides from the drag offset to its snapped position
+          // instead of jumping there.
+          transition: isDragging
+            ? 'none'
+            : 'top 180ms cubic-bezier(.2,.8,.2,1), height 180ms cubic-bezier(.2,.8,.2,1), transform 180ms cubic-bezier(.2,.8,.2,1), box-shadow 180ms ease',
         }}
       >
         <div

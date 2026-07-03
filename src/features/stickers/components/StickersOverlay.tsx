@@ -88,6 +88,7 @@ export function StickersOverlay({
         selectedId={selectedId}
         editing={editMode}
         theme={theme}
+        onSelect={setSelectedId}
         onPointerDownMove={(e, sticker) => startStickerDrag(e, sticker, 'move')}
         onPointerDownResize={(e, sticker) => startStickerDrag(e, sticker, 'resize')}
         onPointerDownRotate={(e, sticker) => startStickerDrag(e, sticker, 'rotate')}
@@ -114,16 +115,20 @@ export function StickersOverlay({
             />
           )}
           {/* Mobile drives this from the header's "..." menu instead — a floating
-              FAB here would be too easy to tap by accident while scrolling. */}
+              FAB here would be too easy to tap by accident while scrolling.
+              Reflects editMode too, not just trayOpen — otherwise this button
+              looks "off" even while edit mode is still lingering on from a
+              catalog close, giving no visual hint that tapping it turns edit
+              mode off rather than reopening the catalog. */}
           <GradientButton
             onClick={onToggleDesktopPanel}
             className={cn(
               'hidden h-11 justify-center gap-1.5 rounded-full transition-all sm:flex',
-              trayOpen ? 'px-[15px] text-[12.5px]' : 'w-11',
+              trayOpen || editMode ? 'px-[15px] text-[12.5px]' : 'w-11',
             )}
           >
             <span className="text-[17px] leading-none">🌈</span>
-            {trayOpen && t.stickers}
+            {(trayOpen || editMode) && t.stickers}
           </GradientButton>
         </div>,
         document.body,

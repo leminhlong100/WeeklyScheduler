@@ -16,7 +16,8 @@ interface DayColumnProps {
   nowTopPx: number | null
   dragPreview: DragPreview | null
   openNoteTaskId: string | null
-  onCreateAt: (clientY: number, boundingTop: number) => void
+  /** Omitted on mobile — the bottom bar's "+" button covers task creation there instead, since a tap on the grid is needed for viewing notes. */
+  onCreateAt?: (clientY: number, boundingTop: number) => void
   onStartDrag: (e: ReactPointerEvent, id: string, mode: DragMode) => void
   onDuplicateTask: (id: string) => void
   onDeleteTask: (id: string) => void
@@ -44,8 +45,8 @@ export function DayColumn({
 
   return (
     <div
-      onClick={(e) => onCreateAt(e.clientY, e.currentTarget.getBoundingClientRect().top)}
-      className="relative min-w-0 flex-1 cursor-pointer border-l"
+      onClick={onCreateAt ? (e) => onCreateAt(e.clientY, e.currentTarget.getBoundingClientRect().top) : undefined}
+      className={`relative min-w-0 flex-1 border-l${onCreateAt ? ' cursor-pointer' : ''}`}
       style={{
         height: gridTotalHeightPx(),
         borderColor: theme.border,

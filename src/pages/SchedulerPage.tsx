@@ -110,12 +110,16 @@ export function SchedulerPage() {
 
   // Single merged sticker toggle (mobile "..." menu item and desktop's
   // floating button both use this): catalog and edit mode move together.
+  // Driven off "is either currently on" rather than just `stickerTrayOpen` —
+  // closing the catalog via its own X leaves edit mode on (on purpose, so an
+  // in-progress rearrange isn't interrupted), and reading trayOpen alone
+  // would make this button reopen the catalog instead of turning edit mode
+  // off in that state.
+  const stickerPanelActive = stickerTrayOpen || stickerEditMode
   const toggleStickerPanel = () => {
-    setStickerTrayOpen((wasOpen) => {
-      const opening = !wasOpen
-      setStickerEditMode(opening)
-      return opening
-    })
+    const next = !stickerPanelActive
+    setStickerTrayOpen(next)
+    setStickerEditMode(next)
   }
   const closeStickerTray = () => setStickerTrayOpen(false)
 

@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react'
-import { CopyIcon, PencilIcon, StickyNoteIcon, Trash2Icon } from 'lucide-react'
+import { CopyIcon, PencilIcon, Trash2Icon } from 'lucide-react'
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog'
 import type { DerivedTheme } from '@/features/theme/types'
 import { useTranslation } from '@/features/i18n/LocaleContext'
@@ -11,18 +11,18 @@ interface TaskActionSheetProps {
   task: TaskWithCategory | null
   onClose: () => void
   onEdit: (id: string) => void
-  onOpenNotes: (id: string) => void
   onDuplicate: (id: string) => void
   onDelete: (id: string) => void
 }
 
 /**
- * Mobile-only bottom sheet opened by tapping a task block — consolidates the
- * actions desktop spreads across a single click (notes popover), double
- * click (edit) and right-click (duplicate/delete context menu), none of
- * which map cleanly onto touch.
+ * Mobile-only bottom sheet opened by holding a task block and releasing
+ * without dragging — consolidates the actions desktop spreads across a
+ * double click (edit) and right-click (duplicate/delete context menu),
+ * neither of which maps cleanly onto touch. A plain tap instead opens the
+ * note popover directly (see useTaskDragResize's onClickTask).
  */
-export function TaskActionSheet({ task, onClose, onEdit, onOpenNotes, onDuplicate, onDelete }: TaskActionSheetProps) {
+export function TaskActionSheet({ task, onClose, onEdit, onDuplicate, onDelete }: TaskActionSheetProps) {
   const { t } = useTranslation()
   const { theme } = useTheme()
 
@@ -61,9 +61,6 @@ export function TaskActionSheet({ task, onClose, onEdit, onOpenNotes, onDuplicat
               <div className="flex flex-col gap-1.5">
                 <ActionRow theme={theme} label={t.editEvent} onClick={() => onEdit(task.id)}>
                   <PencilIcon className="size-4" />
-                </ActionRow>
-                <ActionRow theme={theme} label={t.note} onClick={() => onOpenNotes(task.id)}>
-                  <StickyNoteIcon className="size-4" />
                 </ActionRow>
                 <ActionRow theme={theme} label={t.duplicate} onClick={() => onDuplicate(task.id)}>
                   <CopyIcon className="size-4" />

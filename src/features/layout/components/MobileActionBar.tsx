@@ -42,7 +42,7 @@ function BarButton({
       type="button"
       onClick={onClick}
       aria-label={label}
-      className={`flex h-11 flex-shrink-0 items-center justify-center rounded-[14px] border-[1.5px] text-[13px] font-bold ${className ?? 'w-11'}`}
+      className={`flex h-11 flex-shrink-0 items-center justify-center rounded-[14px] border-[1.5px] text-[13px] font-bold transition-transform duration-150 active:scale-95 ${className ?? 'w-11'}`}
       style={{ borderColor: theme.border, background: theme.chip, color: theme.text }}
     >
       {children}
@@ -88,7 +88,7 @@ export function MobileActionBar({
       <DropdownMenu>
         <DropdownMenuTrigger
           aria-label="More"
-          className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-[14px] border-[1.5px] outline-none"
+          className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-[14px] border-[1.5px] outline-none transition-transform duration-150 active:scale-95"
           style={{ borderColor: theme.border, background: theme.chip, color: theme.text }}
         >
           <EllipsisIcon className="size-5" />

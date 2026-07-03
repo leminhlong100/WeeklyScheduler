@@ -53,6 +53,8 @@ interface UseTaskDragResizeOptions {
   onMove: (id: string, next: { dayIndex: number; startMinute: number }) => void
   onResize: (id: string, next: { durationMinute: number }) => void
   onClickTask: (id: string) => void
+  /** Touch only: the press was held past the long-press threshold but released without dragging — opens the action menu instead of the tap action. */
+  onLongPressTask: (id: string) => void
   onDoubleClickTask: (id: string) => void
 }
 
@@ -78,6 +80,7 @@ export function useTaskDragResize({
   onMove,
   onResize,
   onClickTask,
+  onLongPressTask,
   onDoubleClickTask,
 }: UseTaskDragResizeOptions) {
   const [preview, setPreview] = useState<DragPreview | null>(null)
@@ -95,6 +98,7 @@ export function useTaskDragResize({
   const onMoveRef = useRef(onMove)
   const onResizeRef = useRef(onResize)
   const onClickRef = useRef(onClickTask)
+  const onLongPressRef = useRef(onLongPressTask)
   const onDoubleClickRef = useRef(onDoubleClickTask)
   void weekStart // week boundary changes remount the grid, which resets any in-flight drag anyway
 
@@ -105,8 +109,9 @@ export function useTaskDragResize({
     onMoveRef.current = onMove
     onResizeRef.current = onResize
     onClickRef.current = onClickTask
+    onLongPressRef.current = onLongPressTask
     onDoubleClickRef.current = onDoubleClickTask
-  }, [snapMinutes, columns, lockDay, onMove, onResize, onClickTask, onDoubleClickTask])
+  }, [snapMinutes, columns, lockDay, onMove, onResize, onClickTask, onLongPressTask, onDoubleClickTask])
 
   const clearPending = useCallback(() => {
     if (pendingRef.current) {
@@ -156,9 +161,11 @@ export function useTaskDragResize({
 
       if (!drag.moved) {
         if (drag.pointerType === 'touch') {
-          // Touch never waits for a possible second tap — there's no
-          // double-tap-to-edit affordance on mobile.
-          onClickRef.current(drag.id)
+          // Reaching here means the long-press timer already fired (that's
+          // the only way touch ever gets a dragRef) but the finger never
+          // moved — so this is a deliberate hold-and-release, not a tap.
+          // Opens the action menu instead of re-triggering the tap action.
+          onLongPressRef.current(drag.id)
           return
         }
         const now = Date.now()
