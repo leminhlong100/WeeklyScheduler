@@ -1,4 +1,5 @@
 import { useState, type CSSProperties } from 'react'
+import { createPortal } from 'react-dom'
 import { Pencil, Plus, Trash2, X } from 'lucide-react'
 import { GradientButton } from '@/components/common/GradientButton'
 import { Input } from '@/components/ui/input'
@@ -61,14 +62,16 @@ export function TaskNotePopover({ task, theme, side, onClose, onSave }: TaskNote
   const tailStyle: CSSProperties =
     side === 'right' ? { left: -7, top: 18 } : { right: -7, top: 18 }
 
+  // Mobile: anchored above the bottom action bar (~64px tall + safe area),
+  // not at the viewport edge where the bar would cover it.
   const positionStyle: CSSProperties = isMobile
-    ? { left: 12, right: 12, bottom: 12 }
+    ? { left: 12, right: 12, bottom: 'calc(76px + env(safe-area-inset-bottom))' }
     : {
         top: minutesToTopPx(task.startMinute),
         [side === 'right' ? 'left' : 'right']: 'calc(100% + 14px)',
       }
 
-  return (
+  const popover = (
     <div
       className={
         isMobile
@@ -182,4 +185,9 @@ export function TaskNotePopover({ task, theme, side, onClose, onSave }: TaskNote
       )}
     </div>
   )
+
+  // Portaled on mobile: rendered in place it inherits the scroll container's
+  // stacking context (z-50), which the z-60 bottom action bar paints over —
+  // as a body child its own z-index actually wins.
+  return isMobile ? createPortal(popover, document.body) : popover
 }
