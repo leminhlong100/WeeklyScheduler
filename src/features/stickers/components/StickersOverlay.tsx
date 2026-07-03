@@ -38,6 +38,7 @@ export function StickersOverlay({ t, theme, children }: StickersOverlayProps) {
     addSticker,
     moveSticker,
     resizeSticker,
+    rotateSticker,
     duplicateSticker,
     deleteSticker,
     clearAll,
@@ -47,6 +48,7 @@ export function StickersOverlay({ t, theme, children }: StickersOverlayProps) {
     addSticker,
     moveSticker,
     resizeSticker,
+    rotateSticker,
     onSelect: setSelectedId,
   })
 
@@ -84,13 +86,14 @@ export function StickersOverlay({ t, theme, children }: StickersOverlayProps) {
         theme={theme}
         onPointerDownMove={(e, sticker) => startStickerDrag(e, sticker, 'move')}
         onPointerDownResize={(e, sticker) => startStickerDrag(e, sticker, 'resize')}
+        onPointerDownRotate={(e, sticker) => startStickerDrag(e, sticker, 'rotate')}
         onDuplicate={duplicateSticker}
         onDelete={deleteSticker}
       />
       <PlacingGhost placing={placing} />
 
       {createPortal(
-        <div className="fixed right-3 bottom-3 z-[92] flex flex-col items-end gap-2.5 sm:right-[22px] sm:bottom-[22px]">
+        <div className="fixed right-3 bottom-[calc(72px+env(safe-area-inset-bottom))] z-[40] flex flex-col items-end gap-2.5 sm:right-[22px] sm:bottom-[22px] sm:z-[92]">
           {trayOpen && (
             <StickerDock
               t={t}

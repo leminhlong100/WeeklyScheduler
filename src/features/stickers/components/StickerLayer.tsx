@@ -10,6 +10,7 @@ interface StickerLayerProps {
   theme: DerivedTheme
   onPointerDownMove: (e: PointerEvent, sticker: PlacedSticker) => void
   onPointerDownResize: (e: PointerEvent, sticker: PlacedSticker) => void
+  onPointerDownRotate: (e: PointerEvent, sticker: PlacedSticker) => void
   onDuplicate: (id: string) => void
   onDelete: (id: string) => void
 }
@@ -21,6 +22,7 @@ export function StickerLayer({
   theme,
   onPointerDownMove,
   onPointerDownResize,
+  onPointerDownRotate,
   onDuplicate,
   onDelete,
 }: StickerLayerProps) {
@@ -78,6 +80,17 @@ export function StickerLayer({
                   className="absolute -right-[11px] -bottom-[11px] z-[3] h-[19px] w-[19px] cursor-nwse-resize rounded-full border-[2.5px] bg-white shadow-md"
                   style={{ borderColor: theme.accent }}
                 />
+                <div
+                  className="pointer-events-none absolute top-[-26px] left-1/2 z-[2] h-[17px] w-px -translate-x-1/2"
+                  style={{ background: theme.accent }}
+                />
+                <div
+                  onPointerDown={(e) => onPointerDownRotate(e, sticker)}
+                  className="absolute top-[-38px] left-1/2 z-[3] grid h-[19px] w-[19px] -translate-x-1/2 place-items-center rounded-full border-[2.5px] bg-white text-[10px] leading-none shadow-md"
+                  style={{ borderColor: theme.accent, color: theme.accent, cursor: 'grab' }}
+                >
+                  ↻
+                </div>
               </>
             )}
           </div>

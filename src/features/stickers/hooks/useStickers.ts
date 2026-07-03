@@ -44,6 +44,10 @@ export function useStickers() {
     setStickers((prev) => prev.map((s) => (s.id === id ? { ...s, size: Math.max(26, Math.min(240, size)) } : s)))
   }
 
+  const rotateSticker = (id: string, rot: number) => {
+    setStickers((prev) => prev.map((s) => (s.id === id ? { ...s, rot } : s)))
+  }
+
   const duplicateSticker = (id: string) => {
     const source = stickers.find((s) => s.id === id)
     if (!source) return
@@ -69,6 +73,7 @@ export function useStickers() {
     addSticker,
     moveSticker,
     resizeSticker,
+    rotateSticker,
     duplicateSticker,
     deleteSticker,
     clearAll,

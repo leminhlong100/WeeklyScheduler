@@ -7,7 +7,7 @@ export interface PlacingGhostState {
   y: number
 }
 
-type DragMode = 'move' | 'resize'
+type DragMode = 'move' | 'resize' | 'rotate'
 
 interface DragState {
   id: string
@@ -23,14 +23,16 @@ interface UseStickerPointerInteractionsOptions {
   addSticker: (item: TrayItem, x: number, y: number) => void
   moveSticker: (id: string, x: number, y: number) => void
   resizeSticker: (id: string, size: number) => void
+  rotateSticker: (id: string, rot: number) => void
   onSelect: (id: string) => void
 }
 
-/** Drag-to-place from the tray, and drag-to-move/resize an existing sticker. */
+/** Drag-to-place from the tray, and drag-to-move/resize/rotate an existing sticker. */
 export function useStickerPointerInteractions({
   addSticker,
   moveSticker,
   resizeSticker,
+  rotateSticker,
   onSelect,
 }: UseStickerPointerInteractionsOptions) {
   const [placing, setPlacing] = useState<PlacingGhostState | null>(null)
@@ -40,11 +42,13 @@ export function useStickerPointerInteractions({
   const addStickerRef = useRef(addSticker)
   const moveStickerRef = useRef(moveSticker)
   const resizeStickerRef = useRef(resizeSticker)
+  const rotateStickerRef = useRef(rotateSticker)
   useEffect(() => {
     addStickerRef.current = addSticker
     moveStickerRef.current = moveSticker
     resizeStickerRef.current = resizeSticker
-  }, [addSticker, moveSticker, resizeSticker])
+    rotateStickerRef.current = rotateSticker
+  }, [addSticker, moveSticker, resizeSticker, rotateSticker])
 
   useEffect(() => {
     function handleMove(e: globalThis.PointerEvent) {
@@ -58,6 +62,12 @@ export function useStickerPointerInteractions({
       const dy = e.clientY - drag.pointerStartY
       if (drag.mode === 'resize') {
         resizeStickerRef.current(drag.id, drag.originSize + (dx + dy) / 2)
+      } else if (drag.mode === 'rotate') {
+        // drag.originX/Y hold the sticker's fixed center; the handle tracks
+        // the pointer's angle around it (+90 since the handle sits above
+        // center at rot=0, not to the right).
+        const angle = Math.atan2(e.clientY - drag.originY, e.clientX - drag.originX) * (180 / Math.PI)
+        rotateStickerRef.current(drag.id, angle + 90)
       } else {
         moveStickerRef.current(drag.id, drag.originX + dx, drag.originY + dy)
       }
