@@ -1,6 +1,7 @@
 import type { PointerEvent } from 'react'
 import { Move } from 'lucide-react'
 import type { DerivedTheme } from '@/features/theme/types'
+import { useIsMobile } from '@/hooks/useMediaQuery'
 import type { PlacedSticker } from '../types'
 import { StickerVisual } from './StickerVisual'
 
@@ -29,6 +30,22 @@ export function StickerLayer({
   onDuplicate,
   onDelete,
 }: StickerLayerProps) {
+  const isMobile = useIsMobile()
+  // Touch needs roomier targets than a mouse cursor — the desktop sizes
+  // (19–25px) are well under a fingertip, making the handles miserable to
+  // hit. Offsets scale with the size so the controls stay just outside the
+  // selection border.
+  const btnSize = isMobile ? 34 : 25
+  const btnOffset = isMobile ? -19 : -13
+  const handleSize = isMobile ? 30 : 19
+  const handleOffset = isMobile ? -17 : -11
+  const rotateTop = isMobile ? -52 : -38
+  // Stem runs from under the rotate handle down to the selection border
+  // (which sits at -9px via -inset-[9px]); the top 12px hide behind the
+  // handle's opaque circle.
+  const stemTop = rotateTop + 12
+  const stemHeight = -stemTop - 9
+
   return (
     // Kept below dialogs (z-50): an open modal must win every tap over a
     // placed sticker, even while sticker edit mode is also on — otherwise a
@@ -73,8 +90,8 @@ export function StickerLayer({
                     e.stopPropagation()
                     onDuplicate(sticker.id)
                   }}
-                  className="absolute -top-[13px] -left-[13px] z-[3] grid h-[25px] w-[25px] place-items-center rounded-full bg-white text-[12px] leading-none shadow-md"
-                  style={{ color: theme.accent, border: `1.5px solid ${theme.accent}`, touchAction: 'none' }}
+                  className="absolute z-[3] grid place-items-center rounded-full bg-white text-[12px] leading-none shadow-md"
+                  style={{ top: btnOffset, left: btnOffset, height: btnSize, width: btnSize, color: theme.accent, border: `1.5px solid ${theme.accent}`, touchAction: 'none' }}
                 >
                   ⧉
                 </button>
@@ -84,8 +101,8 @@ export function StickerLayer({
                     e.stopPropagation()
                     onDelete(sticker.id)
                   }}
-                  className="absolute -top-[13px] -right-[13px] z-[3] grid h-[25px] w-[25px] place-items-center rounded-full bg-[#ff5d7a] text-[15px] leading-none text-white shadow-md"
-                  style={{ touchAction: 'none' }}
+                  className="absolute z-[3] grid place-items-center rounded-full bg-[#ff5d7a] text-[15px] leading-none text-white shadow-md"
+                  style={{ top: btnOffset, right: btnOffset, height: btnSize, width: btnSize, touchAction: 'none' }}
                 >
                   ×
                 </button>
@@ -96,24 +113,24 @@ export function StickerLayer({
                     e.stopPropagation()
                     onPointerDownMove(e, sticker)
                   }}
-                  className="absolute -bottom-[11px] -left-[11px] z-[3] grid h-[19px] w-[19px] place-items-center rounded-full border-[2.5px] bg-white shadow-md"
-                  style={{ borderColor: theme.accent, color: theme.accent, cursor: 'grab', touchAction: 'none' }}
+                  className="absolute z-[3] grid place-items-center rounded-full border-[2.5px] bg-white shadow-md"
+                  style={{ bottom: handleOffset, left: handleOffset, height: handleSize, width: handleSize, borderColor: theme.accent, color: theme.accent, cursor: 'grab', touchAction: 'none' }}
                 >
-                  <Move className="size-3" />
+                  <Move className={isMobile ? 'size-4' : 'size-3'} />
                 </div>
                 <div
                   onPointerDown={(e) => onPointerDownResize(e, sticker)}
-                  className="absolute -right-[11px] -bottom-[11px] z-[3] h-[19px] w-[19px] cursor-nwse-resize rounded-full border-[2.5px] bg-white shadow-md"
-                  style={{ borderColor: theme.accent, touchAction: 'none' }}
+                  className="absolute z-[3] cursor-nwse-resize rounded-full border-[2.5px] bg-white shadow-md"
+                  style={{ bottom: handleOffset, right: handleOffset, height: handleSize, width: handleSize, borderColor: theme.accent, touchAction: 'none' }}
                 />
                 <div
-                  className="pointer-events-none absolute top-[-26px] left-1/2 z-[2] h-[17px] w-px -translate-x-1/2"
-                  style={{ background: theme.accent }}
+                  className="pointer-events-none absolute left-1/2 z-[2] w-px -translate-x-1/2"
+                  style={{ top: stemTop, height: stemHeight, background: theme.accent }}
                 />
                 <div
                   onPointerDown={(e) => onPointerDownRotate(e, sticker)}
-                  className="absolute top-[-38px] left-1/2 z-[3] grid h-[19px] w-[19px] -translate-x-1/2 place-items-center rounded-full border-[2.5px] bg-white text-[10px] leading-none shadow-md"
-                  style={{ borderColor: theme.accent, color: theme.accent, cursor: 'grab', touchAction: 'none' }}
+                  className="absolute left-1/2 z-[3] grid -translate-x-1/2 place-items-center rounded-full border-[2.5px] bg-white text-[10px] leading-none shadow-md"
+                  style={{ top: rotateTop, height: handleSize, width: handleSize, borderColor: theme.accent, color: theme.accent, cursor: 'grab', touchAction: 'none' }}
                 >
                   ↻
                 </div>
