@@ -1,4 +1,5 @@
 import { useState, type ReactNode } from 'react'
+import { createPortal } from 'react-dom'
 import { toast } from 'sonner'
 import type { Dictionary } from '@/features/i18n/dictionary'
 import type { DerivedTheme } from '@/features/theme/types'
@@ -20,12 +21,11 @@ interface StickersOverlayProps {
 }
 
 /**
- * Composes the full drag-and-drop sticker feature: a docked library panel,
- * placed-sticker layer, and drag ghost. The library panel sits as a flex
- * sibling of `children` (the schedule grid) so it occupies its own column
- * and never overlaps the calendar. The placed-sticker layer stays fixed to
- * the viewport (not the schedule grid) so stickers can be moved anywhere on
- * screen.
+ * Composes the full drag-and-drop sticker feature: the library panel, the
+ * placed-sticker layer, and the drag ghost. Everything here is fixed to the
+ * viewport's right edge (outside the calendar, not a layout sibling of it),
+ * so it floats over the page background instead of resizing or covering the
+ * schedule grid.
  */
 export function StickersOverlay({ t, theme, children }: StickersOverlayProps) {
   const [trayOpen, setTrayOpen] = useState(false)
@@ -76,10 +76,37 @@ export function StickersOverlay({ t, theme, children }: StickersOverlayProps) {
 
   return (
     <>
-      <div className="flex h-full min-h-0 w-full">
-        <div className="relative min-h-0 min-w-0 flex-1 overflow-hidden">
-          <div className="h-full w-full overflow-auto">{children}</div>
-          <div className="absolute right-3 bottom-3 z-[92] flex gap-2 sm:right-[22px] sm:bottom-[22px]">
+      {children}
+      <StickerLayer
+        stickers={stickers}
+        selectedId={selectedId}
+        editing={editMode}
+        theme={theme}
+        onPointerDownMove={(e, sticker) => startStickerDrag(e, sticker, 'move')}
+        onPointerDownResize={(e, sticker) => startStickerDrag(e, sticker, 'resize')}
+        onDuplicate={duplicateSticker}
+        onDelete={deleteSticker}
+      />
+      <PlacingGhost placing={placing} />
+
+      {createPortal(
+        <div className="fixed right-3 bottom-3 z-[92] flex flex-col items-end gap-2.5 sm:right-[22px] sm:bottom-[22px]">
+          {trayOpen && (
+            <StickerDock
+              t={t}
+              theme={theme}
+              category={category}
+              onCategoryChange={setCategory}
+              onClose={() => setTrayOpen(false)}
+              onItemPointerDown={startPlace}
+              onClearAll={clearAll}
+              customItems={customItems}
+              isSyncingCustom={isSyncing}
+              onAddCustom={handleAddCustom}
+              onRemoveCustom={removeCustomSticker}
+            />
+          )}
+          <div className="flex gap-2">
             <button
               type="button"
               onClick={toggleEditMode}
@@ -104,33 +131,9 @@ export function StickersOverlay({ t, theme, children }: StickersOverlayProps) {
               {trayOpen && t.stickers}
             </GradientButton>
           </div>
-        </div>
-        <StickerDock
-          t={t}
-          theme={theme}
-          open={trayOpen}
-          category={category}
-          onCategoryChange={setCategory}
-          onClose={() => setTrayOpen(false)}
-          onItemPointerDown={startPlace}
-          onClearAll={clearAll}
-          customItems={customItems}
-          isSyncingCustom={isSyncing}
-          onAddCustom={handleAddCustom}
-          onRemoveCustom={removeCustomSticker}
-        />
-      </div>
-      <StickerLayer
-        stickers={stickers}
-        selectedId={selectedId}
-        editing={editMode}
-        theme={theme}
-        onPointerDownMove={(e, sticker) => startStickerDrag(e, sticker, 'move')}
-        onPointerDownResize={(e, sticker) => startStickerDrag(e, sticker, 'resize')}
-        onDuplicate={duplicateSticker}
-        onDelete={deleteSticker}
-      />
-      <PlacingGhost placing={placing} />
+        </div>,
+        document.body,
+      )}
     </>
   )
 }
