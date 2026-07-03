@@ -9,9 +9,11 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
+import { DownloadIcon } from 'lucide-react'
 import { useTranslation } from '@/features/i18n/LocaleContext'
 import { useTheme } from '@/features/theme/ThemeContext'
 import { useSignOut } from '@/features/auth/hooks/useAuthMutations'
+import { useInstallPrompt } from '@/features/pwa/useInstallPrompt'
 import { useProfile } from '../hooks/useProfile'
 
 function getInitials(name: string): string {
@@ -24,6 +26,7 @@ export function UserMenu() {
   const { theme } = useTheme()
   const { data: profile } = useProfile()
   const signOut = useSignOut()
+  const { canInstall, promptInstall } = useInstallPrompt()
 
   const name = profile?.display_name ?? '…'
 
@@ -54,6 +57,15 @@ export function UserMenu() {
         <DropdownMenuGroup>
           <DropdownMenuLabel>{name}</DropdownMenuLabel>
         </DropdownMenuGroup>
+        {canInstall && (
+          <>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem onClick={promptInstall}>
+              <DownloadIcon className="size-4" />
+              {t.installApp}
+            </DropdownMenuItem>
+          </>
+        )}
         <DropdownMenuSeparator />
         <DropdownMenuItem
           onClick={() => signOut.mutate(undefined, { onError: () => toast.error(t.somethingWentWrong) })}

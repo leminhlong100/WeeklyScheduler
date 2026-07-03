@@ -17,6 +17,7 @@ import { useCopyPreviousWeek } from '@/features/tasks/hooks/useTaskMutations'
 import { WeekGrid } from '@/features/tasks/components/WeekGrid'
 import { TaskFormModal, type TaskDraft } from '@/features/tasks/components/TaskFormModal'
 import { StickersOverlay } from '@/features/stickers/components/StickersOverlay'
+import { IosInstallBanner } from '@/features/pwa/IosInstallBanner'
 import { AppShell } from '@/features/layout/components/AppShell'
 import { Header } from '@/features/layout/components/Header'
 import { MobileActionBar } from '@/features/layout/components/MobileActionBar'
@@ -191,6 +192,7 @@ export function SchedulerPage() {
         />
       }
     >
+      <IosInstallBanner />
       <StickersOverlay
         t={t}
         theme={theme}

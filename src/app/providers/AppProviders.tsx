@@ -1,5 +1,6 @@
 import { type ReactNode, useState } from 'react'
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { QueryClient } from '@tanstack/react-query'
+import { PersistQueryClientProvider } from '@tanstack/react-query-persist-client'
 import { BrowserRouter } from 'react-router-dom'
 import { Toaster } from '@/components/ui/sonner'
 import { TooltipProvider } from '@/components/ui/tooltip'
@@ -7,6 +8,7 @@ import { AuthProvider } from '@/features/auth/AuthContext'
 import { ThemeProvider } from '@/features/theme/ThemeContext'
 import { LocaleProvider } from '@/features/i18n/LocaleContext'
 import { PwaUpdatePrompt } from '@/app/PwaUpdatePrompt'
+import { QUERY_CACHE_BUSTER, queryPersister } from '@/lib/queryPersister'
 
 export function AppProviders({ children }: { children: ReactNode }) {
   const [queryClient] = useState(
@@ -17,7 +19,14 @@ export function AppProviders({ children }: { children: ReactNode }) {
   )
 
   return (
-    <QueryClientProvider client={queryClient}>
+    <PersistQueryClientProvider
+      client={queryClient}
+      persistOptions={{
+        persister: queryPersister,
+        maxAge: 1000 * 60 * 60 * 24 * 7,
+        buster: QUERY_CACHE_BUSTER,
+      }}
+    >
       <LocaleProvider>
         <ThemeProvider>
           <AuthProvider>
@@ -29,6 +38,6 @@ export function AppProviders({ children }: { children: ReactNode }) {
           </AuthProvider>
         </ThemeProvider>
       </LocaleProvider>
-    </QueryClientProvider>
+    </PersistQueryClientProvider>
   )
 }

@@ -81,6 +81,9 @@ export const ja: Dictionary = {
 
   updateAvailable: '新しいバージョンがあります',
   reloadApp: '再読み込み',
+  installApp: 'アプリをインストール',
+  iosInstallHint: '共有アイコンをタップし、「ホーム画面に追加」を選ぶとアプリとしてインストールできます。',
+  gotIt: 'わかりました',
 
   taskCreated: '予定を作成しました',
   taskUpdated: '予定を更新しました',

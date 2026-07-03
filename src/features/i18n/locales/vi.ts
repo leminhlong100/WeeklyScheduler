@@ -81,6 +81,9 @@ export const vi: Dictionary = {
 
   updateAvailable: 'Có bản cập nhật mới',
   reloadApp: 'Tải lại',
+  installApp: 'Cài đặt app',
+  iosInstallHint: 'Nhấn biểu tượng Chia sẻ, sau đó chọn "Thêm vào MH chính" để cài Lịch Tuần như một app.',
+  gotIt: 'Đã hiểu',
 
   taskCreated: 'Đã tạo sự kiện',
   taskUpdated: 'Đã cập nhật sự kiện',

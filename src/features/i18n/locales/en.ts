@@ -81,6 +81,9 @@ export const en: Dictionary = {
 
   updateAvailable: 'A new version is available',
   reloadApp: 'Reload',
+  installApp: 'Install app',
+  iosInstallHint: 'Tap the Share icon, then "Add to Home Screen" to install Weekly Scheduler as an app.',
+  gotIt: 'Got it',
 
   taskCreated: 'Event created',
   taskUpdated: 'Event updated',

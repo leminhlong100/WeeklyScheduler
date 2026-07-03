@@ -81,6 +81,9 @@ export const zh: Dictionary = {
 
   updateAvailable: '有新版本可用',
   reloadApp: '重新加载',
+  installApp: '安装应用',
+  iosInstallHint: '点击分享图标，然后选择"添加到主屏幕"即可将周历安装为应用。',
+  gotIt: '知道了',
 
   taskCreated: '事件已创建',
   taskUpdated: '事件已更新',

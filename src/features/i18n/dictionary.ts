@@ -83,6 +83,9 @@ export interface Dictionary {
 
   updateAvailable: string
   reloadApp: string
+  installApp: string
+  iosInstallHint: string
+  gotIt: string
 
   taskCreated: string
   taskUpdated: string
