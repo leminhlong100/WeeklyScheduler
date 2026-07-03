@@ -1,6 +1,8 @@
 import { mixColors, rgba } from '@/lib/utils/color'
 import type { Category } from '@/features/categories/api/categoriesApi'
 import type { DerivedTheme } from '@/features/theme/types'
+import { useTranslation } from '@/features/i18n/LocaleContext'
+import { translateCategoryName } from '@/features/i18n/defaultCategoryNames'
 
 interface TaskCategoryChipsProps {
   categories: Category[]
@@ -10,6 +12,7 @@ interface TaskCategoryChipsProps {
 }
 
 export function TaskCategoryChips({ categories, selectedId, onSelect, theme }: TaskCategoryChipsProps) {
+  const { t } = useTranslation()
   return (
     <div className="flex flex-wrap gap-1.5">
       {categories.map((category) => {
@@ -27,7 +30,7 @@ export function TaskCategoryChips({ categories, selectedId, onSelect, theme }: T
             }}
           >
             <span className="text-sm">{category.emoji}</span>
-            {category.name}
+            {translateCategoryName(category.name, t)}
           </button>
         )
       })}

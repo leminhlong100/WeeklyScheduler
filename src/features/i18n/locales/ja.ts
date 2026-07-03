@@ -55,6 +55,12 @@ export const ja: Dictionary = {
   categoryColor: '色',
   deleteCategoryConfirm: 'このカテゴリを削除しますか？関連する予定は未分類になります。',
   noCategories: 'カテゴリがまだありません',
+  defaultCategoryWork: '仕事',
+  defaultCategoryHealth: '健康',
+  defaultCategoryLearning: '学習',
+  defaultCategoryPersonal: '個人',
+  defaultCategorySocial: '交流',
+  defaultCategoryMeal: '食事',
 
   login: 'ログイン',
   signup: '新規登録',

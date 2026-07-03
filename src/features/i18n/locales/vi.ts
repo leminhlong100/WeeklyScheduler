@@ -55,6 +55,12 @@ export const vi: Dictionary = {
   categoryColor: 'Màu sắc',
   deleteCategoryConfirm: 'Xóa danh mục này? Các sự kiện liên quan sẽ chuyển sang chưa phân loại.',
   noCategories: 'Chưa có danh mục nào',
+  defaultCategoryWork: 'Công việc',
+  defaultCategoryHealth: 'Sức khỏe',
+  defaultCategoryLearning: 'Học tập',
+  defaultCategoryPersonal: 'Cá nhân',
+  defaultCategorySocial: 'Xã hội',
+  defaultCategoryMeal: 'Bữa ăn',
 
   login: 'Đăng nhập',
   signup: 'Đăng ký',

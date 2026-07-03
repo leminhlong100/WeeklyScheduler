@@ -59,6 +59,12 @@ export interface Dictionary {
   categoryColor: string
   deleteCategoryConfirm: string
   noCategories: string
+  defaultCategoryWork: string
+  defaultCategoryHealth: string
+  defaultCategoryLearning: string
+  defaultCategoryPersonal: string
+  defaultCategorySocial: string
+  defaultCategoryMeal: string
 
   login: string
   signup: string

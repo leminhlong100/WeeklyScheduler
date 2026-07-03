@@ -55,6 +55,12 @@ export const en: Dictionary = {
   categoryColor: 'Color',
   deleteCategoryConfirm: 'Delete this category? Its events will become uncategorized.',
   noCategories: 'No categories yet',
+  defaultCategoryWork: 'Work',
+  defaultCategoryHealth: 'Health',
+  defaultCategoryLearning: 'Learning',
+  defaultCategoryPersonal: 'Personal',
+  defaultCategorySocial: 'Social',
+  defaultCategoryMeal: 'Meals',
 
   login: 'Log in',
   signup: 'Sign up',

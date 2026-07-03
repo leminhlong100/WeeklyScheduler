@@ -55,6 +55,12 @@ export const zh: Dictionary = {
   categoryColor: '颜色',
   deleteCategoryConfirm: '删除此分类？相关事件将变为未分类。',
   noCategories: '暂无分类',
+  defaultCategoryWork: '工作',
+  defaultCategoryHealth: '健康',
+  defaultCategoryLearning: '学习',
+  defaultCategoryPersonal: '个人',
+  defaultCategorySocial: '社交',
+  defaultCategoryMeal: '餐饮',
 
   login: '登录',
   signup: '注册',

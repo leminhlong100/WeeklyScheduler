@@ -10,6 +10,7 @@ import { useWeekAnchor } from '@/features/calendar-nav/hooks/useWeekAnchor'
 import { MiniCalendar } from '@/features/calendar-nav/components/MiniCalendar'
 import { formatWeekRange } from '@/features/calendar-nav/utils/formatWeekRange'
 import { useCategories } from '@/features/categories/hooks/useCategories'
+import { translateCategoryName } from '@/features/i18n/defaultCategoryNames'
 import { useActiveCategoryFilter } from '@/features/categories/hooks/useActiveCategoryFilter'
 import { CategoryManagerModal } from '@/features/categories/components/CategoryManagerModal'
 import { useTasksForWeek } from '@/features/tasks/hooks/useTasksForWeek'
@@ -85,12 +86,12 @@ export function SchedulerPage() {
       categories.map((category) => ({
         id: category.id,
         emoji: category.emoji,
-        label: category.name,
+        label: translateCategoryName(category.name, t),
         color: category.color,
         count: tasks.filter((task) => task.category_id === category.id).length,
         active: isActive(category.id),
       })),
-    [categories, tasks, isActive],
+    [categories, tasks, isActive, t],
   )
 
   const handlePickDay = (iso: string) => {

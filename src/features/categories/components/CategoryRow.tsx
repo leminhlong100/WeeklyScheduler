@@ -1,5 +1,7 @@
 import { PencilIcon, Trash2Icon } from 'lucide-react'
 import { useTheme } from '@/features/theme/ThemeContext'
+import { useTranslation } from '@/features/i18n/LocaleContext'
+import { translateCategoryName } from '@/features/i18n/defaultCategoryNames'
 import type { Category } from '../api/categoriesApi'
 
 interface CategoryRowProps {
@@ -10,6 +12,7 @@ interface CategoryRowProps {
 
 export function CategoryRow({ category, onEdit, onDelete }: CategoryRowProps) {
   const { theme } = useTheme()
+  const { t } = useTranslation()
 
   return (
     <div
@@ -23,7 +26,7 @@ export function CategoryRow({ category, onEdit, onDelete }: CategoryRowProps) {
         {category.emoji}
       </span>
       <span className="flex-1 truncate text-sm font-bold" style={{ color: theme.text }}>
-        {category.name}
+        {translateCategoryName(category.name, t)}
       </span>
       <button
         type="button"
