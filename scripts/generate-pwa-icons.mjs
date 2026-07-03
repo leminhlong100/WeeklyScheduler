@@ -1,5 +1,7 @@
-// One-off generator for PWA icon PNGs. Run with `node scripts/generate-pwa-icons.mjs`
-// whenever the source mark below changes — outputs aren't watched/rebuilt automatically.
+// One-off generator for PWA icon PNGs. `sharp` isn't a project dependency
+// (it's a large native binary only needed here) — install it temporarily
+// with `npm install -D sharp`, run `node scripts/generate-pwa-icons.mjs`
+// whenever the source mark below changes, then uninstall it again.
 import { mkdir, writeFile } from 'node:fs/promises'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
