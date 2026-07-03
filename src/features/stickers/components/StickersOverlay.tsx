@@ -69,9 +69,9 @@ export function StickersOverlay({ t, theme, children }: StickersOverlayProps) {
   }
 
   const handleAddCustom = async (files: File[]) => {
-    const { added, failed } = await addCustomStickers(files)
-    if (failed > 0 && added === 0) toast.error(t.somethingWentWrong)
-    else if (failed > 0) toast.error(t.somethingWentWrong)
+    const result = await addCustomStickers(files)
+    if (result.failed > 0) toast.error(t.somethingWentWrong)
+    return result
   }
 
   return (
