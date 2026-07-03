@@ -42,6 +42,7 @@ export const en: Dictionary = {
   stickerCatShapes: 'Shapes',
   stickerCatCustom: 'My stickers',
   addCustomSticker: 'Add your own sticker',
+  stickerSyncing: 'Syncing…',
 
   manageCategories: 'Manage categories',
   addCategory: 'Add category',

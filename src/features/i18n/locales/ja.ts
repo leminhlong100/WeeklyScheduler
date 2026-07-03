@@ -42,6 +42,7 @@ export const ja: Dictionary = {
   stickerCatShapes: '図形',
   stickerCatCustom: 'マイステッカー',
   addCustomSticker: '自分のステッカーを追加',
+  stickerSyncing: '同期中…',
 
   manageCategories: 'カテゴリ管理',
   addCategory: 'カテゴリを追加',

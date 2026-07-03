@@ -1,42 +1,96 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef } from 'react'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { useAuth } from '@/features/auth/AuthContext'
 import { readImageFileAsSticker } from '@/lib/utils/imageFile'
+import { createCustomStickers, deleteCustomSticker, listCustomStickers } from '../api/customStickersApi'
 import type { TrayImageItem } from '../types'
 
-const STORAGE_KEY = 'weeklyScheduler.customStickers'
+const LEGACY_STORAGE_KEY = 'weeklyScheduler.customStickers'
 
-function readStoredCustomStickers(): TrayImageItem[] {
-  if (typeof window === 'undefined') return []
+const customStickersQueryKey = (userId: string | undefined) => ['customStickers', userId] as const
+
+function readLegacyLocalStickers(): TrayImageItem[] {
   try {
-    const raw = window.localStorage.getItem(STORAGE_KEY)
+    const raw = window.localStorage.getItem(LEGACY_STORAGE_KEY)
     return raw ? (JSON.parse(raw) as TrayImageItem[]) : []
   } catch {
     return []
   }
 }
 
-/** User-uploaded image stickers, kept separate from the built-in catalog so they persist independently. */
+/** User-uploaded image stickers, synced through the account so they follow the user across devices. */
 export function useCustomStickers() {
-  const [customItems, setCustomItems] = useState<TrayImageItem[]>(readStoredCustomStickers)
+  const { user } = useAuth()
+  const queryClient = useQueryClient()
+  const key = customStickersQueryKey(user?.id)
+  const migratedRef = useRef(false)
 
+  const query = useQuery({
+    queryKey: key,
+    queryFn: async () => {
+      const rows = await listCustomStickers(user!.id)
+      return rows.map((row): TrayImageItem => ({ kind: 'image', id: row.id, src: row.src, category: 'custom' }))
+    },
+    enabled: !!user,
+  })
+
+  const addMutation = useMutation({
+    mutationFn: async (sources: string[]) => {
+      const created = await createCustomStickers(sources.map((src) => ({ user_id: user!.id, src })))
+      return created.map((row): TrayImageItem => ({ kind: 'image', id: row.id, src: row.src, category: 'custom' }))
+    },
+    onSuccess: (created) => {
+      queryClient.setQueryData<TrayImageItem[]>(key, (prev) => [...(prev ?? []), ...created])
+    },
+  })
+
+  const removeMutation = useMutation({
+    mutationFn: (id: string) => deleteCustomSticker(id),
+    onMutate: async (id) => {
+      const previous = queryClient.getQueryData<TrayImageItem[]>(key)
+      queryClient.setQueryData<TrayImageItem[]>(key, (prev) => (prev ?? []).filter((item) => item.id !== id))
+      return { previous }
+    },
+    onError: (_err, _id, context) => {
+      if (context?.previous) queryClient.setQueryData(key, context.previous)
+    },
+  })
+
+  // One-time migration: a device that uploaded stickers before sync existed
+  // has them sitting in localStorage only — push them up once, then clear so
+  // they aren't re-imported on every load.
   useEffect(() => {
-    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(customItems))
-  }, [customItems])
+    if (!user || migratedRef.current || query.isLoading) return
+    migratedRef.current = true
+    const legacy = readLegacyLocalStickers()
+    if (legacy.length === 0) return
+    window.localStorage.removeItem(LEGACY_STORAGE_KEY)
+    addMutation.mutate(legacy.map((item) => item.src))
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user, query.isLoading])
 
-  const addCustomSticker = async (file: File): Promise<boolean> => {
-    if (!file.type.startsWith('image/')) return false
-    try {
-      const src = await readImageFileAsSticker(file)
-      const id = crypto.randomUUID()
-      setCustomItems((prev) => [...prev, { kind: 'image', id, src, category: 'custom' }])
-      return true
-    } catch {
-      return false
-    }
+  const addCustomStickers = async (files: File[]): Promise<{ added: number; failed: number }> => {
+    const results = await Promise.all(
+      files.map(async (file) => {
+        if (!file.type.startsWith('image/')) return null
+        try {
+          return await readImageFileAsSticker(file)
+        } catch {
+          return null
+        }
+      }),
+    )
+    const sources = results.filter((src): src is string => src !== null)
+    if (sources.length > 0) await addMutation.mutateAsync(sources)
+    return { added: sources.length, failed: files.length - sources.length }
   }
 
-  const removeCustomSticker = (id: string) => {
-    setCustomItems((prev) => prev.filter((item) => item.id !== id))
-  }
+  const removeCustomSticker = (id: string) => removeMutation.mutate(id)
 
-  return { customItems, addCustomSticker, removeCustomSticker }
+  return {
+    customItems: query.data ?? [],
+    isSyncing: query.isLoading || addMutation.isPending,
+    addCustomStickers,
+    removeCustomSticker,
+  }
 }

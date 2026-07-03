@@ -113,6 +113,23 @@ export interface Database {
         }
         Relationships: []
       }
+      custom_stickers: {
+        Row: {
+          id: string
+          user_id: string
+          src: string
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          src: string
+        }
+        Update: {
+          src?: string
+        }
+        Relationships: []
+      }
     }
     Views: Record<string, never>
     Functions: Record<string, never>

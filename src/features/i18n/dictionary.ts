@@ -44,6 +44,7 @@ export interface Dictionary {
   stickerCatShapes: string
   stickerCatCustom: string
   addCustomSticker: string
+  stickerSyncing: string
 
   manageCategories: string
   addCategory: string

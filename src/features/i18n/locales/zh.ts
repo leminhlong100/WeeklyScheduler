@@ -42,6 +42,7 @@ export const zh: Dictionary = {
   stickerCatShapes: '形状',
   stickerCatCustom: '我的贴纸',
   addCustomSticker: '添加你自己的贴纸',
+  stickerSyncing: '同步中…',
 
   manageCategories: '管理分类',
   addCategory: '添加分类',

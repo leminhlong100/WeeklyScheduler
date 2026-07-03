@@ -42,6 +42,7 @@ export const vi: Dictionary = {
   stickerCatShapes: 'Hình khối',
   stickerCatCustom: 'Của tôi',
   addCustomSticker: 'Thêm nhãn dán của riêng bạn',
+  stickerSyncing: 'Đang đồng bộ…',
 
   manageCategories: 'Quản lý danh mục',
   addCategory: 'Thêm danh mục',
