@@ -17,6 +17,10 @@ export const THEME_KEYS: ThemeKey[] = [
   'cottoncandy',
   'sakura',
   'panda',
+  'cyber',
+  'matrix',
+  'basiclight',
+  'basicdark',
 ]
 
 /** Static design tokens for one theme, ported from the design's `themeDef()`. */

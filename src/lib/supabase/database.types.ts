@@ -24,6 +24,10 @@ export type ThemeKey =
   | 'cottoncandy'
   | 'sakura'
   | 'panda'
+  | 'cyber'
+  | 'matrix'
+  | 'basiclight'
+  | 'basicdark'
 
 export interface Database {
   public: {
