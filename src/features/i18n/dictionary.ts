@@ -81,6 +81,9 @@ export interface Dictionary {
   passwordTooShort: string
   passwordMismatch: string
 
+  updateAvailable: string
+  reloadApp: string
+
   taskCreated: string
   taskUpdated: string
   taskDeleted: string

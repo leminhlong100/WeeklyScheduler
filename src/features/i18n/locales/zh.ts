@@ -79,6 +79,9 @@ export const zh: Dictionary = {
   passwordTooShort: '密码至少需要 6 个字符',
   passwordMismatch: '两次输入的密码不一致',
 
+  updateAvailable: '有新版本可用',
+  reloadApp: '重新加载',
+
   taskCreated: '事件已创建',
   taskUpdated: '事件已更新',
   taskDeleted: '事件已删除',

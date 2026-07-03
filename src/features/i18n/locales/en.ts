@@ -79,6 +79,9 @@ export const en: Dictionary = {
   passwordTooShort: 'Password must be at least 6 characters',
   passwordMismatch: 'Passwords do not match',
 
+  updateAvailable: 'A new version is available',
+  reloadApp: 'Reload',
+
   taskCreated: 'Event created',
   taskUpdated: 'Event updated',
   taskDeleted: 'Event deleted',

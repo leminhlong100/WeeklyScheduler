@@ -79,6 +79,9 @@ export const vi: Dictionary = {
   passwordTooShort: 'Mật khẩu cần ít nhất 6 ký tự',
   passwordMismatch: 'Mật khẩu xác nhận không khớp',
 
+  updateAvailable: 'Có bản cập nhật mới',
+  reloadApp: 'Tải lại',
+
   taskCreated: 'Đã tạo sự kiện',
   taskUpdated: 'Đã cập nhật sự kiện',
   taskDeleted: 'Đã xóa sự kiện',

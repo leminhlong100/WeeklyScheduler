@@ -6,6 +6,7 @@ import { TooltipProvider } from '@/components/ui/tooltip'
 import { AuthProvider } from '@/features/auth/AuthContext'
 import { ThemeProvider } from '@/features/theme/ThemeContext'
 import { LocaleProvider } from '@/features/i18n/LocaleContext'
+import { PwaUpdatePrompt } from '@/app/PwaUpdatePrompt'
 
 export function AppProviders({ children }: { children: ReactNode }) {
   const [queryClient] = useState(
@@ -23,6 +24,7 @@ export function AppProviders({ children }: { children: ReactNode }) {
             <TooltipProvider>
               <BrowserRouter>{children}</BrowserRouter>
               <Toaster position="top-center" richColors />
+              <PwaUpdatePrompt />
             </TooltipProvider>
           </AuthProvider>
         </ThemeProvider>

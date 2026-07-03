@@ -79,6 +79,9 @@ export const ja: Dictionary = {
   passwordTooShort: 'パスワードは6文字以上で入力してください',
   passwordMismatch: 'パスワードが一致しません',
 
+  updateAvailable: '新しいバージョンがあります',
+  reloadApp: '再読み込み',
+
   taskCreated: '予定を作成しました',
   taskUpdated: '予定を更新しました',
   taskDeleted: '予定を削除しました',
