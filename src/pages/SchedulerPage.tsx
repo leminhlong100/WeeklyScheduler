@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { toast } from 'sonner'
-import { useIsMobile } from '@/hooks/useMediaQuery'
+import { useIsMobile, useIsTouchDevice } from '@/hooks/useMediaQuery'
 import { useTranslation } from '@/features/i18n/LocaleContext'
 import { useTheme } from '@/features/theme/ThemeContext'
 import { ThemePickerModal } from '@/features/theme/components/ThemePickerModal'
@@ -49,7 +49,8 @@ export function SchedulerPage() {
   const copyPreviousWeek = useCopyPreviousWeek(weekStart)
 
   const isMobile = useIsMobile()
-  const [sidebarOpen, setSidebarOpen] = useState(!isMobile)
+  const isTouch = useIsTouchDevice()
+  const [sidebarOpen, setSidebarOpen] = useState(!isMobile && !isTouch)
   const [themePickerOpen, setThemePickerOpen] = useState(false)
   const [categoryManagerOpen, setCategoryManagerOpen] = useState(false)
   const [taskDraft, setTaskDraft] = useState<TaskDraft | null>(null)
@@ -64,7 +65,7 @@ export function SchedulerPage() {
   const [prevIsMobile, setPrevIsMobile] = useState(isMobile)
   if (isMobile !== prevIsMobile) {
     setPrevIsMobile(isMobile)
-    setSidebarOpen(!isMobile)
+    setSidebarOpen(!isMobile && !isTouch)
   }
 
   useEffect(() => {

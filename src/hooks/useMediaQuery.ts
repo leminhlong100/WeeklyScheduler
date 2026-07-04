@@ -18,3 +18,13 @@ export function useMediaQuery(query: string): boolean {
 export function useIsMobile(): boolean {
   return useMediaQuery('(max-width: 767px)')
 }
+
+/**
+ * True on touch-primary devices (tablets like iPad, regardless of orientation).
+ * Distinct from `useIsMobile`: an iPad in either orientation is `>= 768px` wide
+ * so it renders the desktop-style grid, but it still has no mouse and only a
+ * fraction of a laptop's width — so it should start with the sidebar collapsed.
+ */
+export function useIsTouchDevice(): boolean {
+  return useMediaQuery('(hover: none) and (pointer: coarse)')
+}

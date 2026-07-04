@@ -307,7 +307,7 @@ export function WeekGrid({
   }
 
   return (
-    <div className="min-w-[880px]">
+    <div className="min-w-[700px]">
       <DayHeaderRow days={days} theme={theme} />
       <div className="relative flex">
         <HourRuler theme={theme} />

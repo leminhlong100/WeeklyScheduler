@@ -69,7 +69,7 @@ export function Sidebar({
       >
         <DecorBackground theme={theme} variant="sidebar" />
 
-        <div className="relative z-10 flex h-full w-full max-w-[288px] flex-col justify-center gap-5 overflow-y-auto px-5 py-[22px] pb-7">
+        <div className="relative z-10 flex h-full w-full flex-col justify-center gap-5 overflow-y-auto px-5 py-[22px] pb-7">
           <div className="flex items-center gap-[11px]">
             <div
               className="grid h-11 w-11 flex-shrink-0 place-items-center overflow-hidden rounded-[15px] shadow-lg"
