@@ -30,7 +30,7 @@ export function AuthLayout({ title, subtitle, children, footer }: AuthLayoutProp
             className="grid h-11 w-11 flex-shrink-0 place-items-center rounded-2xl shadow-md"
             style={{ background: 'rgba(255,255,255,0.92)' }}
           >
-            <img src="/favicon.svg" alt="" className="h-7 w-7" />
+            <img src="/favicon.png" alt="" className="h-7 w-7" />
           </div>
           <div
             className="font-heading text-lg font-extrabold"

@@ -57,11 +57,20 @@ export function StickerLayer({
         return (
           <div
             key={sticker.id}
-            // Touch drags only through the dedicated move handle below — a
-            // swipe passing over the sticker's body must still scroll the
-            // page. Mouse keeps the old grab-anywhere shortcut since it
-            // never fights page scrolling the way touch does.
-            onPointerDown={editing ? (e) => { if (e.pointerType !== 'touch') onPointerDownMove(e, sticker) } : undefined}
+            // Before selection, touch drags are ignored so a swipe over the
+            // sticker's body still scrolls the page — a tap just selects it
+            // instead. Once selected (handles visible), touch can grab the
+            // body directly too, since the user is now clearly interacting
+            // with the sticker, not the page. Mouse keeps the old
+            // grab-anywhere shortcut since it never fights page scrolling.
+            onPointerDown={
+              editing
+                ? (e) => {
+                    if (e.pointerType === 'touch' && !selected) return
+                    onPointerDownMove(e, sticker)
+                  }
+                : undefined
+            }
             onClick={editing ? () => onSelect(sticker.id) : undefined}
             className={editing ? 'pointer-events-auto absolute grid place-items-center select-none' : 'pointer-events-none absolute grid place-items-center select-none'}
             style={{
@@ -71,7 +80,7 @@ export function StickerLayer({
               height: sticker.size,
               transform: `translate(-50%, -50%) rotate(${sticker.rot}deg)`,
               cursor: editing ? 'pointer' : 'default',
-              touchAction: editing ? 'pan-y' : 'auto',
+              touchAction: editing && !selected ? 'pan-y' : 'none',
               zIndex: selected ? 70 : 62,
             }}
           >
