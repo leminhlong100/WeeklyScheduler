@@ -46,6 +46,23 @@ export function TaskBlock({
   const showTime = task.durationMinute >= 45
   const isDragging = !!dragOffset
 
+  // Read-only note preview that fills the empty space in a tall block. Editing
+  // and checking off still happens in TaskNotePopover — a tap opens it. We only
+  // draw as many lines as fit above the resize handle, so a short block shows
+  // nothing rather than a clipped half-line.
+  const NOTE_LINE_PX = 15
+  const reservedTopPx = 6 + 16 + (showTime ? 16 : 0) + 4
+  const availableNotePx = height - reservedTopPx - 14
+  const maxNoteLines = Math.floor(availableNotePx / NOTE_LINE_PX)
+  let visibleNotes = task.notes.slice(0, Math.max(0, maxNoteLines))
+  let hiddenNoteCount = task.notes.length - visibleNotes.length
+  // Give up a line to the "+N" counter so it never itself overflows.
+  if (hiddenNoteCount > 0 && visibleNotes.length > 0) {
+    visibleNotes = visibleNotes.slice(0, -1)
+    hiddenNoteCount = task.notes.length - visibleNotes.length
+  }
+  const showNotes = maxNoteLines >= 1 && visibleNotes.length > 0
+
   const blockProps = {
     'data-task-block': true,
     onPointerDown: onPointerDownMove,
@@ -88,6 +105,31 @@ export function TaskBlock({
       {showTime && (
         <div className="mt-0.5 text-[11px] font-semibold opacity-[.82]">
           {formatMinutesAsTime(task.startMinute)} – {formatMinutesAsTime(endMinute)}
+        </div>
+      )}
+      {showNotes && (
+        <div className="mt-1 min-w-0" style={{ pointerEvents: 'none' }}>
+          {visibleNotes.map((noteItem) => (
+            <div
+              key={noteItem.id}
+              className="flex items-center gap-1 text-[10.5px] leading-[15px]"
+            >
+              <span className="flex-shrink-0" style={{ opacity: 0.6 }}>
+                {noteItem.done ? '✓' : '•'}
+              </span>
+              <span
+                className={`min-w-0 truncate ${noteItem.done ? 'line-through' : ''}`}
+                style={{ opacity: noteItem.done ? 0.5 : 0.85 }}
+              >
+                {noteItem.text}
+              </span>
+            </div>
+          ))}
+          {hiddenNoteCount > 0 && (
+            <div className="text-[10px] leading-[15px] font-semibold" style={{ opacity: 0.55 }}>
+              +{hiddenNoteCount}
+            </div>
+          )}
         </div>
       )}
       <div
