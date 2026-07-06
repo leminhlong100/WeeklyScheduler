@@ -13,6 +13,7 @@ import { useTaskDragResize, type TaskOrigin } from '../hooks/useTaskDragResize'
 import { useNowMinutes } from '../hooks/useNowMinutes'
 import { useScrollToNow } from '../hooks/useScrollToNow'
 import { minutesToTopPx } from '../utils/gridMath'
+import { cloneNotes } from '../utils/cloneNotes'
 import { UNCATEGORIZED_COLOR, UNCATEGORIZED_EMOJI, type TaskNoteItem, type TaskWithCategory } from '../types'
 import { HourRuler } from './HourRuler'
 import { DayHeaderRow, type DayHeaderInfo } from './DayHeaderRow'
@@ -155,6 +156,7 @@ export function WeekGrid({
         taskDate: task.task_date,
         startMinute: task.start_minute,
         durationMinute: task.duration_minute,
+        notes: cloneNotes(task.notes),
       },
       {
         onSuccess: () => toast.success(t.taskDuplicated),

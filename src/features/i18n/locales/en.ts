@@ -20,6 +20,7 @@ export const en: Dictionary = {
   editEvent: 'Edit event',
   duplicate: 'Duplicate',
   copyLastWeek: 'Copy last week',
+  copyLastWeekConfirm: "Copy all of last week's events (including notes) into this week?",
   repeatOnDays: 'Repeat on days',
 
   note: 'Note',

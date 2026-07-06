@@ -22,6 +22,7 @@ export interface Dictionary {
   editEvent: string
   duplicate: string
   copyLastWeek: string
+  copyLastWeekConfirm: string
   repeatOnDays: string
 
   note: string

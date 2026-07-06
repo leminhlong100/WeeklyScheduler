@@ -11,6 +11,8 @@ import {
   type Task,
   type TaskUpdate,
 } from '../api/tasksApi'
+import type { TaskNoteItem } from '../types'
+import { cloneNotes } from '../utils/cloneNotes'
 import { tasksQueryKey } from './useTasksForWeek'
 
 interface CreateTaskVars {
@@ -19,6 +21,7 @@ interface CreateTaskVars {
   taskDate: string
   startMinute: number
   durationMinute: number
+  notes?: TaskNoteItem[]
 }
 
 export function useCreateTask(weekStartISO: string) {
@@ -35,6 +38,7 @@ export function useCreateTask(weekStartISO: string) {
         task_date: input.taskDate,
         start_minute: input.startMinute,
         duration_minute: input.durationMinute,
+        notes: input.notes ?? [],
       }),
     onSuccess: (created) => {
       queryClient.setQueryData<Task[]>(key, (prev) => [...(prev ?? []), created])
@@ -118,6 +122,7 @@ export function useCopyPreviousWeek(weekStart: Dayjs) {
           task_date: toISODate(addDays(parseISODate(task.task_date), 7)),
           start_minute: task.start_minute,
           duration_minute: task.duration_minute,
+          notes: cloneNotes(task.notes),
         })),
       )
       return created

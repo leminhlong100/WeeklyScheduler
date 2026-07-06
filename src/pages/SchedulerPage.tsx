@@ -135,6 +135,7 @@ export function SchedulerPage() {
   }
 
   const handleCopyLastWeek = () => {
+    if (!window.confirm(t.copyLastWeekConfirm)) return
     copyPreviousWeek.mutate(undefined, {
       onSuccess: (created) => {
         if (created.length === 0) toast(t.noTasksLastWeek)

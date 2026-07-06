@@ -20,6 +20,7 @@ export const ja: Dictionary = {
   editEvent: '予定を編集',
   duplicate: '複製',
   copyLastWeek: '先週をコピー',
+  copyLastWeekConfirm: '先週の予定（メモを含む）をすべて今週にコピーしますか？',
   repeatOnDays: '繰り返す曜日',
 
   note: 'メモ',

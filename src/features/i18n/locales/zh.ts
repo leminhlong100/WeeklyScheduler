@@ -20,6 +20,7 @@ export const zh: Dictionary = {
   editEvent: '编辑事件',
   duplicate: '复制',
   copyLastWeek: '复制上周',
+  copyLastWeekConfirm: '将上周的所有事件（含备注）复制到本周？',
   repeatOnDays: '重复日期',
 
   note: '备注',

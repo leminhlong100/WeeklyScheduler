@@ -15,6 +15,7 @@ import { useCategories } from '@/features/categories/hooks/useCategories'
 import { addDays, parseISODate, toISODate, weekdayMondayIndex } from '@/lib/utils/date'
 import { taskSchema, type TaskFormInput } from '../schemas/taskSchema'
 import { buildDurationOptions, buildStartTimeOptions } from '../utils/taskFormOptions'
+import { cloneNotes } from '../utils/cloneNotes'
 import { useCreateTask, useCreateTasksOnDays, useDeleteTask, useUpdateTask } from '../hooks/useTaskMutations'
 import type { Task } from '../api/tasksApi'
 import { TaskCategoryChips } from './TaskCategoryChips'
@@ -153,6 +154,7 @@ export function TaskFormModal({ draft, weekStartISO, onClose }: TaskFormModalPro
         taskDate: task.task_date,
         startMinute: task.start_minute,
         durationMinute: task.duration_minute,
+        notes: cloneNotes(task.notes),
       },
       {
         onSuccess: () => { toast.success(t.taskDuplicated); onClose() },

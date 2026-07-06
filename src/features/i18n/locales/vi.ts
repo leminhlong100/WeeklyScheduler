@@ -20,6 +20,7 @@ export const vi: Dictionary = {
   editEvent: 'Sửa sự kiện',
   duplicate: 'Nhân bản',
   copyLastWeek: 'Copy tuần trước',
+  copyLastWeekConfirm: 'Copy toàn bộ sự kiện (kèm ghi chú) từ tuần trước sang tuần này?',
   repeatOnDays: 'Lặp lại vào các ngày',
 
   note: 'Ghi chú',
