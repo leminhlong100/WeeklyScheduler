@@ -4,6 +4,7 @@ import { useAuth } from '@/features/auth/AuthContext'
 import { addDays, parseISODate, toISODate } from '@/lib/utils/date'
 import {
   bulkCreateTasks,
+  bulkDeleteTasks,
   createTask,
   deleteTask,
   listTasksForRange,
@@ -144,6 +145,26 @@ export function useDeleteTask(weekStartISO: string) {
     onMutate: async (id) => {
       const previous = queryClient.getQueryData<Task[]>(key)
       queryClient.setQueryData<Task[]>(key, (prev) => (prev ?? []).filter((task) => task.id !== id))
+      return { previous }
+    },
+    onError: (_err, _vars, context) => {
+      if (context?.previous) queryClient.setQueryData(key, context.previous)
+    },
+  })
+}
+
+/** Deletes many tasks at once — used by "clear week" and multi-select delete. */
+export function useDeleteTasks(weekStartISO: string) {
+  const { user } = useAuth()
+  const queryClient = useQueryClient()
+  const key = tasksQueryKey(user?.id, weekStartISO)
+
+  return useMutation({
+    mutationFn: (ids: string[]) => bulkDeleteTasks(ids),
+    onMutate: async (ids: string[]) => {
+      const previous = queryClient.getQueryData<Task[]>(key)
+      const idSet = new Set(ids)
+      queryClient.setQueryData<Task[]>(key, (prev) => (prev ?? []).filter((task) => !idSet.has(task.id)))
       return { previous }
     },
     onError: (_err, _vars, context) => {

@@ -1,4 +1,5 @@
 import type { MouseEvent as ReactMouseEvent, PointerEvent } from 'react'
+import { CheckIcon } from 'lucide-react'
 import { ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuTrigger } from '@/components/ui/context-menu'
 import type { DerivedTheme } from '@/features/theme/types'
 import { useTranslation } from '@/features/i18n/LocaleContext'
@@ -14,6 +15,9 @@ interface TaskBlockProps {
   theme: DerivedTheme
   isCurrent: boolean
   dragOffset: { dxPx: number; dyPx: number; mode: DragMode } | null
+  /** Multi-select mode: taps toggle selection (via onPointerDownMove's click fallthrough) instead of opening the note/drag/resize/context menu. */
+  selectMode: boolean
+  selected: boolean
   onPointerDownMove: (e: PointerEvent) => void
   onPointerDownResize: (e: PointerEvent) => void
   onDuplicate: () => void
@@ -25,6 +29,8 @@ export function TaskBlock({
   theme,
   isCurrent,
   dragOffset,
+  selectMode,
+  selected,
   onPointerDownMove,
   onPointerDownResize,
   onDuplicate,
@@ -75,7 +81,12 @@ export function TaskBlock({
       background: box.bg,
       color: box.fg,
       border: box.border,
-      boxShadow: isDragging ? '0 16px 34px rgba(0,0,0,0.3)' : box.shadow,
+      boxShadow: isDragging
+        ? '0 16px 34px rgba(0,0,0,0.3)'
+        : selected
+          ? `0 0 0 2px ${theme.accent}, ${box.shadow}`
+          : box.shadow,
+      opacity: selectMode && !selected ? 0.75 : 1,
       cursor: isDragging ? 'grabbing' : 'grab',
       zIndex: isDragging ? 40 : 10,
       transform,
@@ -132,24 +143,38 @@ export function TaskBlock({
           )}
         </div>
       )}
-      <div
-        onPointerDown={(e) => {
-          e.stopPropagation()
-          onPointerDownResize(e)
-        }}
-        className="absolute inset-x-0 bottom-0 flex h-[22px] cursor-ns-resize items-end justify-center pb-1"
-        style={{ touchAction: isDragging ? 'none' : 'pan-y' }}
-      >
-        <div className="h-[3px] w-8 rounded-full opacity-45" style={{ background: box.fg }} />
-      </div>
+      {selectMode ? (
+        <div
+          className="absolute top-1.5 right-1.5 flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full border-2"
+          style={{
+            borderColor: box.fg,
+            background: selected ? box.fg : 'transparent',
+          }}
+        >
+          {selected && <CheckIcon className="size-3" style={{ color: box.bg }} />}
+        </div>
+      ) : (
+        <div
+          onPointerDown={(e) => {
+            e.stopPropagation()
+            onPointerDownResize(e)
+          }}
+          className="absolute inset-x-0 bottom-0 flex h-[22px] cursor-ns-resize items-end justify-center pb-1"
+          style={{ touchAction: isDragging ? 'none' : 'pan-y' }}
+        >
+          <div className="h-[3px] w-8 rounded-full opacity-45" style={{ background: box.fg }} />
+        </div>
+      )}
     </>
   )
 
-  // No context menu on mobile: a touch long-press fires the browser's
-  // contextmenu event, which would pop this menu *on top of* the action
-  // sheet the same hold already opens (see useTaskDragResize's
-  // onLongPressTask) — two overlapping menus for one gesture.
-  if (isMobile) return <div {...blockProps}>{blockContent}</div>
+  // No context menu on mobile or while multi-selecting: a touch long-press
+  // fires the browser's contextmenu event, which would pop this menu *on
+  // top of* the action sheet the same hold already opens (see
+  // useTaskDragResize's onLongPressTask) — two overlapping menus for one
+  // gesture. In select mode the context menu's duplicate/delete actions
+  // would also bypass the selection entirely, so it's suppressed there too.
+  if (isMobile || selectMode) return <div {...blockProps}>{blockContent}</div>
 
   return (
     <ContextMenu>

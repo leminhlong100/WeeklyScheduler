@@ -23,6 +23,8 @@ interface DayColumnProps {
   onDeleteTask: (id: string) => void
   onCloseNote: () => void
   onSaveNotes: (taskId: string, notes: TaskNoteItem[]) => void
+  selectMode: boolean
+  selectedIds: Set<string>
 }
 
 export function DayColumn({
@@ -40,6 +42,8 @@ export function DayColumn({
   onDeleteTask,
   onCloseNote,
   onSaveNotes,
+  selectMode,
+  selectedIds,
 }: DayColumnProps) {
   const openNoteTask = tasks.find((task) => task.id === openNoteTaskId)
 
@@ -70,6 +74,8 @@ export function DayColumn({
             theme={theme}
             isCurrent={isCurrent}
             dragOffset={dragPreview?.id === task.id ? dragPreview : null}
+            selectMode={selectMode}
+            selected={selectedIds.has(task.id)}
             onPointerDownMove={(e) => onStartDrag(e, task.id, 'move')}
             onPointerDownResize={(e) => onStartDrag(e, task.id, 'resize')}
             onDuplicate={() => onDuplicateTask(task.id)}

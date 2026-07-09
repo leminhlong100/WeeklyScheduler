@@ -14,10 +14,7 @@ interface DayHeaderRowProps {
 
 export function DayHeaderRow({ days, theme }: DayHeaderRowProps) {
   return (
-    <div
-      className="sticky top-0 z-30 flex border-b"
-      style={{ background: theme.panel, borderColor: theme.borderStrong }}
-    >
+    <div className="flex border-b" style={{ background: theme.panel, borderColor: theme.borderStrong }}>
       <div className="w-16 flex-shrink-0" />
       <div className="flex flex-1">
         {days.map((d) => (

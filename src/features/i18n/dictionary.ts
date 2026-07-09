@@ -24,6 +24,17 @@ export interface Dictionary {
   copyLastWeek: string
   copyLastWeekConfirm: string
   repeatOnDays: string
+  selectTasks: string
+  /** "{n} selected" — {n} is replaced with the current selection count. */
+  selectedCount: string
+  deleteSelected: string
+  /** "{n}" is replaced with the number of tasks about to be deleted. */
+  deleteSelectedConfirm: string
+  clearWeek: string
+  clearWeekConfirm: string
+  tasksCleared: string
+  /** "{n}" is replaced with the number of tasks deleted. */
+  tasksDeletedCount: string
 
   note: string
   noteAddItemPh: string

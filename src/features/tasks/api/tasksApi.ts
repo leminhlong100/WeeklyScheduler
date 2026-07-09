@@ -44,3 +44,9 @@ export async function deleteTask(id: string): Promise<void> {
   const { error } = await supabase.from('tasks').delete().eq('id', id)
   if (error) throw error
 }
+
+export async function bulkDeleteTasks(ids: string[]): Promise<void> {
+  if (ids.length === 0) return
+  const { error } = await supabase.from('tasks').delete().in('id', ids)
+  if (error) throw error
+}

@@ -1,6 +1,7 @@
 import { useMemo, useRef, useState, type PointerEvent as ReactPointerEvent } from 'react'
 import type { Dayjs } from 'dayjs'
 import { toast } from 'sonner'
+import { CheckSquareIcon, Trash2Icon } from 'lucide-react'
 import type { DerivedTheme } from '@/features/theme/types'
 import type { Dictionary } from '@/features/i18n/dictionary'
 import { useIsMobile } from '@/hooks/useMediaQuery'
@@ -8,7 +9,7 @@ import { addDays, parseISODate, todayISO as getTodayISO, toISODate } from '@/lib
 import { CREATE_SNAP_MINUTES, DEFAULT_SNAP_MINUTES, GRID_END_MINUTE, GRID_START_MINUTE, HOUR_HEIGHT_PX } from '@/constants/grid'
 import type { Category } from '@/features/categories/api/categoriesApi'
 import type { Task } from '../api/tasksApi'
-import { useCreateTask, useDeleteTask, useUpdateTask } from '../hooks/useTaskMutations'
+import { useCreateTask, useDeleteTask, useDeleteTasks, useUpdateTask } from '../hooks/useTaskMutations'
 import { useTaskDragResize, type TaskOrigin } from '../hooks/useTaskDragResize'
 import { useNowMinutes } from '../hooks/useNowMinutes'
 import { useScrollToNow } from '../hooks/useScrollToNow'
@@ -60,8 +61,11 @@ export function WeekGrid({
   const updateTask = useUpdateTask(weekStartISO)
   const createTask = useCreateTask(weekStartISO)
   const deleteTask = useDeleteTask(weekStartISO)
+  const deleteTasks = useDeleteTasks(weekStartISO)
   const [openNoteTaskId, setOpenNoteTaskId] = useState<string | null>(null)
   const [actionSheetTaskId, setActionSheetTaskId] = useState<string | null>(null)
+  const [selectMode, setSelectMode] = useState(false)
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
   const swipeRef = useRef<{ startX: number; startY: number; onTask: boolean } | null>(null)
 
   const categoryById = useMemo(() => new Map(categories.map((c) => [c.id, c])), [categories])
@@ -117,6 +121,15 @@ export function WeekGrid({
     return undefined
   }
 
+  const toggleSelected = (id: string) => {
+    setSelectedIds((prev) => {
+      const next = new Set(prev)
+      if (next.has(id)) next.delete(id)
+      else next.add(id)
+      return next
+    })
+  }
+
   const { preview, startDrag } = useTaskDragResize({
     weekStart,
     snapMinutes: DEFAULT_SNAP_MINUTES,
@@ -125,22 +138,37 @@ export function WeekGrid({
     lockDay: isMobile,
     getTaskOrigin,
     onMove: (id, { dayIndex, startMinute }) => {
+      if (selectMode) return
       updateTask.mutate({
         id,
         patch: { task_date: toISODate(addDays(weekStart, dayIndex)), start_minute: startMinute },
       })
     },
     onResize: (id, { durationMinute }) => {
+      if (selectMode) return
       updateTask.mutate({ id, patch: { duration_minute: durationMinute } })
     },
     // A tap always opens the note popover — on mobile that's the one thing
     // that was hard to reach before. The action sheet (edit/duplicate/delete)
     // is reserved for a touch hold-and-release (see onLongPressTask) so it
     // doesn't compete with the note tap; desktop keeps double-click-for-edit
-    // and its right-click context menu for duplicate/delete.
-    onClickTask: setOpenNoteTaskId,
-    onLongPressTask: setActionSheetTaskId,
-    onDoubleClickTask: onRequestEdit,
+    // and its right-click context menu for duplicate/delete. In select mode
+    // a tap toggles the task into the selection instead of any of that.
+    onClickTask: (id) => {
+      if (selectMode) {
+        toggleSelected(id)
+        return
+      }
+      setOpenNoteTaskId(id)
+    },
+    onLongPressTask: (id) => {
+      if (selectMode) return
+      setActionSheetTaskId(id)
+    },
+    onDoubleClickTask: (id) => {
+      if (selectMode) return
+      onRequestEdit(id)
+    },
   })
 
   const isTodayInWeek = days.some((day) => day.isToday)
@@ -175,6 +203,43 @@ export function WeekGrid({
 
   const handleSaveNotes = (taskId: string, notes: TaskNoteItem[]) => {
     updateTask.mutate({ id: taskId, patch: { notes } })
+  }
+
+  const handleEnterSelectMode = () => {
+    setOpenNoteTaskId(null)
+    setActionSheetTaskId(null)
+    setSelectMode(true)
+  }
+
+  const handleCancelSelect = () => {
+    setSelectMode(false)
+    setSelectedIds(new Set())
+  }
+
+  const handleDeleteSelected = () => {
+    const ids = Array.from(selectedIds)
+    if (ids.length === 0) return
+    if (!window.confirm(t.deleteSelectedConfirm.replace('{n}', String(ids.length)))) return
+    deleteTasks.mutate(ids, {
+      onSuccess: () => toast.success(t.tasksDeletedCount.replace('{n}', String(ids.length))),
+      onError: () => toast.error(t.somethingWentWrong),
+    })
+    setSelectMode(false)
+    setSelectedIds(new Set())
+  }
+
+  const handleClearWeek = () => {
+    if (tasks.length === 0) return
+    if (!window.confirm(t.clearWeekConfirm)) return
+    deleteTasks.mutate(
+      tasks.map((task) => task.id),
+      {
+        onSuccess: () => toast.success(t.tasksCleared),
+        onError: () => toast.error(t.somethingWentWrong),
+      },
+    )
+    setSelectMode(false)
+    setSelectedIds(new Set())
   }
 
   const handleCreateAt = (dayIndex: number, clientY: number, boundingTop: number) => {
@@ -231,13 +296,75 @@ export function WeekGrid({
     />
   )
 
+  const toolbarButtonClass =
+    'flex h-9 flex-shrink-0 items-center gap-1.5 rounded-xl border-[1.5px] px-3 text-[12.5px] font-bold transition-transform duration-150 active:scale-95 disabled:cursor-not-allowed disabled:opacity-45 disabled:active:scale-100'
+
+  const selectionToolbar = (
+    <div
+      className="flex flex-shrink-0 items-center gap-2 border-b px-2.5 py-2 sm:px-4"
+      style={{ background: theme.panel, borderColor: theme.borderStrong }}
+    >
+      {selectMode ? (
+        <>
+          <span className="min-w-0 truncate text-[13px] font-bold" style={{ color: theme.text }}>
+            {t.selectedCount.replace('{n}', String(selectedIds.size))}
+          </span>
+          <div className="flex-1" />
+          <button
+            type="button"
+            onClick={handleCancelSelect}
+            className={toolbarButtonClass}
+            style={{ borderColor: theme.border, background: theme.chip, color: theme.text }}
+          >
+            {t.cancel}
+          </button>
+          <button
+            type="button"
+            onClick={handleDeleteSelected}
+            disabled={selectedIds.size === 0 || deleteTasks.isPending}
+            className={toolbarButtonClass}
+            style={{ borderColor: theme.border, background: theme.chip, color: '#e0284f' }}
+          >
+            <Trash2Icon className="size-4" />
+            {t.deleteSelected}
+          </button>
+        </>
+      ) : (
+        <>
+          <button
+            type="button"
+            onClick={handleEnterSelectMode}
+            disabled={tasks.length === 0}
+            className={toolbarButtonClass}
+            style={{ borderColor: theme.border, background: theme.chip, color: theme.text }}
+          >
+            <CheckSquareIcon className="size-4" />
+            {t.selectTasks}
+          </button>
+          <button
+            type="button"
+            onClick={handleClearWeek}
+            disabled={tasks.length === 0 || deleteTasks.isPending}
+            className={toolbarButtonClass}
+            style={{ borderColor: theme.border, background: theme.chip, color: '#e0284f' }}
+          >
+            <Trash2Icon className="size-4" />
+            {t.clearWeek}
+          </button>
+        </>
+      )}
+    </div>
+  )
+
   if (isMobile) {
     return (
       <div>
-        <div
-          className="sticky top-0 z-30 flex border-b"
-          style={{ background: theme.panel, borderColor: theme.borderStrong }}
-        >
+        <div className="sticky top-0 z-30">
+          {selectionToolbar}
+          <div
+            className="flex border-b"
+            style={{ background: theme.panel, borderColor: theme.borderStrong }}
+          >
           <div className="w-16 flex-shrink-0" />
           <div className="flex flex-1 gap-1.5 overflow-x-auto px-2.5 py-2 scrollbar-hidden">
             {days.map((day, dayIndex) => {
@@ -272,6 +399,7 @@ export function WeekGrid({
               )
             })}
           </div>
+          </div>
         </div>
         <div className="relative flex">
           <HourRuler theme={theme} />
@@ -299,6 +427,8 @@ export function WeekGrid({
                 onDeleteTask={handleDeleteTask}
                 onCloseNote={() => setOpenNoteTaskId(null)}
                 onSaveNotes={handleSaveNotes}
+                selectMode={selectMode}
+                selectedIds={selectedIds}
               />
             </div>
           </div>
@@ -310,7 +440,10 @@ export function WeekGrid({
 
   return (
     <div className="min-w-[700px]">
-      <DayHeaderRow days={days} theme={theme} />
+      <div className="sticky top-0 z-30">
+        {selectionToolbar}
+        <DayHeaderRow days={days} theme={theme} />
+      </div>
       <div className="relative flex">
         <HourRuler theme={theme} />
         <div ref={gridRef} className="flex flex-1">
@@ -325,12 +458,14 @@ export function WeekGrid({
               nowTopPx={day.isToday ? minutesToTopPx(nowMinutes) : null}
               dragPreview={preview}
               openNoteTaskId={openNoteTaskId}
-              onCreateAt={(clientY, boundingTop) => handleCreateAt(dayIndex, clientY, boundingTop)}
+              onCreateAt={selectMode ? undefined : (clientY, boundingTop) => handleCreateAt(dayIndex, clientY, boundingTop)}
               onStartDrag={startDrag}
               onDuplicateTask={handleDuplicateTask}
               onDeleteTask={handleDeleteTask}
               onCloseNote={() => setOpenNoteTaskId(null)}
               onSaveNotes={handleSaveNotes}
+              selectMode={selectMode}
+              selectedIds={selectedIds}
             />
           ))}
         </div>
