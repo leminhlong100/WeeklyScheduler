@@ -30,6 +30,11 @@ export const ja: Dictionary = {
   clearWeekConfirm: '今週の予定をすべて削除しますか？元に戻せません。',
   tasksCleared: '今週の予定を削除しました',
   tasksDeletedCount: '{n}件の予定を削除しました',
+  editSelected: '編集',
+  bulkEditTitle: '{n}件の予定を編集',
+  bulkEditHint: '変更したい項目をオンにしてください。オフの項目はそのまま保持されます。',
+  tasksUpdatedCount: '{n}件の予定を更新しました',
+  keepUnchanged: '変更しない',
 
   note: 'メモ',
   noteAddItemPh: 'やることを追加…',

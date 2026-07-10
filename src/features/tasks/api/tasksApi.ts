@@ -50,3 +50,11 @@ export async function bulkDeleteTasks(ids: string[]): Promise<void> {
   const { error } = await supabase.from('tasks').delete().in('id', ids)
   if (error) throw error
 }
+
+/** Applies the same partial patch to every task in `ids` — used by multi-select bulk edit. */
+export async function bulkUpdateTasks(ids: string[], patch: TaskUpdate): Promise<Task[]> {
+  if (ids.length === 0) return []
+  const { data, error } = await supabase.from('tasks').update(patch).in('id', ids).select('*')
+  if (error) throw error
+  return data
+}

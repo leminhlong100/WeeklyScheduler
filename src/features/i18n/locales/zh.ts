@@ -30,6 +30,11 @@ export const zh: Dictionary = {
   clearWeekConfirm: '删除本周所有事件？此操作无法撤销。',
   tasksCleared: '已清空本周',
   tasksDeletedCount: '已删除 {n} 个事件',
+  editSelected: '编辑',
+  bulkEditTitle: '编辑 {n} 个事件',
+  bulkEditHint: '开启你想修改的字段，未开启的字段将保持不变。',
+  tasksUpdatedCount: '已更新 {n} 个事件',
+  keepUnchanged: '保持不变',
 
   note: '备注',
   noteAddItemPh: '添加待办事项…',

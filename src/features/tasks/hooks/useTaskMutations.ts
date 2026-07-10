@@ -5,6 +5,7 @@ import { addDays, parseISODate, toISODate } from '@/lib/utils/date'
 import {
   bulkCreateTasks,
   bulkDeleteTasks,
+  bulkUpdateTasks,
   createTask,
   deleteTask,
   listTasksForRange,
@@ -145,6 +146,28 @@ export function useDeleteTask(weekStartISO: string) {
     onMutate: async (id) => {
       const previous = queryClient.getQueryData<Task[]>(key)
       queryClient.setQueryData<Task[]>(key, (prev) => (prev ?? []).filter((task) => task.id !== id))
+      return { previous }
+    },
+    onError: (_err, _vars, context) => {
+      if (context?.previous) queryClient.setQueryData(key, context.previous)
+    },
+  })
+}
+
+/** Applies the same patch to many tasks at once — used by multi-select bulk edit. */
+export function useUpdateTasks(weekStartISO: string) {
+  const { user } = useAuth()
+  const queryClient = useQueryClient()
+  const key = tasksQueryKey(user?.id, weekStartISO)
+
+  return useMutation({
+    mutationFn: ({ ids, patch }: { ids: string[]; patch: TaskUpdate }) => bulkUpdateTasks(ids, patch),
+    onMutate: async ({ ids, patch }) => {
+      const previous = queryClient.getQueryData<Task[]>(key)
+      const idSet = new Set(ids)
+      queryClient.setQueryData<Task[]>(key, (prev) =>
+        (prev ?? []).map((task) => (idSet.has(task.id) ? { ...task, ...patch } : task)),
+      )
       return { previous }
     },
     onError: (_err, _vars, context) => {

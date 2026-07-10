@@ -1,7 +1,7 @@
 import { useMemo, useRef, useState, type PointerEvent as ReactPointerEvent } from 'react'
 import type { Dayjs } from 'dayjs'
 import { toast } from 'sonner'
-import { CheckSquareIcon, Trash2Icon } from 'lucide-react'
+import { CheckSquareIcon, PencilIcon, Trash2Icon } from 'lucide-react'
 import type { DerivedTheme } from '@/features/theme/types'
 import type { Dictionary } from '@/features/i18n/dictionary'
 import { useIsMobile } from '@/hooks/useMediaQuery'
@@ -9,7 +9,7 @@ import { addDays, parseISODate, todayISO as getTodayISO, toISODate } from '@/lib
 import { CREATE_SNAP_MINUTES, DEFAULT_SNAP_MINUTES, GRID_END_MINUTE, GRID_START_MINUTE, HOUR_HEIGHT_PX } from '@/constants/grid'
 import type { Category } from '@/features/categories/api/categoriesApi'
 import type { Task } from '../api/tasksApi'
-import { useCreateTask, useDeleteTask, useDeleteTasks, useUpdateTask } from '../hooks/useTaskMutations'
+import { useCreateTask, useDeleteTask, useDeleteTasks, useUpdateTask, useUpdateTasks } from '../hooks/useTaskMutations'
 import { useTaskDragResize, type TaskOrigin } from '../hooks/useTaskDragResize'
 import { useNowMinutes } from '../hooks/useNowMinutes'
 import { useScrollToNow } from '../hooks/useScrollToNow'
@@ -20,6 +20,8 @@ import { HourRuler } from './HourRuler'
 import { DayHeaderRow, type DayHeaderInfo } from './DayHeaderRow'
 import { DayColumn } from './DayColumn'
 import { TaskActionSheet } from './TaskActionSheet'
+import { TaskBulkEditModal } from './TaskBulkEditModal'
+import type { TaskUpdate } from '../api/tasksApi'
 
 /** Horizontal drag distance (px) that counts as a day-change swipe, not a scroll/tap. */
 const SWIPE_THRESHOLD_PX = 55
@@ -62,10 +64,12 @@ export function WeekGrid({
   const createTask = useCreateTask(weekStartISO)
   const deleteTask = useDeleteTask(weekStartISO)
   const deleteTasks = useDeleteTasks(weekStartISO)
+  const updateTasks = useUpdateTasks(weekStartISO)
   const [openNoteTaskId, setOpenNoteTaskId] = useState<string | null>(null)
   const [actionSheetTaskId, setActionSheetTaskId] = useState<string | null>(null)
   const [selectMode, setSelectMode] = useState(false)
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
+  const [bulkEditOpen, setBulkEditOpen] = useState(false)
   const swipeRef = useRef<{ startX: number; startY: number; onTask: boolean } | null>(null)
 
   const categoryById = useMemo(() => new Map(categories.map((c) => [c.id, c])), [categories])
@@ -228,6 +232,21 @@ export function WeekGrid({
     setSelectedIds(new Set())
   }
 
+  const handleApplyBulkEdit = (patch: TaskUpdate) => {
+    const ids = Array.from(selectedIds)
+    if (ids.length === 0) return
+    updateTasks.mutate(
+      { ids, patch },
+      {
+        onSuccess: () => toast.success(t.tasksUpdatedCount.replace('{n}', String(ids.length))),
+        onError: () => toast.error(t.somethingWentWrong),
+      },
+    )
+    setBulkEditOpen(false)
+    setSelectMode(false)
+    setSelectedIds(new Set())
+  }
+
   const handleClearWeek = () => {
     if (tasks.length === 0) return
     if (!window.confirm(t.clearWeekConfirm)) return
@@ -296,6 +315,15 @@ export function WeekGrid({
     />
   )
 
+  const bulkEditModal = bulkEditOpen ? (
+    <TaskBulkEditModal
+      count={selectedIds.size}
+      onClose={() => setBulkEditOpen(false)}
+      onApply={handleApplyBulkEdit}
+      isPending={updateTasks.isPending}
+    />
+  ) : null
+
   const toolbarButtonClass =
     'flex h-9 flex-shrink-0 items-center gap-1.5 rounded-xl border-[1.5px] px-3 text-[12.5px] font-bold transition-transform duration-150 active:scale-95 disabled:cursor-not-allowed disabled:opacity-45 disabled:active:scale-100'
 
@@ -317,6 +345,16 @@ export function WeekGrid({
             style={{ borderColor: theme.border, background: theme.chip, color: theme.text }}
           >
             {t.cancel}
+          </button>
+          <button
+            type="button"
+            onClick={() => setBulkEditOpen(true)}
+            disabled={selectedIds.size === 0 || updateTasks.isPending}
+            className={toolbarButtonClass}
+            style={{ borderColor: theme.border, background: theme.chip, color: theme.text }}
+          >
+            <PencilIcon className="size-4" />
+            {t.editSelected}
           </button>
           <button
             type="button"
@@ -434,6 +472,7 @@ export function WeekGrid({
           </div>
         </div>
         {actionSheet}
+        {bulkEditModal}
       </div>
     )
   }
@@ -471,6 +510,7 @@ export function WeekGrid({
         </div>
       </div>
       {actionSheet}
+      {bulkEditModal}
     </div>
   )
 }

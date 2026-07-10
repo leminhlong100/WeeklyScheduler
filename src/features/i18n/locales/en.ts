@@ -30,6 +30,11 @@ export const en: Dictionary = {
   clearWeekConfirm: "Delete all events this week? This can't be undone.",
   tasksCleared: 'Week cleared',
   tasksDeletedCount: '{n} event(s) deleted',
+  editSelected: 'Edit',
+  bulkEditTitle: 'Edit {n} event(s)',
+  bulkEditHint: 'Turn on the fields you want to change. Fields left off stay as they are.',
+  tasksUpdatedCount: '{n} event(s) updated',
+  keepUnchanged: 'Keep unchanged',
 
   note: 'Note',
   noteAddItemPh: 'Add a to-do…',

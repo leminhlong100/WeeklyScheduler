@@ -30,6 +30,11 @@ export const vi: Dictionary = {
   clearWeekConfirm: 'Xóa tất cả sự kiện trong tuần này? Không thể hoàn tác.',
   tasksCleared: 'Đã xóa toàn bộ tuần',
   tasksDeletedCount: 'Đã xóa {n} sự kiện',
+  editSelected: 'Sửa',
+  bulkEditTitle: 'Sửa {n} sự kiện',
+  bulkEditHint: 'Bật trường bạn muốn đổi. Trường tắt sẽ giữ nguyên.',
+  tasksUpdatedCount: 'Đã cập nhật {n} sự kiện',
+  keepUnchanged: 'Giữ nguyên',
 
   note: 'Ghi chú',
   noteAddItemPh: 'Thêm việc cần làm…',

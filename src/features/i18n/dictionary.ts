@@ -35,6 +35,13 @@ export interface Dictionary {
   tasksCleared: string
   /** "{n}" is replaced with the number of tasks deleted. */
   tasksDeletedCount: string
+  editSelected: string
+  /** "{n}" is replaced with the number of tasks being edited. */
+  bulkEditTitle: string
+  bulkEditHint: string
+  /** "{n}" is replaced with the number of tasks updated. */
+  tasksUpdatedCount: string
+  keepUnchanged: string
 
   note: string
   noteAddItemPh: string
