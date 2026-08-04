@@ -16,5 +16,12 @@ export const queryPersister = createAsyncStoragePersister({
   },
 })
 
-/** Bump this if a cached query's shape ever changes incompatibly. */
-export const QUERY_CACHE_BUSTER = 'v1'
+/**
+ * Bump this if a cached query's shape ever changes incompatibly.
+ *
+ * v2: `['profile', uid]` gained `custom_theme_id`. A persisted v1 profile lacks
+ * it, so on the first load after deploy the sync hook would compare against
+ * `undefined` and push the local (preset-only) state back over the user's saved
+ * custom selection.
+ */
+export const QUERY_CACHE_BUSTER = 'v2'

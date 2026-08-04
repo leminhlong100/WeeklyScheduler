@@ -7,6 +7,7 @@ import { useIsMobile } from '@/hooks/useMediaQuery'
 import { cn } from '@/lib/utils'
 import { DecorBackground } from './DecorBackground'
 import { LanguageSwitcher } from './LanguageSwitcher'
+import { ThemeArtLayer } from './ThemeArtLayer'
 
 export interface CategorySidebarItem {
   id: string
@@ -68,6 +69,7 @@ export function Sidebar({
         style={{ width: isMobile ? undefined : open ? '328px' : '0px', background: theme.sideGrad }}
       >
         <DecorBackground theme={theme} variant="sidebar" />
+        <ThemeArtLayer theme={theme} variant="sidebar" />
 
         <div className="relative z-10 flex h-full w-full flex-col justify-center gap-5 overflow-y-auto px-5 py-[22px] pb-7">
           <div className="flex items-center gap-[11px]">

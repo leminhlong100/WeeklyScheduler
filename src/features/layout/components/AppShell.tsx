@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react'
 import type { DerivedTheme } from '@/features/theme/types'
 import { DecorBackground } from './DecorBackground'
+import { ThemeArtLayer } from './ThemeArtLayer'
 
 interface AppShellProps {
   theme: DerivedTheme
@@ -35,6 +36,8 @@ export function AppShell({ theme, sidebar, header, bottomBar, children }: AppShe
         <div className="flex min-h-0 flex-1 overflow-hidden">
           {sidebar}
           <main className="relative flex min-w-0 flex-1 flex-col" style={{ background: theme.mainBg }}>
+            {/* No z-index, so it layers under the z-50 content well below. */}
+            <ThemeArtLayer theme={theme} variant="main" />
             {header}
             <div className="relative z-[50] min-h-0 flex-1 overflow-auto">{children}</div>
             {bottomBar}

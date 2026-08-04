@@ -11,7 +11,7 @@ interface ThemePickerModalProps {
 
 export function ThemePickerModal({ open, onOpenChange }: ThemePickerModalProps) {
   const { t, locale } = useTranslation()
-  const { themeKey, setThemeKey, theme } = useTheme()
+  const { themeId, setThemeId, theme } = useTheme()
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -34,11 +34,11 @@ export function ThemePickerModal({ open, onOpenChange }: ThemePickerModalProps) 
             <ThemeSwatchButton
               key={def.key}
               def={def}
-              active={def.key === themeKey}
+              active={def.key === themeId}
               activeTheme={theme}
               locale={locale}
               onSelect={() => {
-                setThemeKey(def.key)
+                setThemeId(def.key)
                 onOpenChange(false)
               }}
             />
