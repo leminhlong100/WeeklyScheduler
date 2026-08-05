@@ -21,7 +21,7 @@ export const en: Dictionary = {
   duplicate: 'Duplicate',
   taskColor: 'Event color',
   taskColorAuto: 'Follow category',
-  taskColorCustom: 'Custom color',
+  customColor: 'Custom color',
   copyLastWeek: 'Copy last week',
   copyLastWeekConfirm: "Copy all of last week's events (including notes) into this week?",
   repeatOnDays: 'Repeat on days',

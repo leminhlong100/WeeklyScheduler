@@ -21,7 +21,7 @@ export const ja: Dictionary = {
   duplicate: '複製',
   taskColor: '予定の色',
   taskColorAuto: 'カテゴリに合わせる',
-  taskColorCustom: 'カスタムカラー',
+  customColor: 'カスタムカラー',
   copyLastWeek: '先週をコピー',
   copyLastWeekConfirm: '先週の予定（メモを含む）をすべて今週にコピーしますか？',
   repeatOnDays: '繰り返す曜日',

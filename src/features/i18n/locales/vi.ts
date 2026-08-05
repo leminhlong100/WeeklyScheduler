@@ -21,7 +21,7 @@ export const vi: Dictionary = {
   duplicate: 'Nhân bản',
   taskColor: 'Màu sự kiện',
   taskColorAuto: 'Theo danh mục',
-  taskColorCustom: 'Màu tuỳ chọn',
+  customColor: 'Màu tuỳ chọn',
   copyLastWeek: 'Copy tuần trước',
   copyLastWeekConfirm: 'Copy toàn bộ sự kiện (kèm ghi chú) từ tuần trước sang tuần này?',
   repeatOnDays: 'Lặp lại vào các ngày',
