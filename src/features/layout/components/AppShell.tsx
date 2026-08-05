@@ -37,6 +37,8 @@ export function AppShell({
         fontFamily: "'Baloo 2','Quicksand','Noto Sans SC','Noto Sans JP',sans-serif",
       }}
     >
+      {/* Scenery first, then the floating shapes on top of it. */}
+      <ThemeArtLayer theme={theme} variant="page" />
       <DecorBackground theme={theme} variant="main" />
 
       <div
