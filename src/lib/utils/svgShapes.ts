@@ -31,15 +31,27 @@ const SHAPE_MARKUP: Record<DecorShape, string> = {
 }
 
 /**
- * Builds a `url("data:image/svg+xml,...")` CSS background value for one of
- * the cute decorative shapes, tinted with `color`.
+ * Bare `data:image/svg+xml,...` URI for one of the cute decorative shapes,
+ * tinted with `color`.
+ *
+ * This is the form an `<img src>` or `background-image` needs. Use
+ * `buildShapeDataUri` when the value goes straight into a `background`
+ * shorthand, which needs the `url()` wrapper.
  */
-export function buildShapeDataUri(shape: DecorShape, color = '#ff9ec4'): string {
+export function buildShapeSrc(shape: DecorShape, color = '#ff9ec4'): string {
   const inner = (SHAPE_MARKUP[shape] ?? SHAPE_MARKUP.star)
     .split('@')
     .join(color)
     .split('~')
     .join('#fff4bf')
   const svg = `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'>${inner}</svg>`
-  return `url("data:image/svg+xml,${encodeURIComponent(svg)}")`
+  return `data:image/svg+xml,${encodeURIComponent(svg)}`
+}
+
+/**
+ * Builds a `url("data:image/svg+xml,...")` CSS background value for one of
+ * the cute decorative shapes, tinted with `color`.
+ */
+export function buildShapeDataUri(shape: DecorShape, color = '#ff9ec4'): string {
+  return `url("${buildShapeSrc(shape, color)}")`
 }

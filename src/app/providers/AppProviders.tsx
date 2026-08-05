@@ -27,16 +27,20 @@ export function AppProviders({ children }: { children: ReactNode }) {
         buster: QUERY_CACHE_BUSTER,
       }}
     >
+      {/* AuthProvider sits above ThemeProvider because themes are now per-account:
+          ThemeProvider calls useCustomThemes, which needs useAuth. The reverse
+          order worked only while themes were entirely local. AuthProvider itself
+          touches nothing but supabase.auth, so it is safe above. */}
       <LocaleProvider>
-        <ThemeProvider>
-          <AuthProvider>
+        <AuthProvider>
+          <ThemeProvider>
             <TooltipProvider>
               <BrowserRouter>{children}</BrowserRouter>
               <Toaster position="top-center" richColors />
               <PwaUpdatePrompt />
             </TooltipProvider>
-          </AuthProvider>
-        </ThemeProvider>
+          </ThemeProvider>
+        </AuthProvider>
       </LocaleProvider>
     </PersistQueryClientProvider>
   )
