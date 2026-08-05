@@ -2,7 +2,7 @@ import { Plus, X } from 'lucide-react'
 
 import { ColorField } from '@/components/form/ColorField'
 import { ToggleChipGroup } from '@/components/form/ToggleChipGroup'
-import { DECOR_SHAPES, buildShapeDataUri, type DecorShape } from '@/lib/utils/svgShapes'
+import { DECOR_SHAPES, buildShapeSrc, type DecorShape } from '@/lib/utils/svgShapes'
 import { defaultDecorColors } from '../../recipe/buildTheme'
 import type { StudioTabProps } from '../types'
 
@@ -60,9 +60,13 @@ export function DecorTab({ draft, chrome, t }: StudioTabProps) {
         <ToggleChipGroup<DecorShape>
           options={DECOR_SHAPES.map((shape) => ({
             value: shape,
+            // `buildShapeSrc`, not `buildShapeDataUri` — the latter returns a CSS
+            // `background` value with the `url()` wrapper already on it, which an
+            // `<img src>` would try to fetch literally.
+            //
             // Tinted with the actual first decor colour, so the tile previews what
             // will land on the background rather than a generic glyph.
-            label: <img src={buildShapeDataUri(shape, tint)} alt={shape} className="size-6" />,
+            label: <img src={buildShapeSrc(shape, tint)} alt={shape} className="size-6" />,
           }))}
           value={recipe.decor}
           onChange={(decor) => dispatch({ type: 'recipe', patch: { decor } })}
