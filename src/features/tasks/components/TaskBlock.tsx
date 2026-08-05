@@ -7,7 +7,7 @@ import { useIsMobile } from '@/hooks/useMediaQuery'
 import { formatMinutesAsTime } from '@/lib/utils/date'
 import { durationToHeightPx, minutesToTopPx } from '../utils/gridMath'
 import { taskBoxStyle } from '../utils/taskBoxStyle'
-import type { TaskWithCategory } from '../types'
+import { taskColor, type TaskWithCategory } from '../types'
 import type { DragMode } from '../hooks/useTaskDragResize'
 
 interface TaskBlockProps {
@@ -38,7 +38,8 @@ export function TaskBlock({
 }: TaskBlockProps) {
   const { t } = useTranslation()
   const isMobile = useIsMobile()
-  const box = taskBoxStyle(task.categoryColor, theme, isCurrent)
+  const color = taskColor(task)
+  const box = taskBoxStyle(color, theme, isCurrent)
   const top = minutesToTopPx(task.startMinute)
   let height = durationToHeightPx(task.durationMinute)
   let transform: string | undefined
@@ -107,7 +108,7 @@ export function TaskBlock({
     <>
       <div
         className="absolute top-0 bottom-0 left-0 w-1 rounded-l-[5px]"
-        style={{ background: task.categoryColor }}
+        style={{ background: color }}
       />
       <div className="flex min-w-0 items-center gap-1.5">
         <span className="flex-shrink-0 text-[13px] leading-none">{task.categoryEmoji}</span>

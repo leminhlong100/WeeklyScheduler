@@ -23,6 +23,8 @@ interface CreateTaskVars {
   taskDate: string
   startMinute: number
   durationMinute: number
+  /** Null (or omitted) leaves the task following its category's colour. */
+  color?: string | null
   notes?: TaskNoteItem[]
 }
 
@@ -40,6 +42,7 @@ export function useCreateTask(weekStartISO: string) {
         task_date: input.taskDate,
         start_minute: input.startMinute,
         duration_minute: input.durationMinute,
+        color: input.color ?? null,
         notes: input.notes ?? [],
       }),
     onSuccess: (created) => {
@@ -54,6 +57,7 @@ interface CreateTasksOnDaysVars {
   taskDates: string[]
   startMinute: number
   durationMinute: number
+  color?: string | null
 }
 
 /** Creates the same task on every date in `taskDates` in one request — used for "repeat on these days". */
@@ -72,6 +76,7 @@ export function useCreateTasksOnDays(weekStartISO: string) {
           task_date: taskDate,
           start_minute: input.startMinute,
           duration_minute: input.durationMinute,
+          color: input.color ?? null,
         })),
       ),
     onSuccess: (created) => {
@@ -124,6 +129,7 @@ export function useCopyPreviousWeek(weekStart: Dayjs) {
           task_date: toISODate(addDays(parseISODate(task.task_date), 7)),
           start_minute: task.start_minute,
           duration_minute: task.duration_minute,
+          color: task.color,
           notes: cloneNotes(task.notes),
         })),
       )

@@ -12,8 +12,21 @@ export interface TaskWithCategory {
   categoryId: string | null
   categoryEmoji: string
   categoryColor: string
+  /** The task's own colour. Null follows `categoryColor`. */
+  color: string | null
   notes: TaskNoteItem[]
 }
 
 export const UNCATEGORIZED_EMOJI = '📌'
 export const UNCATEGORIZED_COLOR = '#9aa0ac'
+
+/**
+ * The colour a task actually renders in.
+ *
+ * Stored as an override rather than a copy of the category colour, so a task
+ * left alone keeps following its category when that category is recoloured —
+ * only tasks the user deliberately painted break away.
+ */
+export function taskColor(task: Pick<TaskWithCategory, 'color' | 'categoryColor'>): string {
+  return task.color ?? task.categoryColor
+}
