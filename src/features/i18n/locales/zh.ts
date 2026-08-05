@@ -21,7 +21,7 @@ export const zh: Dictionary = {
   duplicate: '复制',
   taskColor: '事件颜色',
   taskColorAuto: '跟随分类',
-  taskColorCustom: '自定义颜色',
+  customColor: '自定义颜色',
   copyLastWeek: '复制上周',
   copyLastWeekConfirm: '将上周的所有事件（含备注）复制到本周？',
   repeatOnDays: '重复日期',

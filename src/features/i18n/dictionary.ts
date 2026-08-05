@@ -24,7 +24,8 @@ export interface Dictionary {
   taskColor: string
   /** Chip that clears a task's own colour so it follows its category again. */
   taskColorAuto: string
-  taskColorCustom: string
+  /** Shared by the task and category pickers' "any colour" swatch. */
+  customColor: string
   copyLastWeek: string
   copyLastWeekConfirm: string
   repeatOnDays: string
