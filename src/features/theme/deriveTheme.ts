@@ -32,5 +32,9 @@ export function deriveTheme(def: ThemeDefinition): DerivedTheme {
     sidebarMuted: 'rgba(255,255,255,0.78)',
     sidebarCard: 'rgba(255,255,255,0.16)',
     sidebarBorder: 'rgba(255,255,255,0.26)',
+    // Translucent so the thumb reads as part of whatever it floats over — the
+    // grid, the scenery behind it, or a modal — instead of a bar of flat colour.
+    scrollThumb: rgba(accent, dark ? 0.5 : 0.34),
+    scrollThumbHover: rgba(accent, dark ? 0.72 : 0.55),
   }
 }

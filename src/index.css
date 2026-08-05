@@ -133,19 +133,35 @@
   background: rgba(180, 140, 240, 0.3);
 }
 
+/*
+ * Scrollbars follow the active theme's accent. The custom properties are set on
+ * `:root` by ThemeContext; the literals here are the lavender default, used
+ * before the first paint and if a theme ever drops them.
+ */
 ::-webkit-scrollbar {
   width: 10px;
   height: 10px;
 }
+::-webkit-scrollbar-track {
+  /* Transparent, so the gutter beside the week grid shows the grid's own
+     background (and any theme scenery) instead of a stripe of its own. */
+  background: transparent;
+}
 ::-webkit-scrollbar-thumb {
-  background: rgba(170, 150, 210, 0.35);
+  background: var(--sched-scroll-thumb, rgba(170, 150, 210, 0.35));
   border-radius: 20px;
   border: 2px solid transparent;
   background-clip: padding-box;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(170, 150, 210, 0.55);
+  background: var(--sched-scroll-thumb-hover, rgba(170, 150, 210, 0.55));
   background-clip: padding-box;
+}
+
+/* Firefox has no ::-webkit pseudo-elements; this is the whole story there.
+   Inherited, so `:root` covers every scroller including portalled dialogs. */
+:root {
+  scrollbar-color: var(--sched-scroll-thumb, rgba(170, 150, 210, 0.35)) transparent;
 }
 
 .scrollbar-hidden {
