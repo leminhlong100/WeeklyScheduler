@@ -246,6 +246,15 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     if (meta.content !== theme.accent) meta.content = theme.accent
   }, [theme.accent])
 
+  // Scrollbars are painted by the browser, outside React's tree and outside the
+  // app shell's subtree — portalled dialogs scroll too — so their colours ride
+  // on `:root` custom properties that `index.css` reads.
+  useEffect(() => {
+    const root = document.documentElement.style
+    root.setProperty('--sched-scroll-thumb', theme.scrollThumb)
+    root.setProperty('--sched-scroll-thumb-hover', theme.scrollThumbHover)
+  }, [theme.scrollThumb, theme.scrollThumbHover])
+
   return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>
 }
 

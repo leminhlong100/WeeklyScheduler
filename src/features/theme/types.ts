@@ -120,4 +120,6 @@ export interface DerivedTheme extends ThemeDefinition {
   sidebarMuted: string
   sidebarCard: string
   sidebarBorder: string
+  scrollThumb: string
+  scrollThumbHover: string
 }
