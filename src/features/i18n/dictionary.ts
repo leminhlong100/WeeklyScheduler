@@ -21,6 +21,10 @@ export interface Dictionary {
   addEvent: string
   editEvent: string
   duplicate: string
+  taskColor: string
+  /** Chip that clears a task's own colour so it follows its category again. */
+  taskColorAuto: string
+  taskColorCustom: string
   copyLastWeek: string
   copyLastWeekConfirm: string
   repeatOnDays: string

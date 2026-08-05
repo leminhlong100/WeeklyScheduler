@@ -9,7 +9,9 @@ import { useTheme } from '@/features/theme/ThemeContext'
 import { useCategories } from '@/features/categories/hooks/useCategories'
 import type { TaskUpdate } from '../api/tasksApi'
 import { buildDurationOptions, buildStartTimeOptions } from '../utils/taskFormOptions'
+import { UNCATEGORIZED_COLOR } from '../types'
 import { TaskCategoryChips } from './TaskCategoryChips'
+import { TaskColorField } from './TaskColorField'
 
 interface TaskBulkEditModalProps {
   count: number
@@ -69,17 +71,19 @@ export function TaskBulkEditModal({ count, onClose, onApply, isPending }: TaskBu
 
   const [titleOn, setTitleOn] = useState(false)
   const [categoryOn, setCategoryOn] = useState(false)
+  const [colorOn, setColorOn] = useState(false)
   const [startOn, setStartOn] = useState(false)
   const [durationOn, setDurationOn] = useState(false)
 
   const [title, setTitle] = useState('')
   const [categoryId, setCategoryId] = useState<string | null>(categories[0]?.id ?? null)
+  const [color, setColor] = useState<string | null>(null)
   const [startMinute, setStartMinute] = useState(startOptions[0].value)
   const [durationMinute, setDurationMinute] = useState(60)
 
   const trimmedTitle = title.trim()
   const titleValid = !titleOn || trimmedTitle.length > 0
-  const nothingSelected = !titleOn && !categoryOn && !startOn && !durationOn
+  const nothingSelected = !titleOn && !categoryOn && !colorOn && !startOn && !durationOn
   const canApply = !nothingSelected && titleValid && !isPending
 
   const handleApply = () => {
@@ -87,6 +91,9 @@ export function TaskBulkEditModal({ count, onClose, onApply, isPending }: TaskBu
     const patch: TaskUpdate = {}
     if (titleOn) patch.title = trimmedTitle
     if (categoryOn) patch.category_id = categoryId
+    // Null is a real choice here — it hands the selection back to its
+    // categories' colours — so the toggle, not the value, decides inclusion.
+    if (colorOn) patch.color = color
     if (startOn) patch.start_minute = startMinute
     if (durationOn) patch.duration_minute = durationMinute
     onApply(patch)
@@ -127,6 +134,17 @@ export function TaskBulkEditModal({ count, onClose, onApply, isPending }: TaskBu
               categories={categories}
               selectedId={categoryId}
               onSelect={setCategoryId}
+              theme={theme}
+            />
+          </FieldToggle>
+
+          <FieldToggle label={t.taskColor} enabled={colorOn} onToggle={setColorOn}>
+            <TaskColorField
+              value={color}
+              onChange={setColor}
+              categoryColor={
+                categories.find((category) => category.id === categoryId)?.color ?? UNCATEGORIZED_COLOR
+              }
               theme={theme}
             />
           </FieldToggle>

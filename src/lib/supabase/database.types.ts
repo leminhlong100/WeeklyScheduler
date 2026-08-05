@@ -114,6 +114,8 @@ export interface Database {
           start_minute: number
           duration_minute: number
           notes: TaskNoteItem[]
+          /** Overrides the category's colour. Null follows the category. */
+          color: string | null
           created_at: string
           updated_at: string
         }
@@ -126,6 +128,7 @@ export interface Database {
           start_minute: number
           duration_minute: number
           notes?: TaskNoteItem[]
+          color?: string | null
         }
         Update: {
           category_id?: string | null
@@ -134,6 +137,7 @@ export interface Database {
           start_minute?: number
           duration_minute?: number
           notes?: TaskNoteItem[]
+          color?: string | null
         }
         Relationships: []
       }

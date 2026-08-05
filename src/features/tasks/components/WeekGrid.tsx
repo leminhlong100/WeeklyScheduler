@@ -111,6 +111,7 @@ export function WeekGrid({
         categoryId: task.category_id,
         categoryEmoji: category?.emoji ?? UNCATEGORIZED_EMOJI,
         categoryColor: category?.color ?? UNCATEGORIZED_COLOR,
+        color: task.color ?? null,
         notes: task.notes ?? [],
       })
     }
@@ -188,6 +189,7 @@ export function WeekGrid({
         taskDate: task.task_date,
         startMinute: task.start_minute,
         durationMinute: task.duration_minute,
+        color: task.color,
         notes: cloneNotes(task.notes),
       },
       {
