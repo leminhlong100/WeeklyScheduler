@@ -9,8 +9,8 @@ import {
   type ReactNode,
 } from 'react'
 import { deriveTheme } from './deriveTheme'
-import { useCustomThemes } from './hooks/useCustomThemes'
-import type { CustomThemeDraft, CustomThemeRecord } from './recipe/types'
+import { useCustomThemes, type SaveThemeInput } from './hooks/useCustomThemes'
+import type { CustomThemeRecord } from './recipe/types'
 import { getThemeDefinition } from './themes'
 import {
   customThemeId as toCustomThemeId,
@@ -93,7 +93,7 @@ interface ThemeContextValue {
   isPreviewing: boolean
   customThemes: CustomThemeRecord[]
   isCustomThemesLoading: boolean
-  saveCustomTheme: (draft: CustomThemeDraft & { id?: string }) => Promise<CustomThemeRecord | null>
+  saveCustomTheme: (draft: SaveThemeInput) => Promise<CustomThemeRecord | null>
   removeCustomTheme: (id: string) => Promise<void>
   newCustomThemeId: () => string
 }

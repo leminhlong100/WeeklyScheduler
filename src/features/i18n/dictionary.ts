@@ -59,6 +59,129 @@ export interface Dictionary {
   clearAll: string
   themeTitle: string
   themeSub: string
+
+  // --- theme picker: user-authored themes ---
+  themeMine: string
+  themePresets: string
+  themeCreate: string
+  themeEdit: string
+  themeDuplicate: string
+  themeDelete: string
+  themeDeleteConfirm: string
+  /** Contains `{n}`. */
+  themeLimitReached: string
+  themeSaveFailed: string
+
+  // --- theme studio shell ---
+  studioTitle: string
+  studioCreateTitle: string
+  studioSave: string
+  studioSaving: string
+  studioCancel: string
+  studioClose: string
+  studioUnsaved: string
+  studioDiscardConfirm: string
+  /** Hold-to-hide, so the whole app is visible behind the panel on a phone. */
+  studioPeek: string
+  studioMinimize: string
+  studioExpand: string
+  studioTabBasics: string
+  studioTabColors: string
+  studioTabDecor: string
+  studioTabArt: string
+  studioTabAdvanced: string
+
+  // --- basics tab ---
+  studioName: string
+  studioNamePh: string
+  studioIcon: string
+  studioIconPh: string
+  studioBasedOn: string
+  studioReseedConfirm: string
+  studioMode: string
+  studioModeLight: string
+  studioModeDark: string
+
+  // --- colours tab ---
+  studioAccent: string
+  studioSecondary: string
+  studioSecondaryAuto: string
+  studioHighlight: string
+  studioPaper: string
+  studioPaperPure: string
+  studioPaperTinted: string
+  studioPaperWarm: string
+  studioIntensity: string
+  studioSidebarDepth: string
+  studioLineTint: string
+  studioLineTintWhite: string
+  studioLineTintAccent: string
+  studioRandomize: string
+  studioTokens: string
+  studioTokensHint: string
+
+  // --- decor tab ---
+  studioShapes: string
+  studioShapesHint: string
+  studioDecorColors: string
+  studioSidebarShapeNote: string
+
+  // --- artwork tab ---
+  studioScene: string
+  studioSceneHint: string
+  studioSceneOpacity: string
+  studioScenePosition: string
+  studioPosCenterBottom: string
+  studioPosCenterCenter: string
+  studioPosCenterTop: string
+  studioPosLeftBottom: string
+  studioPosRightBottom: string
+  studioSideScene: string
+  studioSideSceneHint: string
+  studioFigures: string
+  studioFiguresHint: string
+  studioAddFigure: string
+  studioFigureX: string
+  studioFigureH: string
+  studioFigureFlip: string
+  studioFigureOpacity: string
+  studioRemove: string
+
+  // --- advanced tab ---
+  studioAdvancedNote: string
+  studioGroupSurfaces: string
+  studioGroupText: string
+  studioGroupLines: string
+  studioGroupBrand: string
+  studioLineAlpha: string
+  studioResetToken: string
+  studioResetAll: string
+
+  // --- readability warnings ---
+  themeIssueTextSurface: string
+  themeIssueMuted: string
+  themeIssueSidebar: string
+  themeIssueScene: string
+  /** Contains `{n}`. */
+  studioUseOpacity: string
+  studioDarkenSidebar: string
+
+  // --- validation + image errors ---
+  themeErrHex: string
+  themeErrTooLong: string
+  themeErrCssChars: string
+  themeErrCssFunc: string
+  themeErrCssParens: string
+  themeErrArtOrigin: string
+  themeErrArtChars: string
+  themeErrPercent: string
+  themeErrNeedDecor: string
+  themeErrNeedColor: string
+  /** Contains `{n}` — the measured size in KB. */
+  themeImageTooBig: string
+  themeImageTooSmall: string
+  themeImageFailed: string
+  themeWarnNoAlpha: string
   stickerCatLove: string
   stickerCatNature: string
   stickerCatAnimals: string

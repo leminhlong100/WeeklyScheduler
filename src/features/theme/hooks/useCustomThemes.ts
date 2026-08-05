@@ -27,13 +27,23 @@ function referencedArtUrls(themes: CustomThemeRecord[]): string[] {
   })
 }
 
+/**
+ * The id is always supplied by the caller — artwork paths embed it, so it exists
+ * before the row does. `isNew` is therefore what decides insert versus update;
+ * the presence of an id says nothing.
+ */
+export interface SaveThemeInput extends CustomThemeDraft {
+  id: string
+  isNew: boolean
+}
+
 export interface UseCustomThemesResult {
   themes: CustomThemeRecord[]
   /** True while the account's themes are unknown — not the same as "none". */
   isLoading: boolean
   /** True once the list is authoritative. Gates the context's self-heal. */
   isReady: boolean
-  saveTheme: (draft: CustomThemeDraft & { id?: string }) => Promise<CustomThemeRecord | null>
+  saveTheme: (draft: SaveThemeInput) => Promise<CustomThemeRecord | null>
   removeTheme: (id: string) => Promise<void>
   isSaving: boolean
   newThemeId: () => string
@@ -61,10 +71,9 @@ export function useCustomThemes(): UseCustomThemesResult {
   })
 
   const saveMutation = useMutation({
-    mutationFn: async (draft: CustomThemeDraft & { id?: string }) => {
-      const existing = draft.id
+    mutationFn: async (draft: SaveThemeInput) => {
       const args = {
-        id: existing ?? newCustomThemeId(),
+        id: draft.id,
         userId: user!.id,
         name: draft.name,
         icon: draft.icon,
@@ -72,7 +81,7 @@ export function useCustomThemes(): UseCustomThemesResult {
         overrides: draft.overrides,
         art: draft.art,
       }
-      const row = existing ? await updateCustomTheme(args) : await createCustomTheme(args)
+      const row = draft.isNew ? await createCustomTheme(args) : await updateCustomTheme(args)
       return parseCustomTheme(row)
     },
     onSuccess: (saved) => {

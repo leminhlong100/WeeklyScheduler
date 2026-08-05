@@ -1,3 +1,4 @@
+import { cssUrl } from '@/lib/utils/css'
 import type { DerivedTheme, ThemeDefinition } from '../types'
 import type { Locale } from '@/features/i18n/types'
 
@@ -27,6 +28,15 @@ export function ThemeSwatchButton({
       }}
     >
       <div className="relative h-[74px]" style={{ background: def.sideGrad }}>
+        {/* A theme's backdrop is the most recognisable thing about it, so the band
+            shows it rather than just the sidebar gradient. Presets leave `art`
+            undefined and are unaffected. */}
+        {def.art?.scene && (
+          <div
+            className="absolute inset-0 opacity-40"
+            style={{ background: `${cssUrl(def.art.scene)} center/cover no-repeat` }}
+          />
+        )}
         <div className="absolute top-2 right-2 text-base">{def.icon}</div>
       </div>
       <div className="flex items-center gap-2 px-3 py-2.5">
