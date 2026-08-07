@@ -12,9 +12,14 @@ interface DayHeaderRowProps {
   theme: DerivedTheme
 }
 
+/**
+ * The row's fill and its bottom divider are drawn by the caller, not here: they
+ * have to extend past this row into the grid's scrollbar gutter, and this row is
+ * sized to the columns it labels.
+ */
 export function DayHeaderRow({ days, theme }: DayHeaderRowProps) {
   return (
-    <div className="flex border-b" style={{ background: theme.panel, borderColor: theme.borderStrong }}>
+    <div className="flex">
       <div className="w-16 flex-shrink-0" />
       <div className="flex flex-1">
         {days.map((d) => (
