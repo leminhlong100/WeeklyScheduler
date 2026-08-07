@@ -59,7 +59,10 @@ export function AppShell({
             {/* No z-index, so it layers under the z-50 content well below. */}
             <ThemeArtLayer theme={theme} variant="main" />
             {header}
-            <div className="relative z-[50] min-h-0 flex-1 overflow-auto">{children}</div>
+            {/* A column so a child can claim the leftover height and scroll
+                inside itself — the week grid does, to keep its day header out
+                of the scrollbar's way. */}
+            <div className="relative z-[50] flex min-h-0 flex-1 flex-col overflow-auto">{children}</div>
             {bottomBar}
           </main>
         </div>
