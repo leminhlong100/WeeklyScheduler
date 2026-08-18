@@ -1,6 +1,7 @@
-import type { PointerEvent as ReactPointerEvent } from 'react'
+import { useMemo, type PointerEvent as ReactPointerEvent } from 'react'
 import type { DerivedTheme } from '@/features/theme/types'
 import { gridTotalHeightPx } from '../utils/gridMath'
+import { computeTaskLanes } from '../utils/layoutOverlaps'
 import type { TaskNoteItem, TaskWithCategory } from '../types'
 import type { DragMode, DragPreview } from '../hooks/useTaskDragResize'
 import { TaskBlock } from './TaskBlock'
@@ -21,6 +22,7 @@ interface DayColumnProps {
   onStartDrag: (e: ReactPointerEvent, id: string, mode: DragMode) => void
   onDuplicateTask: (id: string) => void
   onDeleteTask: (id: string) => void
+  onToggleDone: (id: string) => void
   onCloseNote: () => void
   onSaveNotes: (taskId: string, notes: TaskNoteItem[]) => void
   selectMode: boolean
@@ -40,12 +42,14 @@ export function DayColumn({
   onStartDrag,
   onDuplicateTask,
   onDeleteTask,
+  onToggleDone,
   onCloseNote,
   onSaveNotes,
   selectMode,
   selectedIds,
 }: DayColumnProps) {
   const openNoteTask = tasks.find((task) => task.id === openNoteTaskId)
+  const lanes = useMemo(() => computeTaskLanes(tasks), [tasks])
 
   return (
     <div
@@ -67,6 +71,8 @@ export function DayColumn({
           nowMinutes >= task.startMinute &&
           nowMinutes < task.startMinute + task.durationMinute
 
+        const lane = lanes.get(task.id)
+
         return (
           <TaskBlock
             key={task.id}
@@ -74,12 +80,15 @@ export function DayColumn({
             theme={theme}
             isCurrent={isCurrent}
             dragOffset={dragPreview?.id === task.id ? dragPreview : null}
+            lane={lane?.lane ?? 0}
+            laneCount={lane?.laneCount ?? 1}
             selectMode={selectMode}
             selected={selectedIds.has(task.id)}
             onPointerDownMove={(e) => onStartDrag(e, task.id, 'move')}
             onPointerDownResize={(e) => onStartDrag(e, task.id, 'resize')}
             onDuplicate={() => onDuplicateTask(task.id)}
             onDelete={() => onDeleteTask(task.id)}
+            onToggleDone={() => onToggleDone(task.id)}
           />
         )
       })}

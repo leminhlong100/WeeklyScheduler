@@ -43,6 +43,40 @@ export interface Dictionary {
   tasksUpdatedCount: string
   keepUnchanged: string
 
+  markDone: string
+  markNotDone: string
+  doneLabel: string
+
+  search: string
+  searchPh: string
+  /** "{n}" is replaced with the minimum number of characters a search needs. */
+  searchMinChars: string
+  searchNoResults: string
+  /** "{n}" is replaced with the number of matches found. */
+  searchResultsCount: string
+
+  weekStats: string
+  statsTotalTime: string
+  statsTaskCount: string
+  statsDone: string
+  statsBusiestDay: string
+  statsByCategory: string
+  statsEmpty: string
+  statsUncategorized: string
+
+  repeatWeekly: string
+  repeatNone: string
+  /** "{n}" is replaced with the number of weeks the task repeats for. */
+  repeatWeeksCount: string
+  seriesNotice: string
+  applyToSeries: string
+  deleteSeries: string
+  deleteSeriesConfirm: string
+  seriesUpdated: string
+  seriesDeleted: string
+  /** "{n}" is replaced with the number of occurrences created. */
+  seriesCreated: string
+
   note: string
   noteAddItemPh: string
   editNote: string

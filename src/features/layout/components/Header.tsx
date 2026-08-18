@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react'
-import { CopyIcon, PlusIcon } from 'lucide-react'
+import { ChartColumnIcon, CopyIcon, PlusIcon, SearchIcon } from 'lucide-react'
 import type { Dictionary } from '@/features/i18n/dictionary'
 import type { DerivedTheme } from '@/features/theme/types'
 import { GradientButton } from '@/components/common/GradientButton'
@@ -16,6 +16,8 @@ interface HeaderProps {
   onOpenTheme: () => void
   onNewEvent: () => void
   onCopyLastWeek: () => void
+  onOpenSearch: () => void
+  onOpenStats: () => void
   copyLastWeekPending: boolean
   userMenu: ReactNode
 }
@@ -61,6 +63,8 @@ export function Header({
   onOpenTheme,
   onNewEvent,
   onCopyLastWeek,
+  onOpenSearch,
+  onOpenStats,
   copyLastWeekPending,
   userMenu,
 }: HeaderProps) {
@@ -95,7 +99,16 @@ export function Header({
           <CopyIcon className="size-4" />
           {t.copyLastWeek}
         </ChromeButton>
+        <ChromeButton onClick={onOpenStats} theme={theme} className="w-10" title={t.weekStats}>
+          <ChartColumnIcon className="size-4" />
+        </ChromeButton>
       </div>
+
+      {/* Kept outside the `sm:` group: finding an event matters most on the
+          phone, where only one day is on screen at a time. */}
+      <ChromeButton onClick={onOpenSearch} theme={theme} className="w-10" title={t.search}>
+        <SearchIcon className="size-4" />
+      </ChromeButton>
 
       <div
         className="font-heading min-w-0 flex-1 truncate text-[15px] font-extrabold sm:min-w-fit sm:flex-initial sm:text-[21px]"

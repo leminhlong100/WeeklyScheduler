@@ -17,6 +17,8 @@ import { useTasksForWeek } from '@/features/tasks/hooks/useTasksForWeek'
 import { useCopyPreviousWeek } from '@/features/tasks/hooks/useTaskMutations'
 import { WeekGrid } from '@/features/tasks/components/WeekGrid'
 import { TaskFormModal, type TaskDraft } from '@/features/tasks/components/TaskFormModal'
+import { TaskSearchModal } from '@/features/tasks/components/TaskSearchModal'
+import { WeekStatsModal } from '@/features/tasks/components/WeekStatsModal'
 import { StickersOverlay } from '@/features/stickers/components/StickersOverlay'
 import { IosInstallBanner } from '@/features/pwa/IosInstallBanner'
 import { AppShell } from '@/features/layout/components/AppShell'
@@ -54,6 +56,8 @@ export function SchedulerPage() {
   const [themePickerOpen, setThemePickerOpen] = useState(false)
   const [categoryManagerOpen, setCategoryManagerOpen] = useState(false)
   const [taskDraft, setTaskDraft] = useState<TaskDraft | null>(null)
+  const [searchOpen, setSearchOpen] = useState(false)
+  const [statsOpen, setStatsOpen] = useState(false)
   const [stickerTrayOpen, setStickerTrayOpen] = useState(false)
   const [stickerEditMode, setStickerEditMode] = useState(false)
 
@@ -74,6 +78,8 @@ export function SchedulerPage() {
       setThemePickerOpen(false)
       setCategoryManagerOpen(false)
       setTaskDraft(null)
+      setSearchOpen(false)
+      setStatsOpen(false)
     }
     window.addEventListener('keydown', onKeyDown)
     return () => window.removeEventListener('keydown', onKeyDown)
@@ -189,6 +195,8 @@ export function SchedulerPage() {
           onNewEvent={openNewEventFromHeader}
           onCopyLastWeek={handleCopyLastWeek}
           copyLastWeekPending={copyPreviousWeek.isPending}
+          onOpenSearch={() => setSearchOpen(true)}
+          onOpenStats={() => setStatsOpen(true)}
           userMenu={<UserMenu />}
         />
       }
@@ -204,6 +212,8 @@ export function SchedulerPage() {
           onNewEvent={openNewEventFromHeader}
           onCopyLastWeek={handleCopyLastWeek}
           copyLastWeekPending={copyPreviousWeek.isPending}
+          onOpenSearch={() => setSearchOpen(true)}
+          onOpenStats={() => setStatsOpen(true)}
           onToggleStickerPanel={toggleStickerPanel}
         />
       }
@@ -238,6 +248,14 @@ export function SchedulerPage() {
       </StickersOverlay>
 
       <TaskFormModal draft={taskDraft} weekStartISO={weekStartISO} onClose={() => setTaskDraft(null)} />
+      <TaskSearchModal open={searchOpen} onOpenChange={setSearchOpen} onPickDate={handlePickDay} />
+      <WeekStatsModal
+        open={statsOpen}
+        onOpenChange={setStatsOpen}
+        tasks={tasks}
+        categories={categories}
+        weekStart={weekStart}
+      />
       <ThemePickerModal open={themePickerOpen} onOpenChange={setThemePickerOpen} />
       <CategoryManagerModal open={categoryManagerOpen} onOpenChange={setCategoryManagerOpen} />
     </AppShell>

@@ -7,8 +7,10 @@ import {
   bulkDeleteTasks,
   bulkUpdateTasks,
   createTask,
+  deleteSeriesFrom,
   deleteTask,
   listTasksForRange,
+  updateSeriesFrom,
   updateTask,
   type Task,
   type TaskUpdate,
@@ -48,22 +50,28 @@ export function useCreateTask(weekStartISO: string) {
   })
 }
 
-interface CreateTasksOnDaysVars {
+interface CreateTaskOccurrencesVars {
   title: string
   categoryId: string | null
   taskDates: string[]
   startMinute: number
   durationMinute: number
+  /** Set when the dates span several weeks, so the occurrences can later be edited or deleted as one series. */
+  seriesId: string | null
 }
 
-/** Creates the same task on every date in `taskDates` in one request — used for "repeat on these days". */
-export function useCreateTasksOnDays(weekStartISO: string) {
+/**
+ * Creates the same task on every date in `taskDates` in one request — used both
+ * for "repeat on these weekdays" (dates inside the current week) and for
+ * "repeat weekly for N weeks" (dates spanning later weeks too).
+ */
+export function useCreateTaskOccurrences(weekStartISO: string) {
   const { user } = useAuth()
   const queryClient = useQueryClient()
   const key = tasksQueryKey(user?.id, weekStartISO)
 
   return useMutation({
-    mutationFn: (input: CreateTasksOnDaysVars) =>
+    mutationFn: (input: CreateTaskOccurrencesVars) =>
       bulkCreateTasks(
         input.taskDates.map((taskDate) => ({
           user_id: user!.id,
@@ -72,10 +80,62 @@ export function useCreateTasksOnDays(weekStartISO: string) {
           task_date: taskDate,
           start_minute: input.startMinute,
           duration_minute: input.durationMinute,
+          series_id: input.seriesId,
         })),
       ),
     onSuccess: (created) => {
-      queryClient.setQueryData<Task[]>(key, (prev) => [...(prev ?? []), ...created])
+      // Only this week's occurrences belong in this week's cache entry; the
+      // later ones land in weeks that may already be cached from an earlier
+      // visit, so those entries are invalidated rather than left stale.
+      const weekEndISO = toISODate(addDays(parseISODate(weekStartISO), 6))
+      const thisWeek = created.filter(
+        (task) => task.task_date >= weekStartISO && task.task_date <= weekEndISO,
+      )
+      if (thisWeek.length > 0) {
+        queryClient.setQueryData<Task[]>(key, (prev) => [...(prev ?? []), ...thisWeek])
+      }
+      if (thisWeek.length !== created.length) {
+        queryClient.invalidateQueries({ queryKey: ['tasks', user?.id] })
+      }
+    },
+  })
+}
+
+/**
+ * Edits every occurrence of a repeat series from `fromDate` onwards. Touches
+ * weeks other than the one on screen, so the whole task cache is refetched
+ * rather than patched by hand.
+ */
+export function useUpdateTaskSeries() {
+  const { user } = useAuth()
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: ({
+      seriesId,
+      fromDate,
+      patch,
+    }: {
+      seriesId: string
+      fromDate: string
+      patch: Omit<TaskUpdate, 'task_date' | 'series_id'>
+    }) => updateSeriesFrom(user!.id, seriesId, fromDate, patch),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['tasks', user?.id] })
+    },
+  })
+}
+
+/** Deletes every occurrence of a repeat series from `fromDate` onwards. */
+export function useDeleteTaskSeries() {
+  const { user } = useAuth()
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: ({ seriesId, fromDate }: { seriesId: string; fromDate: string }) =>
+      deleteSeriesFrom(user!.id, seriesId, fromDate),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['tasks', user?.id] })
     },
   })
 }

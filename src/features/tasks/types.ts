@@ -13,6 +13,9 @@ export interface TaskWithCategory {
   categoryEmoji: string
   categoryColor: string
   notes: TaskNoteItem[]
+  done: boolean
+  /** Set when the task came from a "repeat weekly" run; shared with its sibling occurrences. */
+  seriesId: string | null
 }
 
 export const UNCATEGORIZED_EMOJI = '📌'
