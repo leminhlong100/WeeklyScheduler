@@ -147,6 +147,8 @@ export function WeekGrid({
         categoryColor: category?.color ?? UNCATEGORIZED_COLOR,
         color: task.color ?? null,
         notes: task.notes ?? [],
+        done: task.done,
+        seriesId: task.series_id,
       })
     }
     return byDay.map((day) => [...day].sort((a, b) => a.startMinute - b.startMinute))
@@ -243,6 +245,17 @@ export function WeekGrid({
 
   const handleSaveNotes = (taskId: string, notes: TaskNoteItem[]) => {
     updateTask.mutate({ id: taskId, patch: { notes } })
+  }
+
+  // Optimistic (see useUpdateTask) and reversible with one more tap, so it
+  // ticks over silently instead of firing a toast for every check-off.
+  const handleToggleDone = (id: string) => {
+    const task = tasks.find((tk) => tk.id === id)
+    if (!task) return
+    updateTask.mutate(
+      { id, patch: { done: !task.done } },
+      { onError: () => toast.error(t.somethingWentWrong) },
+    )
   }
 
   const handleEnterSelectMode = () => {
@@ -348,6 +361,10 @@ export function WeekGrid({
       onEdit={handleActionEdit}
       onDuplicate={handleActionDuplicate}
       onDelete={handleActionDelete}
+      onToggleDone={(id) => {
+        closeActionSheet()
+        handleToggleDone(id)
+      }}
     />
   )
 
@@ -499,6 +516,7 @@ export function WeekGrid({
                 onStartDrag={startDrag}
                 onDuplicateTask={handleDuplicateTask}
                 onDeleteTask={handleDeleteTask}
+                onToggleDone={handleToggleDone}
                 onCloseNote={() => setOpenNoteTaskId(null)}
                 onSaveNotes={handleSaveNotes}
                 selectMode={selectMode}
@@ -559,6 +577,7 @@ export function WeekGrid({
               onStartDrag={startDrag}
               onDuplicateTask={handleDuplicateTask}
               onDeleteTask={handleDeleteTask}
+              onToggleDone={handleToggleDone}
               onCloseNote={() => setOpenNoteTaskId(null)}
               onSaveNotes={handleSaveNotes}
               selectMode={selectMode}

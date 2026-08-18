@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react'
-import { CopyIcon, PencilIcon, Trash2Icon } from 'lucide-react'
+import { CheckCircle2Icon, CopyIcon, PencilIcon, Trash2Icon } from 'lucide-react'
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog'
 import type { DerivedTheme } from '@/features/theme/types'
 import { useTranslation } from '@/features/i18n/LocaleContext'
@@ -13,6 +13,7 @@ interface TaskActionSheetProps {
   onEdit: (id: string) => void
   onDuplicate: (id: string) => void
   onDelete: (id: string) => void
+  onToggleDone: (id: string) => void
 }
 
 /**
@@ -22,7 +23,14 @@ interface TaskActionSheetProps {
  * neither of which maps cleanly onto touch. A plain tap instead opens the
  * note popover directly (see useTaskDragResize's onClickTask).
  */
-export function TaskActionSheet({ task, onClose, onEdit, onDuplicate, onDelete }: TaskActionSheetProps) {
+export function TaskActionSheet({
+  task,
+  onClose,
+  onEdit,
+  onDuplicate,
+  onDelete,
+  onToggleDone,
+}: TaskActionSheetProps) {
   const { t } = useTranslation()
   const { theme } = useTheme()
 
@@ -59,6 +67,13 @@ export function TaskActionSheet({ task, onClose, onEdit, onDuplicate, onDelete }
               </div>
 
               <div className="flex flex-col gap-1.5">
+                <ActionRow
+                  theme={theme}
+                  label={task.done ? t.markNotDone : t.markDone}
+                  onClick={() => onToggleDone(task.id)}
+                >
+                  <CheckCircle2Icon className="size-4" />
+                </ActionRow>
                 <ActionRow theme={theme} label={t.editEvent} onClick={() => onEdit(task.id)}>
                   <PencilIcon className="size-4" />
                 </ActionRow>

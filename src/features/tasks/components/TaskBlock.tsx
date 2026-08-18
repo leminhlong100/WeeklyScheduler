@@ -10,11 +10,18 @@ import { taskBoxStyle } from '../utils/taskBoxStyle'
 import { taskColor, type TaskWithCategory } from '../types'
 import type { DragMode } from '../hooks/useTaskDragResize'
 
+/** Gap (px) left between two side-by-side task blocks in the same day column. */
+const LANE_GUTTER_PX = 3
+
 interface TaskBlockProps {
   task: TaskWithCategory
   theme: DerivedTheme
   isCurrent: boolean
   dragOffset: { dxPx: number; dyPx: number; mode: DragMode } | null
+  /** Column this task takes inside its overlap cluster (see `computeTaskLanes`). */
+  lane: number
+  /** How many columns that cluster is split into — 1 means the task is full width. */
+  laneCount: number
   /** Multi-select mode: taps toggle selection (via onPointerDownMove's click fallthrough) instead of opening the note/drag/resize/context menu. */
   selectMode: boolean
   selected: boolean
@@ -22,6 +29,7 @@ interface TaskBlockProps {
   onPointerDownResize: (e: PointerEvent) => void
   onDuplicate: () => void
   onDelete: () => void
+  onToggleDone: () => void
 }
 
 export function TaskBlock({
@@ -29,17 +37,22 @@ export function TaskBlock({
   theme,
   isCurrent,
   dragOffset,
+  lane,
+  laneCount,
   selectMode,
   selected,
   onPointerDownMove,
   onPointerDownResize,
   onDuplicate,
   onDelete,
+  onToggleDone,
 }: TaskBlockProps) {
   const { t } = useTranslation()
   const isMobile = useIsMobile()
   const color = taskColor(task)
-  const box = taskBoxStyle(color, theme, isCurrent)
+  // A finished task drops the "happening now" fill: the block is history, and
+  // leaving it lit competes with whatever is actually running.
+  const box = taskBoxStyle(color, theme, isCurrent && !task.done)
   const top = minutesToTopPx(task.startMinute)
   let height = durationToHeightPx(task.durationMinute)
   let transform: string | undefined
@@ -48,6 +61,15 @@ export function TaskBlock({
     if (dragOffset.mode === 'resize') height = Math.max(14, height + dragOffset.dyPx)
     else transform = `translate(${dragOffset.dxPx}px, ${dragOffset.dyPx}px)`
   }
+
+  // Overlapping tasks split the day column between them. Each lane keeps the
+  // 4px inset the full-width block always had, minus a gutter between
+  // neighbours so two same-colour blocks don't read as one. At laneCount 1
+  // this resolves to the original `left: 4px; width: calc(100% - 8px)`.
+  const isSplit = laneCount > 1
+  const laneWidth = `((100% - 8px) / ${laneCount})`
+  const laneLeft = `calc(4px + ${laneWidth} * ${lane})`
+  const laneBoxWidth = `calc(${laneWidth} - ${lane < laneCount - 1 ? LANE_GUTTER_PX : 0}px)`
 
   const endMinute = task.startMinute + task.durationMinute
   const showTime = task.durationMinute >= 45
@@ -74,10 +96,13 @@ export function TaskBlock({
     'data-task-block': true,
     onPointerDown: onPointerDownMove,
     onClick: (e: ReactMouseEvent) => e.stopPropagation(),
-    className:
-      'animate-[sched-fade_220ms_ease] absolute right-1 left-1 overflow-hidden rounded-[14px] py-1.5 pr-2 pl-3 select-none',
+    className: `animate-[sched-fade_220ms_ease] absolute overflow-hidden rounded-[14px] py-1.5 pr-2 select-none ${
+      isSplit ? 'pl-2' : 'pl-3'
+    }`,
     style: {
       top,
+      left: laneLeft,
+      width: laneBoxWidth,
       height: Math.max(height - 2, 12),
       background: box.bg,
       color: box.fg,
@@ -87,7 +112,7 @@ export function TaskBlock({
         : selected
           ? `0 0 0 2px ${theme.accent}, ${box.shadow}`
           : box.shadow,
-      opacity: selectMode && !selected ? 0.75 : 1,
+      opacity: task.done ? (selectMode && !selected ? 0.45 : 0.6) : selectMode && !selected ? 0.75 : 1,
       cursor: isDragging ? 'grabbing' : 'grab',
       zIndex: isDragging ? 40 : 10,
       transform,
@@ -100,7 +125,7 @@ export function TaskBlock({
       // instead of jumping there.
       transition: isDragging
         ? 'none'
-        : 'top 180ms cubic-bezier(.2,.8,.2,1), height 180ms cubic-bezier(.2,.8,.2,1), transform 180ms cubic-bezier(.2,.8,.2,1), box-shadow 180ms ease',
+        : 'top 180ms cubic-bezier(.2,.8,.2,1), left 180ms cubic-bezier(.2,.8,.2,1), width 180ms cubic-bezier(.2,.8,.2,1), height 180ms cubic-bezier(.2,.8,.2,1), transform 180ms cubic-bezier(.2,.8,.2,1), box-shadow 180ms ease',
     },
   }
 
@@ -111,11 +136,16 @@ export function TaskBlock({
         style={{ background: color }}
       />
       <div className="flex min-w-0 items-center gap-1.5">
+        {/* Inline rather than a corner badge so it can't overlap the title in a
+            narrow lane, and so the check survives every block width. */}
+        {task.done && <CheckIcon className="size-3 flex-shrink-0" strokeWidth={4} />}
         <span className="flex-shrink-0 text-[13px] leading-none">{task.categoryEmoji}</span>
-        <div className="truncate text-[12.5px] leading-tight font-bold">{task.title}</div>
+        <div className={`truncate text-[12.5px] leading-tight font-bold ${task.done ? 'line-through' : ''}`}>
+          {task.title}
+        </div>
       </div>
       {showTime && (
-        <div className="mt-0.5 text-[11px] font-semibold opacity-[.82]">
+        <div className="mt-0.5 truncate text-[11px] font-semibold opacity-[.82]">
           {formatMinutesAsTime(task.startMinute)} – {formatMinutesAsTime(endMinute)}
         </div>
       )}
@@ -181,6 +211,14 @@ export function TaskBlock({
     <ContextMenu>
       <ContextMenuTrigger {...blockProps}>{blockContent}</ContextMenuTrigger>
       <ContextMenuContent>
+        <ContextMenuItem
+          onClick={(e) => {
+            e.stopPropagation()
+            onToggleDone()
+          }}
+        >
+          {task.done ? t.markNotDone : t.markDone}
+        </ContextMenuItem>
         <ContextMenuItem
           onClick={(e) => {
             e.stopPropagation()

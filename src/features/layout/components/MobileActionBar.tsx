@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react'
-import { CopyIcon, EllipsisIcon, PlusIcon } from 'lucide-react'
+import { ChartColumnIcon, CopyIcon, EllipsisIcon, PlusIcon, SearchIcon } from 'lucide-react'
 import type { Dictionary } from '@/features/i18n/dictionary'
 import type { DerivedTheme } from '@/features/theme/types'
 import { GradientButton } from '@/components/common/GradientButton'
@@ -22,6 +22,8 @@ interface MobileActionBarProps {
   onCopyLastWeek: () => void
   copyLastWeekPending: boolean
   onToggleStickerPanel: () => void
+  onOpenSearch: () => void
+  onOpenStats: () => void
 }
 
 function BarButton({
@@ -67,6 +69,8 @@ export function MobileActionBar({
   onCopyLastWeek,
   copyLastWeekPending,
   onToggleStickerPanel,
+  onOpenSearch,
+  onOpenStats,
 }: MobileActionBarProps) {
   return (
     <nav
@@ -94,6 +98,14 @@ export function MobileActionBar({
           <EllipsisIcon className="size-5" />
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
+          <DropdownMenuItem onClick={onOpenSearch}>
+            <SearchIcon className="size-4" />
+            {t.search}
+          </DropdownMenuItem>
+          <DropdownMenuItem onClick={onOpenStats}>
+            <ChartColumnIcon className="size-4" />
+            {t.weekStats}
+          </DropdownMenuItem>
           <DropdownMenuItem onClick={onCopyLastWeek} disabled={copyLastWeekPending}>
             <CopyIcon className="size-4" />
             {t.copyLastWeek}

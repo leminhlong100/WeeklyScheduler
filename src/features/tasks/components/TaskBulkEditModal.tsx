@@ -74,16 +74,19 @@ export function TaskBulkEditModal({ count, onClose, onApply, isPending }: TaskBu
   const [colorOn, setColorOn] = useState(false)
   const [startOn, setStartOn] = useState(false)
   const [durationOn, setDurationOn] = useState(false)
+  const [doneOn, setDoneOn] = useState(false)
 
   const [title, setTitle] = useState('')
   const [categoryId, setCategoryId] = useState<string | null>(categories[0]?.id ?? null)
   const [color, setColor] = useState<string | null>(null)
   const [startMinute, setStartMinute] = useState(startOptions[0].value)
   const [durationMinute, setDurationMinute] = useState(60)
+  const [done, setDone] = useState(true)
 
   const trimmedTitle = title.trim()
   const titleValid = !titleOn || trimmedTitle.length > 0
-  const nothingSelected = !titleOn && !categoryOn && !colorOn && !startOn && !durationOn
+  const nothingSelected =
+    !titleOn && !categoryOn && !colorOn && !startOn && !durationOn && !doneOn
   const canApply = !nothingSelected && titleValid && !isPending
 
   const handleApply = () => {
@@ -96,6 +99,7 @@ export function TaskBulkEditModal({ count, onClose, onApply, isPending }: TaskBu
     if (colorOn) patch.color = color
     if (startOn) patch.start_minute = startMinute
     if (durationOn) patch.duration_minute = durationMinute
+    if (doneOn) patch.done = done
     onApply(patch)
   }
 
@@ -183,6 +187,29 @@ export function TaskBulkEditModal({ count, onClose, onApply, isPending }: TaskBu
                     {o.label}
                   </SelectItem>
                 ))}
+              </SelectContent>
+            </Select>
+          </FieldToggle>
+
+          <FieldToggle label={t.doneLabel} enabled={doneOn} onToggle={setDoneOn}>
+            <Select
+              items={[
+                { value: 'true', label: t.doneLabel },
+                { value: 'false', label: t.markNotDone },
+              ]}
+              value={String(done)}
+              onValueChange={(v) => setDone(v === 'true')}
+            >
+              <SelectTrigger className="w-full" style={selectTriggerStyle}>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent style={selectContentStyle}>
+                <SelectItem value="true" label={t.doneLabel}>
+                  {t.doneLabel}
+                </SelectItem>
+                <SelectItem value="false" label={t.markNotDone}>
+                  {t.markNotDone}
+                </SelectItem>
               </SelectContent>
             </Select>
           </FieldToggle>

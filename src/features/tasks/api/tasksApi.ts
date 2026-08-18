@@ -58,3 +58,65 @@ export async function bulkUpdateTasks(ids: string[], patch: TaskUpdate): Promise
   if (error) throw error
   return data
 }
+
+/**
+ * Escapes the wildcards Postgres' LIKE treats specially, so searching for
+ * "100%" looks for that literal text instead of matching everything.
+ */
+function escapeLikeWildcards(value: string): string {
+  return value.replace(/[\\%_]/g, (char) => '\\' + char)
+}
+
+/** Title search across every week, newest first. Used by the search modal. */
+export async function searchTasks(userId: string, query: string, limit = 50): Promise<Task[]> {
+  const term = query.trim()
+  if (term.length === 0) return []
+  const { data, error } = await supabase
+    .from('tasks')
+    .select('*')
+    .eq('user_id', userId)
+    .ilike('title', `%${escapeLikeWildcards(term)}%`)
+    .order('task_date', { ascending: false })
+    .order('start_minute', { ascending: true })
+    .limit(limit)
+  if (error) throw error
+  return data
+}
+
+/**
+ * Applies a patch to one repeat series from `fromDate` onwards — never to
+ * occurrences already in the past, which stay as a record of what was planned.
+ * `task_date` is deliberately not patchable here: every occurrence sits on its
+ * own date, so writing one date across the series would collapse them.
+ */
+export async function updateSeriesFrom(
+  userId: string,
+  seriesId: string,
+  fromDate: string,
+  patch: Omit<TaskUpdate, 'task_date' | 'series_id'>,
+): Promise<Task[]> {
+  const { data, error } = await supabase
+    .from('tasks')
+    .update(patch)
+    .eq('user_id', userId)
+    .eq('series_id', seriesId)
+    .gte('task_date', fromDate)
+    .select('*')
+  if (error) throw error
+  return data
+}
+
+/** Deletes one repeat series from `fromDate` onwards, leaving earlier occurrences in place. */
+export async function deleteSeriesFrom(
+  userId: string,
+  seriesId: string,
+  fromDate: string,
+): Promise<void> {
+  const { error } = await supabase
+    .from('tasks')
+    .delete()
+    .eq('user_id', userId)
+    .eq('series_id', seriesId)
+    .gte('task_date', fromDate)
+  if (error) throw error
+}

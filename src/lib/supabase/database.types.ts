@@ -114,6 +114,9 @@ export interface Database {
           start_minute: number
           duration_minute: number
           notes: TaskNoteItem[]
+          done: boolean
+          /** Shared by every occurrence created from one "repeat weekly" run; null for one-off tasks. */
+          series_id: string | null
           /** Overrides the category's colour. Null follows the category. */
           color: string | null
           created_at: string
@@ -128,6 +131,8 @@ export interface Database {
           start_minute: number
           duration_minute: number
           notes?: TaskNoteItem[]
+          done?: boolean
+          series_id?: string | null
           color?: string | null
         }
         Update: {
@@ -137,6 +142,8 @@ export interface Database {
           start_minute?: number
           duration_minute?: number
           notes?: TaskNoteItem[]
+          done?: boolean
+          series_id?: string | null
           color?: string | null
         }
         Relationships: []

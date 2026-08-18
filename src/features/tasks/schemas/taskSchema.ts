@@ -6,6 +6,8 @@ export const taskSchema = z.object({
   taskDate: z.string().min(1, 'fieldRequired'),
   startMinute: z.number().int(),
   durationMinute: z.number().int().min(15),
+  /** How many consecutive weeks to create the task on; 1 means it does not repeat. */
+  repeatWeeks: z.number().int().min(1).max(52),
   /**
    * Null follows the category. Hex-pinned to match the column's check
    * constraint — the swatches and the native picker can only produce that

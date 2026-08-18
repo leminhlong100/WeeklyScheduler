@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { Controller, useForm, useWatch, type Control } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { toast } from 'sonner'
+import { RepeatIcon } from 'lucide-react'
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
@@ -13,11 +14,20 @@ import { useTheme } from '@/features/theme/ThemeContext'
 import type { DerivedTheme } from '@/features/theme/types'
 import { translateFieldError } from '@/lib/utils/formErrors'
 import { useCategories } from '@/features/categories/hooks/useCategories'
-import { addDays, parseISODate, toISODate, weekdayMondayIndex } from '@/lib/utils/date'
+import { parseISODate, weekdayMondayIndex } from '@/lib/utils/date'
 import { taskSchema, type TaskFormInput } from '../schemas/taskSchema'
 import { buildDurationOptions, buildStartTimeOptions } from '../utils/taskFormOptions'
+import { buildRepeatOptions } from '../utils/repeatOptions'
+import { buildRepeatDates } from '../utils/buildRepeatDates'
 import { cloneNotes } from '../utils/cloneNotes'
-import { useCreateTask, useCreateTasksOnDays, useDeleteTask, useUpdateTask } from '../hooks/useTaskMutations'
+import {
+  useCreateTask,
+  useCreateTaskOccurrences,
+  useDeleteTask,
+  useDeleteTaskSeries,
+  useUpdateTask,
+  useUpdateTaskSeries,
+} from '../hooks/useTaskMutations'
 import type { Task } from '../api/tasksApi'
 import { UNCATEGORIZED_COLOR } from '../types'
 import { TaskCategoryChips } from './TaskCategoryChips'
@@ -41,14 +51,19 @@ export function TaskFormModal({ draft, weekStartISO, onClose }: TaskFormModalPro
   const { theme } = useTheme()
   const { data: categories = [] } = useCategories()
   const createTask = useCreateTask(weekStartISO)
-  const createTasksOnDays = useCreateTasksOnDays(weekStartISO)
+  const createOccurrences = useCreateTaskOccurrences(weekStartISO)
   const updateTask = useUpdateTask(weekStartISO)
   const deleteTask = useDeleteTask(weekStartISO)
+  const updateSeries = useUpdateTaskSeries()
+  const deleteSeries = useDeleteTaskSeries()
   const [selectedDows, setSelectedDows] = useState<number[]>([])
+  const [applyToSeries, setApplyToSeries] = useState(false)
 
   const isEdit = !!draft?.task
+  const seriesId = draft?.task?.series_id ?? null
   const startOptions = buildStartTimeOptions()
   const durationOptions = buildDurationOptions(t)
+  const repeatOptions = buildRepeatOptions(t)
 
   const toggleDow = (dow: number) => {
     setSelectedDows((prev) => {
@@ -67,6 +82,7 @@ export function TaskFormModal({ draft, weekStartISO, onClose }: TaskFormModalPro
       taskDate: draft?.taskDate ?? '',
       startMinute: draft?.startMinute ?? startOptions[0].value,
       durationMinute: 60,
+      repeatWeeks: 1,
       color: null,
     },
   })
@@ -81,6 +97,7 @@ export function TaskFormModal({ draft, weekStartISO, onClose }: TaskFormModalPro
       taskDate: baseDate,
       startMinute: task?.start_minute ?? draft.startMinute,
       durationMinute: task?.duration_minute ?? 60,
+      repeatWeeks: 1,
       color: task?.color ?? null,
     })
     // Seeded here rather than during render because it has to land in the same
@@ -88,6 +105,7 @@ export function TaskFormModal({ draft, weekStartISO, onClose }: TaskFormModalPro
     // describe one draft, and splitting them would show a half-swapped modal.
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setSelectedDows(task ? [] : [weekdayMondayIndex(parseISODate(baseDate))])
+    setApplyToSeries(false)
     // Only re-run when the target task/slot changes — `categories` is
     // intentionally excluded so an in-progress edit isn't reset by
     // unrelated category list refetches.
@@ -100,51 +118,71 @@ export function TaskFormModal({ draft, weekStartISO, onClose }: TaskFormModalPro
     const onError = () => toast.error(t.somethingWentWrong)
 
     if (isEdit && draft.task) {
-      updateTask.mutate(
-        {
-          id: draft.task.id,
-          patch: {
-            title: values.title,
-            category_id: values.categoryId,
-            task_date: values.taskDate,
-            start_minute: values.startMinute,
-            duration_minute: values.durationMinute,
-            color: values.color,
+      const task = draft.task
+      const sharedPatch = {
+        title: values.title,
+        category_id: values.categoryId,
+        start_minute: values.startMinute,
+        duration_minute: values.durationMinute,
+        color: values.color,
+      }
+
+      if (applyToSeries && task.series_id) {
+        // The series patch already covers this occurrence (it starts at this
+        // date), so only a date move needs a second, single-task write —
+        // every occurrence sits on its own date and must keep it.
+        updateSeries.mutate(
+          { seriesId: task.series_id, fromDate: task.task_date, patch: sharedPatch },
+          {
+            onSuccess: () => {
+              if (values.taskDate !== task.task_date) {
+                updateTask.mutate({ id: task.id, patch: { task_date: values.taskDate } })
+              }
+              toast.success(t.seriesUpdated)
+              onClose()
+            },
+            onError,
           },
-        },
+        )
+        return
+      }
+
+      updateTask.mutate(
+        { id: task.id, patch: { ...sharedPatch, task_date: values.taskDate } },
         { onSuccess: () => { toast.success(t.taskUpdated); onClose() }, onError },
       )
     } else {
-      const targetDates =
+      const dows =
         selectedDows.length > 0
-          ? selectedDows.map((dow) => toISODate(addDays(parseISODate(weekStartISO), dow)))
-          : [values.taskDate]
+          ? selectedDows
+          : [weekdayMondayIndex(parseISODate(values.taskDate))]
+      const targetDates = buildRepeatDates(weekStartISO, dows, values.repeatWeeks)
+      // Only a run that spans several weeks becomes a series — picking a few
+      // weekdays of one week stays a handful of independent tasks, as before.
+      const newSeriesId = values.repeatWeeks > 1 ? crypto.randomUUID() : null
 
-      if (targetDates.length > 1) {
-        createTasksOnDays.mutate(
-          {
-            title: values.title,
-            categoryId: values.categoryId,
-            taskDates: targetDates,
-            startMinute: values.startMinute,
-            durationMinute: values.durationMinute,
-            color: values.color,
+      createOccurrences.mutate(
+        {
+          title: values.title,
+          categoryId: values.categoryId,
+          taskDates: targetDates,
+          startMinute: values.startMinute,
+          durationMinute: values.durationMinute,
+          seriesId: newSeriesId,
+          color: values.color,
+        },
+        {
+          onSuccess: () => {
+            toast.success(
+              targetDates.length > 1
+                ? t.seriesCreated.replace('{n}', String(targetDates.length))
+                : t.taskCreated,
+            )
+            onClose()
           },
-          { onSuccess: () => { toast.success(t.taskCreated); onClose() }, onError },
-        )
-      } else {
-        createTask.mutate(
-          {
-            title: values.title,
-            categoryId: values.categoryId,
-            taskDate: targetDates[0],
-            startMinute: values.startMinute,
-            durationMinute: values.durationMinute,
-            color: values.color,
-          },
-          { onSuccess: () => { toast.success(t.taskCreated); onClose() }, onError },
-        )
-      }
+          onError,
+        },
+      )
     }
   }
 
@@ -154,6 +192,19 @@ export function TaskFormModal({ draft, weekStartISO, onClose }: TaskFormModalPro
       onSuccess: () => { toast.success(t.taskDeleted); onClose() },
       onError: () => toast.error(t.somethingWentWrong),
     })
+  }
+
+  const handleDeleteSeries = () => {
+    const task = draft.task
+    if (!task?.series_id) return
+    if (!window.confirm(t.deleteSeriesConfirm)) return
+    deleteSeries.mutate(
+      { seriesId: task.series_id, fromDate: task.task_date },
+      {
+        onSuccess: () => { toast.success(t.seriesDeleted); onClose() },
+        onError: () => toast.error(t.somethingWentWrong),
+      },
+    )
   }
 
   const handleDuplicate = () => {
@@ -177,7 +228,12 @@ export function TaskFormModal({ draft, weekStartISO, onClose }: TaskFormModalPro
   }
 
   const isPending =
-    createTask.isPending || createTasksOnDays.isPending || updateTask.isPending || deleteTask.isPending
+    createTask.isPending ||
+    createOccurrences.isPending ||
+    updateTask.isPending ||
+    deleteTask.isPending ||
+    updateSeries.isPending ||
+    deleteSeries.isPending
 
   return (
     <Dialog open onOpenChange={(next) => !next && onClose()}>
@@ -250,6 +306,71 @@ export function TaskFormModal({ draft, weekStartISO, onClose }: TaskFormModalPro
                 {t.repeatOnDays}
               </div>
               <DayOfWeekPicker labels={t.dow} selected={selectedDows} onToggle={toggleDow} theme={theme} />
+            </div>
+          )}
+
+          {!isEdit && (
+            <div>
+              <div className="mb-2 text-xs font-extrabold" style={{ color: theme.muted }}>
+                {t.repeatWeekly}
+              </div>
+              <Controller
+                control={form.control}
+                name="repeatWeeks"
+                render={({ field }) => (
+                  <Select
+                    items={repeatOptions.map((o) => ({ value: String(o.value), label: o.label }))}
+                    value={String(field.value)}
+                    onValueChange={(v) => field.onChange(Number(v))}
+                  >
+                    <SelectTrigger
+                      className="w-full"
+                      style={{ background: theme.inputBg, borderColor: theme.border, color: theme.text }}
+                    >
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent style={{ background: theme.modalBg, borderColor: theme.border, color: theme.text }}>
+                      {repeatOptions.map((o) => (
+                        <SelectItem key={o.value} value={String(o.value)} label={o.label}>
+                          {o.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
+              />
+            </div>
+          )}
+
+          {isEdit && seriesId && (
+            <div className="rounded-2xl px-3.5 py-3" style={{ background: theme.chip }}>
+              <div className="flex items-start gap-2">
+                <RepeatIcon className="mt-px size-4 flex-shrink-0" style={{ color: theme.muted }} />
+                <p className="text-[12.5px] font-semibold" style={{ color: theme.muted }}>
+                  {t.seriesNotice}
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setApplyToSeries((v) => !v)}
+                className="mt-2.5 flex w-full items-center gap-2.5 text-left"
+              >
+                <span
+                  className="flex h-5 w-9 flex-shrink-0 items-center rounded-full p-0.5 transition-colors duration-150"
+                  style={{ background: applyToSeries ? theme.accent : theme.border }}
+                >
+                  <span
+                    className="h-4 w-4 rounded-full bg-white transition-transform duration-150"
+                    style={{ transform: applyToSeries ? 'translateX(16px)' : 'translateX(0)' }}
+                  />
+                </span>
+                <span
+                  className="text-xs font-extrabold"
+                  style={{ color: applyToSeries ? theme.text : theme.muted }}
+                >
+                  {t.applyToSeries}
+                </span>
+              </button>
             </div>
           )}
 
@@ -326,6 +447,17 @@ export function TaskFormModal({ draft, weekStartISO, onClose }: TaskFormModalPro
                 style={{ background: 'transparent', borderColor: theme.dangerBorder, color: theme.danger }}
               >
                 {t.delete}
+              </Button>
+            )}
+            {isEdit && seriesId && (
+              <Button
+                type="button"
+                variant="outline"
+                onClick={handleDeleteSeries}
+                disabled={isPending}
+                style={{ background: 'transparent', borderColor: theme.dangerBorder, color: theme.danger }}
+              >
+                {t.deleteSeries}
               </Button>
             )}
             {isEdit && (
