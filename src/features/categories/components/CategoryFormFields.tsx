@@ -1,6 +1,7 @@
 import type { UseFormReturn } from 'react-hook-form'
 import { Input } from '@/components/ui/input'
 import { FormField } from '@/components/form/FormField'
+import { ColorSwatches } from '@/components/form/ColorSwatches'
 import { useTranslation } from '@/features/i18n/LocaleContext'
 import { useTheme } from '@/features/theme/ThemeContext'
 import { translateFieldError } from '@/lib/utils/formErrors'
@@ -60,21 +61,14 @@ export function CategoryFormFields({ form }: CategoryFormFieldsProps) {
         <div className="mb-2 text-xs font-extrabold" style={{ color: theme.muted }}>
           {t.categoryColor}
         </div>
-        <div className="flex flex-wrap gap-2">
-          {CATEGORY_COLOR_PRESETS.map((c) => (
-            <button
-              key={c}
-              type="button"
-              onClick={() => setValue('color', c, { shouldValidate: true })}
-              className="h-8 w-8 rounded-full border-2 transition-transform"
-              style={{
-                background: c,
-                borderColor: color === c ? theme.text : 'transparent',
-                transform: color === c ? 'scale(1.12)' : undefined,
-              }}
-              aria-label={c}
-            />
-          ))}
+        <div className="flex flex-wrap items-center gap-2">
+          <ColorSwatches
+            value={color ?? null}
+            onChange={(next) => setValue('color', next, { shouldValidate: true })}
+            presets={CATEGORY_COLOR_PRESETS}
+            ringColor={theme.text}
+            customLabel={t.customColor}
+          />
         </div>
       </div>
     </div>

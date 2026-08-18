@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Controller, useForm } from 'react-hook-form'
+import { Controller, useForm, useWatch, type Control } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { toast } from 'sonner'
 import { RepeatIcon } from 'lucide-react'
@@ -11,6 +11,7 @@ import { FormField } from '@/components/form/FormField'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { useTranslation } from '@/features/i18n/LocaleContext'
 import { useTheme } from '@/features/theme/ThemeContext'
+import type { DerivedTheme } from '@/features/theme/types'
 import { translateFieldError } from '@/lib/utils/formErrors'
 import { useCategories } from '@/features/categories/hooks/useCategories'
 import { parseISODate, weekdayMondayIndex } from '@/lib/utils/date'
@@ -28,7 +29,9 @@ import {
   useUpdateTaskSeries,
 } from '../hooks/useTaskMutations'
 import type { Task } from '../api/tasksApi'
+import { UNCATEGORIZED_COLOR } from '../types'
 import { TaskCategoryChips } from './TaskCategoryChips'
+import { TaskColorField } from './TaskColorField'
 import { DayOfWeekPicker } from './DayOfWeekPicker'
 
 export interface TaskDraft {
@@ -80,6 +83,7 @@ export function TaskFormModal({ draft, weekStartISO, onClose }: TaskFormModalPro
       startMinute: draft?.startMinute ?? startOptions[0].value,
       durationMinute: 60,
       repeatWeeks: 1,
+      color: null,
     },
   })
 
@@ -94,7 +98,12 @@ export function TaskFormModal({ draft, weekStartISO, onClose }: TaskFormModalPro
       startMinute: task?.start_minute ?? draft.startMinute,
       durationMinute: task?.duration_minute ?? 60,
       repeatWeeks: 1,
+      color: task?.color ?? null,
     })
+    // Seeded here rather than during render because it has to land in the same
+    // pass as the `form.reset()` above — the day picker and the form fields
+    // describe one draft, and splitting them would show a half-swapped modal.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setSelectedDows(task ? [] : [weekdayMondayIndex(parseISODate(baseDate))])
     setApplyToSeries(false)
     // Only re-run when the target task/slot changes — `categories` is
@@ -115,6 +124,7 @@ export function TaskFormModal({ draft, weekStartISO, onClose }: TaskFormModalPro
         category_id: values.categoryId,
         start_minute: values.startMinute,
         duration_minute: values.durationMinute,
+        color: values.color,
       }
 
       if (applyToSeries && task.series_id) {
@@ -159,6 +169,7 @@ export function TaskFormModal({ draft, weekStartISO, onClose }: TaskFormModalPro
           startMinute: values.startMinute,
           durationMinute: values.durationMinute,
           seriesId: newSeriesId,
+          color: values.color,
         },
         {
           onSuccess: () => {
@@ -206,6 +217,7 @@ export function TaskFormModal({ draft, weekStartISO, onClose }: TaskFormModalPro
         taskDate: task.task_date,
         startMinute: task.start_minute,
         durationMinute: task.duration_minute,
+        color: task.color,
         notes: cloneNotes(task.notes),
       },
       {
@@ -270,6 +282,13 @@ export function TaskFormModal({ draft, weekStartISO, onClose }: TaskFormModalPro
                 />
               )}
             />
+          </div>
+
+          <div>
+            <div className="mb-2 text-xs font-extrabold" style={{ color: theme.muted }}>
+              {t.taskColor}
+            </div>
+            <TaskColorRow control={form.control} categories={categories} theme={theme} />
           </div>
 
           {isEdit ? (
@@ -468,5 +487,39 @@ export function TaskFormModal({ draft, weekStartISO, onClose }: TaskFormModalPro
         </form>
       </DialogContent>
     </Dialog>
+  )
+}
+
+/**
+ * The colour row, split out only so the "follow the category" swatch can
+ * subscribe to the category chips above it — `useWatch` is a hook, and the
+ * modal returns early when there is no draft.
+ */
+function TaskColorRow({
+  control,
+  categories,
+  theme,
+}: {
+  control: Control<TaskFormInput>
+  categories: { id: string; color: string }[]
+  theme: DerivedTheme
+}) {
+  const categoryId = useWatch({ control, name: 'categoryId' })
+  const categoryColor =
+    categories.find((category) => category.id === categoryId)?.color ?? UNCATEGORIZED_COLOR
+
+  return (
+    <Controller
+      control={control}
+      name="color"
+      render={({ field }) => (
+        <TaskColorField
+          value={field.value}
+          onChange={field.onChange}
+          categoryColor={categoryColor}
+          theme={theme}
+        />
+      )}
+    />
   )
 }

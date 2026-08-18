@@ -4,6 +4,8 @@ import { useIsMobile, useIsTouchDevice } from '@/hooks/useMediaQuery'
 import { useTranslation } from '@/features/i18n/LocaleContext'
 import { useTheme } from '@/features/theme/ThemeContext'
 import { ThemePickerModal } from '@/features/theme/components/ThemePickerModal'
+import { ThemeStudioPanel } from '@/features/theme/studio/ThemeStudioPanel'
+import type { CustomThemeRecord } from '@/features/theme/recipe/types'
 import { useProfilePreferenceSync } from '@/features/profile/hooks/useProfilePreferenceSync'
 import { UserMenu } from '@/features/profile/components/UserMenu'
 import { useWeekAnchor } from '@/features/calendar-nav/hooks/useWeekAnchor'
@@ -54,6 +56,9 @@ export function SchedulerPage() {
   const isTouch = useIsTouchDevice()
   const [sidebarOpen, setSidebarOpen] = useState(!isMobile && !isTouch)
   const [themePickerOpen, setThemePickerOpen] = useState(false)
+  // Wrapped in an object so "create" (record: null) is distinguishable from
+  // "closed" without a second boolean that could disagree with it.
+  const [studioTarget, setStudioTarget] = useState<{ record: CustomThemeRecord | null } | null>(null)
   const [categoryManagerOpen, setCategoryManagerOpen] = useState(false)
   const [taskDraft, setTaskDraft] = useState<TaskDraft | null>(null)
   const [searchOpen, setSearchOpen] = useState(false)
@@ -154,6 +159,7 @@ export function SchedulerPage() {
   return (
     <AppShell
       theme={theme}
+      insetRight={studioTarget !== null}
       sidebar={
         <Sidebar
           open={sidebarOpen}
@@ -256,7 +262,19 @@ export function SchedulerPage() {
         categories={categories}
         weekStart={weekStart}
       />
-      <ThemePickerModal open={themePickerOpen} onOpenChange={setThemePickerOpen} />
+      <ThemePickerModal
+        open={themePickerOpen}
+        onOpenChange={setThemePickerOpen}
+        onEditTheme={(record) => setStudioTarget({ record })}
+      />
+      {/* Mounted conditionally on purpose: unmounting is what clears the live
+          preview, so there is no way to leave an unsaved draft applied. */}
+      {studioTarget && (
+        <ThemeStudioPanel
+          record={studioTarget.record}
+          onClose={() => setStudioTarget(null)}
+        />
+      )}
       <CategoryManagerModal open={categoryManagerOpen} onOpenChange={setCategoryManagerOpen} />
     </AppShell>
   )

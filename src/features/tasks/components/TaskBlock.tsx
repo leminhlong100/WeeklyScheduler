@@ -7,7 +7,7 @@ import { useIsMobile } from '@/hooks/useMediaQuery'
 import { formatMinutesAsTime } from '@/lib/utils/date'
 import { durationToHeightPx, minutesToTopPx } from '../utils/gridMath'
 import { taskBoxStyle } from '../utils/taskBoxStyle'
-import type { TaskWithCategory } from '../types'
+import { taskColor, type TaskWithCategory } from '../types'
 import type { DragMode } from '../hooks/useTaskDragResize'
 
 /** Gap (px) left between two side-by-side task blocks in the same day column. */
@@ -49,9 +49,10 @@ export function TaskBlock({
 }: TaskBlockProps) {
   const { t } = useTranslation()
   const isMobile = useIsMobile()
+  const color = taskColor(task)
   // A finished task drops the "happening now" fill: the block is history, and
   // leaving it lit competes with whatever is actually running.
-  const box = taskBoxStyle(task.categoryColor, theme, isCurrent && !task.done)
+  const box = taskBoxStyle(color, theme, isCurrent && !task.done)
   const top = minutesToTopPx(task.startMinute)
   let height = durationToHeightPx(task.durationMinute)
   let transform: string | undefined
@@ -132,7 +133,7 @@ export function TaskBlock({
     <>
       <div
         className="absolute top-0 bottom-0 left-0 w-1 rounded-l-[5px]"
-        style={{ background: task.categoryColor }}
+        style={{ background: color }}
       />
       <div className="flex min-w-0 items-center gap-1.5">
         {/* Inline rather than a corner badge so it can't overlap the title in a

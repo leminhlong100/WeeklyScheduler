@@ -5,7 +5,7 @@ import type { DerivedTheme } from '@/features/theme/types'
 import { useTranslation } from '@/features/i18n/LocaleContext'
 import { useTheme } from '@/features/theme/ThemeContext'
 import { formatMinutesAsTime } from '@/lib/utils/date'
-import type { TaskWithCategory } from '../types'
+import { taskColor, type TaskWithCategory } from '../types'
 
 interface TaskActionSheetProps {
   task: TaskWithCategory | null
@@ -48,7 +48,7 @@ export function TaskActionSheet({
               <div className="flex items-center gap-2.5">
                 <span
                   className="grid h-10 w-10 flex-shrink-0 place-items-center rounded-full text-lg"
-                  style={{ background: `${task.categoryColor}33` }}
+                  style={{ background: `${taskColor(task)}33` }}
                 >
                   {task.categoryEmoji}
                 </span>

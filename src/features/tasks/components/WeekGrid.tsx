@@ -1,4 +1,11 @@
-import { useMemo, useRef, useState, type PointerEvent as ReactPointerEvent } from 'react'
+import {
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type PointerEvent as ReactPointerEvent,
+  type UIEvent as ReactUIEvent,
+} from 'react'
 import type { Dayjs } from 'dayjs'
 import { toast } from 'sonner'
 import { CheckSquareIcon, PencilIcon, Trash2Icon } from 'lucide-react'
@@ -57,6 +64,8 @@ export function WeekGrid({
 }: WeekGridProps) {
   const isMobile = useIsMobile()
   const gridRef = useRef<HTMLDivElement>(null)
+  const headerRef = useRef<HTMLDivElement>(null)
+  const bodyRef = useRef<HTMLDivElement>(null)
   const nowMinutes = useNowMinutes()
   const todayISO = getTodayISO()
   const weekStartISO = toISODate(weekStart)
@@ -71,6 +80,31 @@ export function WeekGrid({
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
   const [bulkEditOpen, setBulkEditOpen] = useState(false)
   const swipeRef = useRef<{ startX: number; startY: number; onTask: boolean } | null>(null)
+
+  /**
+   * Width the grid's own scrollbar takes, mirrored as padding on the day-header
+   * row above it so the seven columns line up with the seven headers.
+   *
+   * Measured rather than assumed: our CSS pins WebKit's bar to 10px, but Firefox
+   * sizes its own and phones overlay theirs at zero, and `scrollbar-gutter:
+   * stable` keeps the answer steady whether or not the week currently overflows.
+   */
+  const [gutterPx, setGutterPx] = useState(0)
+  useEffect(() => {
+    const body = bodyRef.current
+    if (!body) return
+    const measure = () => setGutterPx(body.offsetWidth - body.clientWidth)
+    measure()
+    const observer = new ResizeObserver(measure)
+    observer.observe(body)
+    return () => observer.disconnect()
+  }, [isMobile])
+
+  /** The header has no scrollbar of its own, so it rides the grid's. */
+  const syncHeaderScroll = (event: ReactUIEvent<HTMLDivElement>) => {
+    const header = headerRef.current
+    if (header) header.scrollLeft = event.currentTarget.scrollLeft
+  }
 
   const categoryById = useMemo(() => new Map(categories.map((c) => [c.id, c])), [categories])
 
@@ -111,6 +145,7 @@ export function WeekGrid({
         categoryId: task.category_id,
         categoryEmoji: category?.emoji ?? UNCATEGORIZED_EMOJI,
         categoryColor: category?.color ?? UNCATEGORIZED_COLOR,
+        color: task.color ?? null,
         notes: task.notes ?? [],
         done: task.done,
         seriesId: task.series_id,
@@ -190,6 +225,7 @@ export function WeekGrid({
         taskDate: task.task_date,
         startMinute: task.start_minute,
         durationMinute: task.duration_minute,
+        color: task.color,
         notes: cloneNotes(task.notes),
       },
       {
@@ -496,14 +532,36 @@ export function WeekGrid({
   }
 
   return (
-    <div className="min-w-[700px]">
-      <div className="sticky top-0 z-30">
-        {selectionToolbar}
-        <DayHeaderRow days={days} theme={theme} />
+    <div className="flex min-h-0 flex-1 flex-col">
+      {/* Full width — it needs no column alignment, so it is kept out of the
+          horizontally scrolled strip below and its divider reaches the edge. */}
+      {selectionToolbar}
+
+      {/* Outside the scroller on purpose: a sticky header inside it would have
+          the scrollbar running up alongside the day names. Horizontally it is
+          slaved to the grid below, and padded by the grid's scrollbar width so
+          the columns stay in line.
+          The panel fill and the divider sit here rather than on DayHeaderRow so
+          both run across that padding too — otherwise the strip beside Sunday
+          shows the grid behind it and reads as a seam. */}
+      <div
+        ref={headerRef}
+        className="flex-shrink-0 overflow-hidden border-b"
+        style={{ paddingRight: gutterPx, background: theme.panel, borderColor: theme.borderStrong }}
+      >
+        <div className="min-w-[700px]">
+          <DayHeaderRow days={days} theme={theme} />
+        </div>
       </div>
-      <div className="relative flex">
-        <HourRuler theme={theme} />
-        <div ref={gridRef} className="flex flex-1">
+      <div
+        ref={bodyRef}
+        onScroll={syncHeaderScroll}
+        className="min-h-0 flex-1 overflow-auto"
+        style={{ scrollbarGutter: 'stable' }}
+      >
+        <div className="relative flex min-w-[700px]">
+          <HourRuler theme={theme} />
+          <div ref={gridRef} className="flex flex-1">
           {days.map((day, dayIndex) => (
             <DayColumn
               key={day.key}
@@ -526,6 +584,7 @@ export function WeekGrid({
               selectedIds={selectedIds}
             />
           ))}
+          </div>
         </div>
       </div>
       {actionSheet}
