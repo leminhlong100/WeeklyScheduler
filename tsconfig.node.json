@@ -5,6 +5,10 @@
     "lib": ["ES2023"],
     "types": ["node"],
     "skipLibCheck": true,
+    /* The Netlify Functions in `netlify/functions/` are plain JS shared between
+       the deployed function and the dev-server plugin in `vite.config.ts`; this
+       lets the config import them. They are not type-checked (`checkJs` off). */
+    "allowJs": true,
 
     /* Bundler mode */
     "module": "nodenext",
