@@ -289,6 +289,105 @@ export interface Dictionary {
   categoryDeleted: string
   somethingWentWrong: string
 
+  /* --- Module switcher (sidebar) --- */
+  navScheduler: string
+  navExpenses: string
+
+  /* --- Expenses --- */
+  expensesTitle: string
+  expensesSub: string
+  addExpense: string
+  editExpense: string
+  expenseAmount: string
+  expenseAmountPh: string
+  expenseCurrency: string
+  expenseNote: string
+  expenseNotePh: string
+  expenseDate: string
+  expenseCategory: string
+  expenseUncategorized: string
+  /** Badge on rows the AI extracted (as opposed to typed by hand). */
+  expenseSourceAi: string
+  noExpenses: string
+  expenseMonthTotal: string
+  deleteExpenseConfirm: string
+  expenseCreated: string
+  expenseUpdated: string
+  expenseDeleted: string
+  expenseAmountPositive: string
+  /* Default expense categories seeded at signup (migration 0009). */
+  defaultExpenseCategoryFood: string
+  defaultExpenseCategoryTransport: string
+  defaultExpenseCategoryHome: string
+  defaultExpenseCategoryShopping: string
+  defaultExpenseCategoryHealth: string
+  defaultExpenseCategoryFun: string
+  defaultExpenseCategoryOther: string
+
+  /* --- Nhập nhanh bằng AI (Bước 4) --- */
+  quickAdd: string
+  quickAddPh: string
+  quickAddSend: string
+  quickAddThinking: string
+  /** "{n}" = số ký tự tối đa cho một lần nhập. */
+  quickAddTooLong: string
+  draftTitle: string
+  draftHint: string
+  draftLowConfidence: string
+  draftDiscard: string
+  saveAll: string
+  /** "{n}" = số khoản chi vừa lưu. */
+  expensesSavedCount: string
+  aiNoItems: string
+  aiErrorAuth: string
+  aiErrorRateLimited: string
+  aiErrorTimeout: string
+  aiErrorParseFailed: string
+  aiErrorConfig: string
+  aiErrorGeneric: string
+  retry: string
+  enterManually: string
+
+  tabExpenseList: string
+  tabReport: string
+  reportNoData: string
+  reportVsPrevMonth: string
+  reportNoPrevMonth: string
+  reportFlat: string
+  reportBudget: string
+  reportOverBudget: string
+
+  voiceInput: string
+  voiceListening: string
+  voiceErrorDenied: string
+  voiceErrorNoSpeech: string
+  voiceErrorNoMic: string
+  voiceErrorNetwork: string
+  voiceErrorGeneric: string
+
+  manageExpenseCategories: string
+  addExpenseCategory: string
+  editExpenseCategory: string
+  deleteExpenseCategoryConfirm: string
+  expenseBudget: string
+  expenseBudgetPh: string
+  expenseBudgetPositive: string
+  exportCsv: string
+  csvColumnSource: string
+  csvColumnRawText: string
+  expenseRepeat: string
+  expenseRepeatNone: string
+  /** "{n}" = số tháng của chuỗi định kỳ. */
+  expenseRepeatMonths: string
+  expenseSeriesNotice: string
+  applyToExpenseSeries: string
+  deleteExpenseSeries: string
+  deleteExpenseSeriesConfirm: string
+  /** "{n}" = số kỳ vừa tạo. */
+  expenseSeriesCreated: string
+  expenseSeriesUpdated: string
+  expenseSeriesDeleted: string
+
   dow: [string, string, string, string, string, string, string]
   miniDow: [string, string, string, string, string, string, string]
   mon: [
