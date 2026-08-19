@@ -15,6 +15,9 @@ const ResetPasswordPage = lazy(() =>
 const SchedulerPage = lazy(() =>
   import('@/pages/SchedulerPage').then((m) => ({ default: m.SchedulerPage })),
 )
+const ExpensesPage = lazy(() =>
+  import('@/pages/ExpensesPage').then((m) => ({ default: m.ExpensesPage })),
+)
 const DevTestUserMenu = lazy(() =>
   import('@/features/profile/components/UserMenu').then((m) => ({ default: m.UserMenu })),
 )
@@ -37,6 +40,7 @@ export function AppRouter() {
 
         <Route element={<ProtectedRoute />}>
           <Route path="/" element={<SchedulerPage />} />
+          <Route path="/expenses" element={<ExpensesPage />} />
         </Route>
       </Routes>
     </Suspense>

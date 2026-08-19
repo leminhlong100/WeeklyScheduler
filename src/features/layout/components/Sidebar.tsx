@@ -6,6 +6,7 @@ import type { DerivedTheme } from '@/features/theme/types'
 import { useIsMobile } from '@/hooks/useMediaQuery'
 import { cn } from '@/lib/utils'
 import { DecorBackground } from './DecorBackground'
+import { ModuleNav } from './ModuleNav'
 import { LanguageSwitcher } from './LanguageSwitcher'
 import { ThemeArtLayer } from './ThemeArtLayer'
 
@@ -25,10 +26,13 @@ interface SidebarProps {
   locale: Locale
   onLocaleChange: (locale: Locale) => void
   onClose: () => void
-  miniCalendar: ReactNode
-  categories: CategorySidebarItem[]
-  onToggleCategory: (id: string) => void
-  onManageCategories: () => void
+  /* Nội dung riêng của trang lịch tuần. Trang chi tiêu không truyền chúng —
+     mini-calendar và bộ lọc danh mục công việc không còn đúng ngữ cảnh ở đó —
+     nên mỗi khối tự ẩn khi vắng mặt thay vì render một khung rỗng. */
+  miniCalendar?: ReactNode
+  categories?: CategorySidebarItem[]
+  onToggleCategory?: (id: string) => void
+  onManageCategories?: () => void
 }
 
 export function Sidebar({
@@ -80,7 +84,9 @@ export function Sidebar({
               <img src="/favicon.png" alt="" className="h-full w-full object-cover" />
             </div>
             <div className="min-w-0 flex-1">
-              <div className="font-heading text-[19px] font-extrabold leading-tight">{t.appName}</div>
+              <div className="font-heading text-[19px] font-extrabold leading-tight">
+                {t.appName}
+              </div>
               <div className="text-xs font-semibold" style={{ color: 'rgba(255,255,255,0.78)' }}>
                 {t.appSub}
               </div>
@@ -99,42 +105,46 @@ export function Sidebar({
 
           <LanguageSwitcher locale={locale} onChange={onLocaleChange} theme={theme} />
 
+          <ModuleNav t={t} onNavigate={isMobile ? onClose : undefined} />
+
           {miniCalendar}
 
-          <div>
-            <div className="mb-2.5 text-[11px] font-extrabold uppercase tracking-wider text-white/78">
-              {t.categories}
-            </div>
-            <div className="flex flex-col gap-1.5">
-              {categories.map((c) => (
-                <button
-                  key={c.id}
-                  type="button"
-                  onClick={() => onToggleCategory(c.id)}
-                  className="flex items-center gap-2.5 rounded-2xl border-none bg-white/13 px-[11px] py-2.5 text-left transition-opacity"
-                  style={{ opacity: c.active ? 1 : 0.42 }}
-                >
-                  <span className="flex-shrink-0 text-base">{c.emoji}</span>
-                  <span className="flex-1 text-[13.5px] font-bold">{c.label}</span>
-                  <span
-                    className="min-w-[22px] rounded-lg bg-white/25 px-[5px] py-px text-center text-xs font-extrabold"
+          {categories && (
+            <div>
+              <div className="mb-2.5 text-[11px] font-extrabold uppercase tracking-wider text-white/78">
+                {t.categories}
+              </div>
+              <div className="flex flex-col gap-1.5">
+                {categories.map((c) => (
+                  <button
+                    key={c.id}
+                    type="button"
+                    onClick={() => onToggleCategory?.(c.id)}
+                    className="flex items-center gap-2.5 rounded-2xl border-none bg-white/13 px-[11px] py-2.5 text-left transition-opacity"
+                    style={{ opacity: c.active ? 1 : 0.42 }}
                   >
-                    {c.count}
-                  </span>
+                    <span className="flex-shrink-0 text-base">{c.emoji}</span>
+                    <span className="flex-1 text-[13.5px] font-bold">{c.label}</span>
+                    <span className="min-w-[22px] rounded-lg bg-white/25 px-[5px] py-px text-center text-xs font-extrabold">
+                      {c.count}
+                    </span>
+                  </button>
+                ))}
+                {categories.length === 0 && (
+                  <p className="text-xs font-semibold text-white/78">{t.noCategories}</p>
+                )}
+              </div>
+              {onManageCategories && (
+                <button
+                  type="button"
+                  onClick={onManageCategories}
+                  className="mt-2.5 text-xs font-bold text-white/90 underline-offset-2 hover:underline"
+                >
+                  {t.manageCategories}
                 </button>
-              ))}
-              {categories.length === 0 && (
-                <p className="text-xs font-semibold text-white/78">{t.noCategories}</p>
               )}
             </div>
-            <button
-              type="button"
-              onClick={onManageCategories}
-              className="mt-2.5 text-xs font-bold text-white/90 underline-offset-2 hover:underline"
-            >
-              {t.manageCategories}
-            </button>
-          </div>
+          )}
         </div>
       </aside>
     </>
