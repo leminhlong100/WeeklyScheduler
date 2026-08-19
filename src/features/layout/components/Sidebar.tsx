@@ -75,7 +75,10 @@ export function Sidebar({
         <DecorBackground theme={theme} variant="sidebar" />
         <ThemeArtLayer theme={theme} variant="sidebar" />
 
-        <div className="relative z-10 flex h-full w-full flex-col justify-center-safe gap-5 overflow-y-auto px-5 py-[22px] pb-7">
+        {/* Luôn xếp từ trên xuống. Căn giữa dọc chỉ "vô hình" ở trang lịch tuần
+            vì nội dung ở đó tràn màn hình; trang chi tiêu ít khối hơn nên cả
+            sidebar bị đẩy xuống giữa, lệch hẳn so với trang kia. */}
+        <div className="relative z-10 flex h-full w-full flex-col justify-start gap-5 overflow-y-auto px-5 py-[22px] pb-7">
           <div className="flex items-center gap-[11px]">
             <div
               className="grid h-11 w-11 flex-shrink-0 place-items-center overflow-hidden rounded-[15px] shadow-lg"
