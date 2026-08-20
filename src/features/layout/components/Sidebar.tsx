@@ -72,8 +72,15 @@ export function Sidebar({
         )}
         style={{ width: isMobile ? undefined : open ? '328px' : '0px', background: theme.sideGrad }}
       >
-        <DecorBackground theme={theme} variant="sidebar" />
-        <ThemeArtLayer theme={theme} variant="sidebar" />
+        {/* Cả hai lớp con đều `absolute inset-0`, nên khung này quyết định vùng
+            chúng phủ. Trên mobile nó bắt đầu dưới safe-area: mây và sao của
+            sidebar đứng ở 4–6% chiều cao, tức rơi đúng dải iOS làm mờ sau status
+            bar, và hoá thành vệt trắng nhoè. Dưới dải đó chỉ còn `sideGrad` —
+            gradient mượt, mờ bao nhiêu cũng không ai thấy. */}
+        <div className="pointer-events-none absolute inset-0 max-md:top-[env(safe-area-inset-top)]">
+          <DecorBackground theme={theme} variant="sidebar" />
+          <ThemeArtLayer theme={theme} variant="sidebar" />
+        </div>
 
         {/* Luôn xếp từ trên xuống. Căn giữa dọc chỉ "vô hình" ở trang lịch tuần
             vì nội dung ở đó tràn màn hình; trang chi tiêu ít khối hơn nên cả
