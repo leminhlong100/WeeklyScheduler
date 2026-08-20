@@ -38,6 +38,7 @@ export function ExpenseCategoryEditForm({ category, onDone }: ExpenseCategoryEdi
       name: category?.name ?? '',
       emoji: category?.emoji ?? EXPENSE_EMOJI_PRESETS[0],
       color: category?.color ?? EXPENSE_COLOR_PRESETS[0],
+      kind: category?.kind ?? 'expense',
       monthlyBudget: category?.monthly_budget != null ? String(category.monthly_budget) : '',
     },
   })
@@ -48,7 +49,10 @@ export function ExpenseCategoryEditForm({ category, onDone }: ExpenseCategoryEdi
       name: values.name.trim(),
       emoji: values.emoji,
       color: values.color,
-      monthly_budget: parseBudget(values.monthlyBudget),
+      kind: values.kind,
+      // Danh mục thu không có ô hạn mức, nên bất kể form còn giữ giá trị gì thì
+      // cột này phải về NULL — không để lại một hạn mức vô hình không ai thấy.
+      monthly_budget: values.kind === 'expense' ? parseBudget(values.monthlyBudget) : null,
     }
 
     if (isEdit) {
@@ -77,7 +81,7 @@ export function ExpenseCategoryEditForm({ category, onDone }: ExpenseCategoryEdi
 
   return (
     <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-4">
-      <ExpenseCategoryFormFields form={form} />
+      <ExpenseCategoryFormFields form={form} allowKindChange={!isEdit} />
       <div className="flex justify-end gap-2">
         <Button
           type="button"

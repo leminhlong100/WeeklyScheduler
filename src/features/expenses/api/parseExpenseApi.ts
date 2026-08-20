@@ -1,12 +1,12 @@
 import { supabase } from '@/lib/supabase/client'
-import type { Currency } from '@/lib/supabase/database.types'
+import type { Currency, ExpenseKind } from '@/lib/supabase/database.types'
 
 const ENDPOINT = '/.netlify/functions/parse-expense'
 
 /** Khớp với `MAX_TEXT_LENGTH` trong `netlify/functions/parse-expense.js`. */
 export const MAX_PARSE_TEXT_LENGTH = 500
 
-/** Một khoản chi AI tách ra — bản nháp, chưa nằm trong DB. */
+/** Một khoản thu/chi AI tách ra — bản nháp, chưa nằm trong DB. */
 export interface ParsedExpenseItem {
   amount: number
   currency: Currency
@@ -16,6 +16,8 @@ export interface ParsedExpenseItem {
   spent_at: string
   /** 'low' = câu mơ hồ; UI tô cảnh báo để người dùng để mắt tới dòng đó. */
   confidence: 'high' | 'low'
+  /** Tiền ra hay tiền vào. Server luôn trả field này (mặc định 'expense'). */
+  kind: ExpenseKind
 }
 
 /**
@@ -45,8 +47,10 @@ interface ParseExpenseArgs {
   text: string
   /** 'YYYY-MM-DD' của máy người dùng — server không đoán múi giờ hộ. */
   today: string
-  /** Tên các danh mục của chính user này; AI chỉ được chọn trong đây. */
+  /** Tên các danh mục CHI của chính user này; AI chỉ được chọn trong đây. */
   categories: string[]
+  /** Tên các danh mục THU. Rỗng thì server không cho AI trả dòng income nào. */
+  incomeCategories: string[]
   defaultCurrency: Currency
 }
 
@@ -54,6 +58,7 @@ export async function parseExpenseText({
   text,
   today,
   categories,
+  incomeCategories,
   defaultCurrency,
 }: ParseExpenseArgs): Promise<ParsedExpenseItem[]> {
   // Endpoint có xác thực JWT: nó tiêu quota key của mình và nhận dữ liệu tài
@@ -67,7 +72,7 @@ export async function parseExpenseText({
     response = await fetch(ENDPOINT, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-      body: JSON.stringify({ text, today, categories, defaultCurrency }),
+      body: JSON.stringify({ text, today, categories, incomeCategories, defaultCurrency }),
     })
   } catch {
     throw new ParseExpenseError('network', 'Fetch failed')

@@ -142,6 +142,19 @@ function checkCase(testCase, items) {
     )
   }
   if (
+    testCase.kinds &&
+    !sameMultiset(
+      // Prompt cũ không có phần thu nên model không trả `kind`; mặc định
+      // 'expense' ở đây khớp với `itemSchema` của function.
+      items.map((i) => i.kind ?? 'expense'),
+      testCase.kinds,
+    )
+  ) {
+    problems.push(
+      `kind: mong ${JSON.stringify(testCase.kinds)}, nhận ${JSON.stringify(items.map((i) => i.kind ?? 'expense'))}`,
+    )
+  }
+  if (
     testCase.confidences &&
     !sameMultiset(
       items.map((i) => i.confidence),
@@ -170,6 +183,7 @@ async function run() {
   const systemPrompt = buildSystemPrompt({
     today: suite.today,
     categories: suite.categories,
+    incomeCategories: suite.incomeCategories ?? [],
     defaultCurrency: suite.defaultCurrency,
   })
 

@@ -12,7 +12,13 @@ type DefaultExpenseCategoryKey =
   | 'defaultExpenseCategoryHealth'
   | 'defaultExpenseCategoryFun'
   | 'defaultExpenseCategoryOther'
+  | 'defaultIncomeCategorySalary'
+  | 'defaultIncomeCategoryBonus'
+  | 'defaultIncomeCategoryInvestment'
+  | 'defaultIncomeCategoryOther'
 
+// Cả danh mục chi và danh mục thu đều được seed bằng chuỗi tiếng Việt trong
+// migration, nên cùng đi qua một bảng tra: tên nào còn khớp bản mặc định thì dịch.
 const DEFAULT_EXPENSE_CATEGORY_KEYS: DefaultExpenseCategoryKey[] = [
   'defaultExpenseCategoryFood',
   'defaultExpenseCategoryTransport',
@@ -21,6 +27,10 @@ const DEFAULT_EXPENSE_CATEGORY_KEYS: DefaultExpenseCategoryKey[] = [
   'defaultExpenseCategoryHealth',
   'defaultExpenseCategoryFun',
   'defaultExpenseCategoryOther',
+  'defaultIncomeCategorySalary',
+  'defaultIncomeCategoryBonus',
+  'defaultIncomeCategoryInvestment',
+  'defaultIncomeCategoryOther',
 ]
 
 const ALL_DICTIONARIES = [vi, en, zh, ja]

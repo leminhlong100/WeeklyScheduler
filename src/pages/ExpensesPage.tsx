@@ -1,8 +1,9 @@
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { DownloadIcon, SlidersHorizontalIcon } from 'lucide-react'
 import { toast } from 'sonner'
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog'
 import { useIsMobile, useIsTouchDevice } from '@/hooks/useMediaQuery'
+import { useSessionStorageState } from '@/hooks/useSessionStorageState'
 import { useTranslation } from '@/features/i18n/LocaleContext'
 import { useTheme } from '@/features/theme/ThemeContext'
 import { useProfilePreferenceSync } from '@/features/profile/hooks/useProfilePreferenceSync'
@@ -22,10 +23,20 @@ import {
   downloadCsv,
   expensesCsvFilename,
 } from '@/features/expenses/utils/exportCsv'
-import type { ParsedExpenseItem } from '@/features/expenses/api/parseExpenseApi'
+import {
+  isExpenseDraft,
+  toDraftRows,
+  type DraftRow,
+  type ExpenseDraft,
+} from '@/features/expenses/utils/draft'
+import {
+  EMPTY_EXPENSE_FILTER,
+  filterExpenses,
+  type ExpenseFilter,
+} from '@/features/expenses/utils/filter'
 import { useExpensesForMonth } from '@/features/expenses/hooks/useExpenses'
 import { useExpenseCategories } from '@/features/expenses/hooks/useExpenseCategories'
-import { useDeleteExpense } from '@/features/expenses/hooks/useExpenseMutations'
+import { useDeleteExpense, useUpdateExpense } from '@/features/expenses/hooks/useExpenseMutations'
 import type { Expense } from '@/features/expenses/api/expensesApi'
 import { todayISO } from '@/lib/utils/date'
 import {
@@ -37,6 +48,16 @@ import {
 
 /** `null` = đóng, `'new'` = thêm mới, một `Expense` = đang sửa dòng đó. */
 type EditTarget = Expense | 'new' | null
+
+/**
+ * Bản nháp AI nằm trong `sessionStorage`, không chỉ trong state.
+ *
+ * Một bản nháp đã tốn một lượt gọi AI và thường đã được sửa vài dòng bằng tay.
+ * Bấm nhầm sang trang lịch tuần, hay chỉ F5, mà mất sạch thì người dùng phải nói
+ * lại từ đầu và tiêu thêm một lượt quota. Khoá đặt tên có tiền tố module để
+ * không đụng phần lịch tuần.
+ */
+const DRAFT_STORAGE_KEY = 'weekly-scheduler:expense-draft'
 
 export function ExpensesPage() {
   useProfilePreferenceSync()
@@ -51,15 +72,23 @@ export function ExpensesPage() {
   const [tab, setTab] = useState<ExpenseTab>('list')
   const [categoryManagerOpen, setCategoryManagerOpen] = useState(false)
   const [editTarget, setEditTarget] = useState<EditTarget>(null)
-  /** Bản nháp AI đang chờ xác nhận — không có gì được ghi vào DB cho tới khi lưu. */
-  const [draft, setDraft] = useState<{ items: ParsedExpenseItem[]; rawText: string } | null>(null)
+  const [filter, setFilter] = useState<ExpenseFilter>(EMPTY_EXPENSE_FILTER)
+  /** Không có gì được ghi vào DB cho tới khi user bấm lưu bản nháp này. */
+  const [draft, setDraft] = useSessionStorageState<ExpenseDraft | null>(
+    DRAFT_STORAGE_KEY,
+    null,
+    isExpenseDraft,
+  )
 
   const { data: expenses = [] } = useExpensesForMonth(month)
   const { data: categories = [] } = useExpenseCategories()
   const deleteExpense = useDeleteExpense()
+  const updateExpense = useUpdateExpense()
 
   const { monthIndex, year } = monthLabelParts(month)
   const monthLabel = `${t.mon[monthIndex]} ${year}`
+
+  const visibleExpenses = useMemo(() => filterExpenses(expenses, filter), [expenses, filter])
 
   // Đang xem tháng này thì điền hôm nay; xem tháng khác thì điền ngày 1 của
   // tháng đó — nếu cứ điền hôm nay, khoản vừa thêm sẽ rơi ra ngoài danh sách
@@ -67,11 +96,13 @@ export function ExpensesPage() {
   const defaultDateForMonth = month === currentMonthKey() ? todayISO() : monthRange(month).startISO
 
   const handleExportCsv = () => {
-    if (expenses.length === 0) {
+    // Xuất đúng tập đang xem: đã lọc thì file phải khớp với những gì trên màn
+    // hình, chứ không âm thầm kèm cả những dòng vừa bị lọc ra.
+    if (visibleExpenses.length === 0) {
       toast.error(t.noExpenses)
       return
     }
-    downloadCsv(expensesCsvFilename(month), buildExpensesCsv(expenses, categories, t))
+    downloadCsv(expensesCsvFilename(month), buildExpensesCsv(visibleExpenses, categories, t))
   }
 
   const handleDelete = (expense: Expense) => {
@@ -80,6 +111,17 @@ export function ExpensesPage() {
       onSuccess: () => toast.success(t.expenseDeleted),
       onError: () => toast.error(t.somethingWentWrong),
     })
+  }
+
+  /** Kỳ dự kiến -> đã trả. Từ lúc này nó mới được cộng vào tổng và số dư. */
+  const handleMarkPaid = (expense: Expense) => {
+    updateExpense.mutate(
+      { id: expense.id, patch: { status: 'paid' } },
+      {
+        onSuccess: () => toast.success(t.expenseMarkedPaid),
+        onError: () => toast.error(t.somethingWentWrong),
+      },
+    )
   }
 
   return (
@@ -114,13 +156,13 @@ export function ExpensesPage() {
             lúc thì rất dễ gửi câu thứ hai và mất bản nháp đang sửa dở. */}
         {draft ? (
           <ParsedDraftList
-            items={draft.items}
-            rawText={draft.rawText}
+            draft={draft}
+            onChange={(rows: DraftRow[]) => setDraft({ ...draft, rows })}
             onDone={() => setDraft(null)}
           />
         ) : (
           <QuickAddSheet
-            onDrafts={(items, rawText) => setDraft({ items, rawText })}
+            onDrafts={(items, rawText) => setDraft({ rawText, rows: toDraftRows(items) })}
             onEnterManually={() => setEditTarget('new')}
           />
         )}
@@ -152,12 +194,18 @@ export function ExpensesPage() {
 
         {tab === 'list' ? (
           <ExpenseList
-            expenses={expenses}
+            expenses={visibleExpenses}
+            monthCount={expenses.length}
             categories={categories}
+            filter={filter}
+            onFilterChange={setFilter}
             onEdit={setEditTarget}
             onDelete={handleDelete}
+            onMarkPaid={handleMarkPaid}
           />
         ) : (
+          // Báo cáo cố ý KHÔNG chịu ảnh hưởng của bộ lọc: nó là bức tranh cả
+          // tháng, một báo cáo đã lọc mà không nói rõ sẽ bị đọc thành toàn cảnh.
           <MonthlyReport month={month} />
         )}
       </div>

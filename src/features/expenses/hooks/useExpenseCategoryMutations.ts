@@ -1,5 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useAuth } from '@/features/auth/AuthContext'
+import type { ExpenseKind } from '@/lib/supabase/database.types'
 import {
   createExpenseCategory,
   deleteExpenseCategory,
@@ -15,6 +16,7 @@ interface CreateExpenseCategoryVars {
   emoji: string
   color: string
   monthly_budget: number | null
+  kind: ExpenseKind
 }
 
 export function useCreateExpenseCategory() {
@@ -25,9 +27,11 @@ export function useCreateExpenseCategory() {
   return useMutation({
     mutationFn: (input: CreateExpenseCategoryVars) => {
       const existing = queryClient.getQueryData<ExpenseCategory[]>(key) ?? []
-      // `sort_order` nối tiếp cuối danh sách, giống danh mục công việc — danh mục
-      // mới thêm xuất hiện cuối, không chen vào giữa bộ seed.
-      return createExpenseCategory({ ...input, user_id: user!.id, sort_order: existing.length })
+      // `sort_order` nối tiếp cuối danh sách CÙNG KIND — hai nhóm được sắp xếp
+      // độc lập, nên đếm cả danh mục thu khi thêm một danh mục chi sẽ để lại
+      // khoảng trống trong thứ tự và làm mục mới nhảy chỗ.
+      const sameKind = existing.filter((c) => c.kind === input.kind)
+      return createExpenseCategory({ ...input, user_id: user!.id, sort_order: sameKind.length })
     },
     onSuccess: (created) => {
       queryClient.setQueryData<ExpenseCategory[]>(key, (prev) => [...(prev ?? []), created])

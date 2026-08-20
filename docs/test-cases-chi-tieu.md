@@ -41,6 +41,7 @@ Chạy một phần: `node scripts/test-parse-expense.mjs 12 13 14` (theo `id`).
     "Giải trí",
     "Khác"
   ],
+  "incomeCategories": ["Lương", "Thưởng", "Đầu tư", "Thu khác"],
   "defaultCurrency": "VND",
   "cases": [
     {
@@ -272,6 +273,49 @@ Chạy một phần: `node scripts/test-parse-expense.mjs 12 13 14` (theo `id`).
       "text": "sáng cà phê 30k, trưa cơm văn phòng 45k, chiều gửi xe 5k, tối hôm qua nhậu 400k",
       "amounts": [30000, 45000, 5000, 400000],
       "dates": ["2026-03-10", "2026-03-10", "2026-03-10", "2026-03-09"]
+    },
+    {
+      "id": 36,
+      "group": "thu nhập",
+      "text": "nhận lương tháng này 20 triệu",
+      "amounts": [20000000],
+      "kinds": ["income"],
+      "categories": ["Lương"]
+    },
+    {
+      "id": 37,
+      "group": "thu nhập",
+      "text": "được thưởng 2tr",
+      "amounts": [2000000],
+      "kinds": ["income"]
+    },
+    {
+      "id": 38,
+      "group": "thu nhập",
+      "text": "bán con xe cũ được 15 triệu",
+      "amounts": [15000000],
+      "kinds": ["income"]
+    },
+    {
+      "id": 39,
+      "group": "thu nhập lẫn chi trong một câu",
+      "text": "nhận lương 20tr, đóng tiền nhà 5tr",
+      "amounts": [20000000, 5000000],
+      "kinds": ["income", "expense"]
+    },
+    {
+      "id": 40,
+      "group": "thu nhập — không được nhận nhầm",
+      "text": "trả tiền điện 800k",
+      "amounts": [800000],
+      "kinds": ["expense"]
+    },
+    {
+      "id": 41,
+      "group": "thu nhập — không được nhận nhầm",
+      "text": "chuyển khoản cho mẹ 3 triệu",
+      "amounts": [3000000],
+      "kinds": ["expense"]
     }
   ]
 }
@@ -296,6 +340,7 @@ Ghi lại ngày chạy + model + tỉ lệ đạt mỗi lần đổi prompt, đ�
 
 | Ngày | Model | Đạt | Ghi chú |
 |---|---|---|---|
+| 2026-08-20 | `openai/gpt-oss-120b` | 9/10 (chạy chọn lọc) | Sau khi thêm phần THU vào prompt (`kind`, danh mục thu riêng). Chạy case 1, 10, 11, 34 (hồi quy phần chi) + 36–41 (thu): 6/6 case thu đạt, chi chỉ trượt #10 — đúng cái vốn đã chệch từ trước, và đạt khi chạy riêng. **Chưa chạy full 41 case** để tiết kiệm quota ngày. |
 | 2026-08-19 | `openai/gpt-oss-120b` | 34/35 | Sau khi thêm bảng ngày tính sẵn + từ khoá danh mục + quy tắc "rưỡi". Case còn chệch: #10 "hai trăm rưỡi" (đạt khi chạy riêng, trượt trong lần chạy dài). |
 | 2026-08-19 | `openai/gpt-oss-120b` | 33/35 | Prompt gốc: model tự cộng trừ lịch ("thứ 3 tuần trước" ra sai một tuần rưỡi) và xếp "grab về nhà" vào Ăn uống. |
 

@@ -20,7 +20,9 @@ export {
 export { buildExpensesCsv, downloadCsv, expensesCsvFilename } from './utils/exportCsv'
 export { ExpenseEditForm } from './components/ExpenseEditForm'
 export { ExpensesHeader } from './components/ExpensesHeader'
-export { sumByCurrency, type CurrencyTotal } from './utils/totals'
+export { summarizeByCurrency, type CurrencySummary } from './utils/totals'
+export { sumAmounts, subtractAmounts } from './utils/money'
+export { statusForDate } from './utils/status'
 export {
   buildMonthlyReport,
   UNCATEGORIZED,
@@ -28,9 +30,27 @@ export {
   type CategoryBreakdown,
 } from './utils/report'
 export {
+  EMPTY_EXPENSE_FILTER,
+  filterExpenses,
+  groupByDay,
+  isFilterActive,
+  type CategoryFilter,
+  type ExpenseDayGroup,
+  type ExpenseFilter,
+  type KindFilter,
+} from './utils/filter'
+export {
+  isExpenseDraft,
+  toDraftRows,
+  NO_CATEGORY,
+  type DraftRow,
+  type ExpenseDraft,
+} from './utils/draft'
+export {
   currentMonthKey,
   monthRange,
   monthLabelParts,
+  partialMonthCutoffDay,
   shiftMonth,
   toMonthKey,
   buildMonthlyRepeatDates,

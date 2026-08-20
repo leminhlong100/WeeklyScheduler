@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useForm, Controller } from 'react-hook-form'
+import { useForm, useWatch, Controller } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { RepeatIcon } from 'lucide-react'
 import { toast } from 'sonner'
@@ -19,11 +19,13 @@ import { useTheme } from '@/features/theme/ThemeContext'
 import { translateExpenseCategoryName } from '@/features/i18n/defaultExpenseCategoryNames'
 import { translateFieldError } from '@/lib/utils/formErrors'
 import { todayISO } from '@/lib/utils/date'
+import type { ExpenseKind } from '@/lib/supabase/database.types'
 import {
   expenseSchema,
   parseAmount,
   CURRENCIES,
   DEFAULT_CURRENCY,
+  KINDS,
   REPEAT_MONTH_OPTIONS,
   type ExpenseFormInput,
 } from '../schemas/expenseSchema'
@@ -36,18 +38,15 @@ import {
 } from '../hooks/useExpenseMutations'
 import { useExpenseCategories } from '../hooks/useExpenseCategories'
 import { buildMonthlyRepeatDates } from '../utils/month'
+import { statusForDate } from '../utils/status'
+import { NO_CATEGORY } from '../utils/draft'
 import type { Expense } from '../api/expensesApi'
 
-/**
- * `<Select>` không có khái niệm "không chọn gì" — value rỗng làm nó rơi về
- * placeholder và không gửi được. Dùng một sentinel để "Chưa phân loại" là một
- * lựa chọn thật, rồi ánh xạ về NULL khi ghi DB.
- */
-const NO_CATEGORY = '__none__'
+const INCOME_COLOR = '#2fc39a'
 
 interface ExpenseEditFormProps {
   expense?: Expense
-  /** Ngày điền sẵn cho khoản chi mới — thường là ngày đang xem. */
+  /** Ngày điền sẵn cho khoản mới — thường là ngày đang xem. */
   defaultDate?: string
   onDone: () => void
 }
@@ -71,6 +70,7 @@ export function ExpenseEditForm({ expense, defaultDate, onDone }: ExpenseEditFor
     defaultValues: {
       amount: expense ? String(expense.amount) : '',
       currency: expense?.currency ?? DEFAULT_CURRENCY,
+      kind: expense?.kind ?? 'expense',
       categoryId: expense?.category_id ?? NO_CATEGORY,
       note: expense?.note ?? '',
       spentAt: expense?.spent_at ?? defaultDate ?? todayISO(),
@@ -83,97 +83,114 @@ export function ExpenseEditForm({ expense, defaultDate, onDone }: ExpenseEditFor
     formState: { errors },
   } = form
 
+  // useWatch chứ không phải form.watch: form.watch trả về một hàm không memo hoá
+  // được, React Compiler thấy vậy là bỏ luôn việc memo cả component này.
+  const kind = useWatch({ control, name: 'kind' })
+  const repeatMonths = useWatch({ control, name: 'repeatMonths' })
+
+  // Danh mục thu và danh mục chi tách hẳn, nên bộ chọn chỉ hiện nhóm khớp kind
+  // đang chọn — tránh gán "Lương" cho một khoản chi.
   const categoryOptions = [
     { value: NO_CATEGORY, label: t.expenseUncategorized },
-    ...categories.map((c) => ({
-      value: c.id,
-      label: `${c.emoji} ${translateExpenseCategoryName(c.name, t)}`,
-    })),
+    ...categories
+      .filter((c) => c.kind === kind)
+      .map((c) => ({
+        value: c.id,
+        label: `${c.emoji} ${translateExpenseCategoryName(c.name, t)}`,
+      })),
   ]
+
+  const kindLabel: Record<ExpenseKind, string> = {
+    expense: t.expenseKindExpense,
+    income: t.expenseKindIncome,
+  }
 
   const repeatOptions = REPEAT_MONTH_OPTIONS.map((n) => ({
     value: n,
     label: n === 1 ? t.expenseRepeatNone : t.expenseRepeatMonths.replace('{n}', String(n)),
   }))
 
-  const onSubmit = (values: ExpenseFormInput) => {
-    const onError = () => toast.error(t.somethingWentWrong)
+  const onSubmit = async (values: ExpenseFormInput) => {
+    // Không đưa `status` vào đây: mỗi kỳ giữ trạng thái đã trả / chưa trả của
+    // riêng nó, một bản vá chung cho cả chuỗi sẽ ghi đè hết.
     const shared = {
       amount: parseAmount(values.amount),
       currency: values.currency,
+      kind: values.kind,
       category_id: values.categoryId === NO_CATEGORY ? null : values.categoryId,
       note: values.note.trim(),
     }
 
-    if (isEdit) {
-      if (applyToSeries && seriesId) {
-        // Bản vá chuỗi đã bao gồm chính kỳ này (nó bắt đầu từ ngày của kỳ này),
-        // nên chỉ khi user đổi ngày mới cần thêm một lượt ghi riêng — mỗi kỳ
-        // phải giữ ngày của nó, không thể ghi một ngày cho cả chuỗi.
-        updateSeries.mutate(
-          { seriesId, fromISO: expense.spent_at, patch: shared },
-          {
-            onSuccess: () => {
-              if (values.spentAt !== expense.spent_at) {
-                updateExpense.mutate({ id: expense.id, patch: { spent_at: values.spentAt } })
-              }
-              toast.success(t.expenseSeriesUpdated)
-              onDone()
-            },
-            onError,
-          },
-        )
+    try {
+      if (isEdit) {
+        if (applyToSeries && seriesId) {
+          // Bản vá chuỗi đã bao gồm chính kỳ này (nó bắt đầu từ ngày của kỳ
+          // này), nên chỉ khi user đổi ngày mới cần thêm một lượt ghi riêng —
+          // mỗi kỳ phải giữ ngày của nó, không thể ghi một ngày cho cả chuỗi.
+          //
+          // Hai lượt ghi này phải `await` tuần tự và nằm trong cùng một try:
+          // báo "đã cập nhật" rồi đóng modal khi lượt thứ hai còn chưa xong là
+          // nói với người dùng một điều chưa chắc đúng.
+          await updateSeries.mutateAsync({
+            seriesId,
+            fromISO: expense.spent_at,
+            patch: shared,
+          })
+          if (values.spentAt !== expense.spent_at) {
+            await updateExpense.mutateAsync({
+              id: expense.id,
+              patch: { spent_at: values.spentAt },
+            })
+          }
+          toast.success(t.expenseSeriesUpdated)
+          onDone()
+          return
+        }
+
+        await updateExpense.mutateAsync({
+          id: expense.id,
+          patch: { ...shared, spent_at: values.spentAt },
+        })
+        toast.success(t.expenseUpdated)
+        onDone()
         return
       }
 
-      updateExpense.mutate(
-        { id: expense.id, patch: { ...shared, spent_at: values.spentAt } },
-        {
-          onSuccess: () => {
-            toast.success(t.expenseUpdated)
-            onDone()
-          },
-          onError,
-        },
-      )
-      return
-    }
+      // `source: 'manual'` phân biệt với các dòng AI tách ra; `raw_text` để trống
+      // vì không có câu gốc nào để đối chiếu.
+      if (values.repeatMonths > 1) {
+        const dates = buildMonthlyRepeatDates(values.spentAt, values.repeatMonths)
+        // Chỉ chuỗi thật mới có `series_id`; khoản lẻ để NULL, tránh dựng chuỗi
+        // một phần tử rồi phải xử lý riêng ở mọi chỗ.
+        const newSeriesId = crypto.randomUUID()
+        await bulkCreate.mutateAsync(
+          dates.map((spent_at) => ({
+            ...shared,
+            spent_at,
+            // Các kỳ chưa tới vào DB ở trạng thái 'planned': dòng vẫn có thật để
+            // sửa/xoá lẻ được, nhưng không bị cộng vào tổng của tháng tương lai
+            // như thể đã trả.
+            status: statusForDate(spent_at),
+            source: 'manual' as const,
+            series_id: newSeriesId,
+          })),
+        )
+        toast.success(t.expenseSeriesCreated.replace('{n}', String(dates.length)))
+        onDone()
+        return
+      }
 
-    // `source: 'manual'` phân biệt với các dòng AI tách ra; `raw_text` để trống
-    // vì không có câu gốc nào để đối chiếu.
-    if (values.repeatMonths > 1) {
-      const dates = buildMonthlyRepeatDates(values.spentAt, values.repeatMonths)
-      // Chỉ chuỗi thật mới có `series_id`; khoản lẻ để NULL, tránh dựng chuỗi
-      // một phần tử rồi phải xử lý riêng ở mọi chỗ.
-      const newSeriesId = crypto.randomUUID()
-      bulkCreate.mutate(
-        dates.map((spent_at) => ({
-          ...shared,
-          spent_at,
-          source: 'manual' as const,
-          series_id: newSeriesId,
-        })),
-        {
-          onSuccess: () => {
-            toast.success(t.expenseSeriesCreated.replace('{n}', String(dates.length)))
-            onDone()
-          },
-          onError,
-        },
-      )
-      return
+      await createExpense.mutateAsync({
+        ...shared,
+        spent_at: values.spentAt,
+        status: statusForDate(values.spentAt),
+        source: 'manual',
+      })
+      toast.success(t.expenseCreated)
+      onDone()
+    } catch {
+      toast.error(t.somethingWentWrong)
     }
-
-    createExpense.mutate(
-      { ...shared, spent_at: values.spentAt, source: 'manual' },
-      {
-        onSuccess: () => {
-          toast.success(t.expenseCreated)
-          onDone()
-        },
-        onError,
-      },
-    )
   }
 
   const handleDeleteSeries = () => {
@@ -202,6 +219,51 @@ export function ExpenseEditForm({ expense, defaultDate, onDone }: ExpenseEditFor
 
   return (
     <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-4">
+      {/* Chi hay Thu là câu hỏi đầu tiên: nó đổi cả danh sách danh mục bên dưới
+          và đổi dấu của khoản này trong số dư. */}
+      <Controller
+        control={control}
+        name="kind"
+        render={({ field }) => (
+          <div
+            role="tablist"
+            aria-label={t.expenseKind}
+            className="flex gap-1 rounded-[14px] border-[1.5px] p-1"
+            style={{ borderColor: theme.border, background: theme.chip }}
+          >
+            {KINDS.map((option) => {
+              const selected = field.value === option
+              return (
+                <button
+                  key={option}
+                  type="button"
+                  role="tab"
+                  aria-selected={selected}
+                  onClick={() => {
+                    if (selected) return
+                    field.onChange(option)
+                    // Danh mục của kind cũ không còn nằm trong danh sách mới, để
+                    // lại sẽ là một id vô hình mà bộ chọn không hiển thị được.
+                    form.setValue('categoryId', NO_CATEGORY)
+                  }}
+                  className="flex-1 rounded-[10px] py-1.5 text-[13px] font-extrabold transition-transform duration-150 active:scale-[0.98]"
+                  style={{
+                    background: selected
+                      ? option === 'income'
+                        ? INCOME_COLOR
+                        : theme.accent
+                      : 'transparent',
+                    color: selected ? '#fff' : theme.muted,
+                  }}
+                >
+                  {kindLabel[option]}
+                </button>
+              )
+            })}
+          </div>
+        )}
+      />
+
       <div className="flex gap-3">
         <div className="min-w-0 flex-1">
           <FormField
@@ -319,6 +381,18 @@ export function ExpenseEditForm({ expense, defaultDate, onDone }: ExpenseEditFor
         </FormField>
       )}
 
+      {!isEdit && repeatMonths > 1 && (
+        <p className="text-[11.5px] font-semibold" style={{ color: theme.muted }}>
+          {t.expensePlannedHint}
+        </p>
+      )}
+
+      {isEdit && expense.status === 'planned' && (
+        <p className="text-[11.5px] font-semibold" style={{ color: '#b07300' }}>
+          {t.expensePlannedEditHint}
+        </p>
+      )}
+
       {isEdit && seriesId && (
         <div className="rounded-2xl px-3.5 py-3" style={{ background: theme.chip }}>
           <div className="flex items-start gap-2">
@@ -352,7 +426,13 @@ export function ExpenseEditForm({ expense, defaultDate, onDone }: ExpenseEditFor
         </div>
       )}
 
-      <div className="flex flex-wrap justify-end gap-2">
+      {/* Dính đáy modal: trên điện thoại, bàn phím ảo mở ra ăn hết chiều cao và
+          nút Lưu bị đẩy xuống dưới vùng thấy được — người dùng gõ xong thì không
+          còn nút nào để bấm. Sticky giữ nó luôn nằm trong khung. */}
+      <div
+        className="sticky bottom-0 -mx-5 flex flex-wrap justify-end gap-2 border-t px-5 pb-1 pt-3 sm:-mx-6 sm:px-6"
+        style={{ background: theme.modalBg, borderColor: theme.border }}
+      >
         {isEdit && seriesId && (
           <Button
             type="button"

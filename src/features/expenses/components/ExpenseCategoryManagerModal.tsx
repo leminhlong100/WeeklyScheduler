@@ -7,6 +7,7 @@ import { useTranslation } from '@/features/i18n/LocaleContext'
 import { useTheme } from '@/features/theme/ThemeContext'
 import { useExpenseCategories } from '../hooks/useExpenseCategories'
 import { useDeleteExpenseCategory } from '../hooks/useExpenseCategoryMutations'
+import { KINDS } from '../schemas/expenseSchema'
 import type { ExpenseCategory } from '../api/expenseCategoriesApi'
 import { ExpenseCategoryRow } from './ExpenseCategoryRow'
 import { ExpenseCategoryEditForm } from './ExpenseCategoryEditForm'
@@ -64,15 +65,32 @@ export function ExpenseCategoryManagerModal({
           />
         ) : (
           <div className="flex flex-col gap-3">
-            <div className="flex max-h-[320px] flex-col gap-2 overflow-y-auto">
-              {categories.map((category) => (
-                <ExpenseCategoryRow
-                  key={category.id}
-                  category={category}
-                  onEdit={() => setEditTarget(category)}
-                  onDelete={() => handleDelete(category)}
-                />
-              ))}
+            {/* Tách hai nhóm bằng tiêu đề: danh mục thu và danh mục chi không
+                dùng lẫn được, trộn một danh sách thì phải đọc từng cái mới biết
+                cái nào dùng cho việc gì. */}
+            <div className="flex max-h-[320px] flex-col gap-3 overflow-y-auto">
+              {KINDS.map((kind) => {
+                const group = categories.filter((c) => c.kind === kind)
+                if (group.length === 0) return null
+                return (
+                  <div key={kind} className="flex flex-col gap-2">
+                    <div
+                      className="text-[11px] font-extrabold uppercase tracking-wider"
+                      style={{ color: theme.muted }}
+                    >
+                      {kind === 'expense' ? t.expenseKindExpense : t.expenseKindIncome}
+                    </div>
+                    {group.map((category) => (
+                      <ExpenseCategoryRow
+                        key={category.id}
+                        category={category}
+                        onEdit={() => setEditTarget(category)}
+                        onDelete={() => handleDelete(category)}
+                      />
+                    ))}
+                  </div>
+                )
+              })}
               {categories.length === 0 && (
                 <p className="text-sm font-medium" style={{ color: theme.muted }}>
                   {t.noCategories}
