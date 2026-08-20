@@ -77,8 +77,13 @@ export function Sidebar({
 
         {/* Luôn xếp từ trên xuống. Căn giữa dọc chỉ "vô hình" ở trang lịch tuần
             vì nội dung ở đó tràn màn hình; trang chi tiêu ít khối hơn nên cả
-            sidebar bị đẩy xuống giữa, lệch hẳn so với trang kia. */}
-        <div className="relative z-10 flex h-full w-full flex-col justify-start gap-5 overflow-y-auto px-5 py-[22px] pb-7">
+            sidebar bị đẩy xuống giữa, lệch hẳn so với trang kia.
+
+            Trên mobile drawer phủ từ `top: 0` và trang chạy `viewport-fit=cover`,
+            nên nếu chỉ padding cố định thì logo và tên app nằm ngay dưới notch —
+            đúng dải iOS vẽ lớp kính sau status bar, và chúng trông mờ đi. Cộng
+            thêm safe-area giống Header để nội dung bắt đầu bên dưới dải đó. */}
+        <div className="relative z-10 flex h-full w-full flex-col justify-start gap-5 overflow-y-auto px-5 pt-[22px] pb-7 max-md:pt-[calc(22px+env(safe-area-inset-top))]">
           <div className="flex items-center gap-[11px]">
             <div
               className="grid h-11 w-11 flex-shrink-0 place-items-center overflow-hidden rounded-[15px] shadow-lg"
