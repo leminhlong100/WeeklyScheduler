@@ -31,6 +31,18 @@ export type Currency = 'VND' | 'JPY' | 'USD'
 
 /** 'ai' = do AI tách ra rồi user xác nhận; 'manual' = user tự nhập form. */
 export type ExpenseSource = 'ai' | 'manual'
+
+/**
+ * Tiền ra hay tiền vào. `amount` luôn dương ở cả hai — dấu nằm ở đây, không nằm
+ * trong con số, nên không có chỗ nào phải nhớ quy ước dấu.
+ */
+export type ExpenseKind = 'expense' | 'income'
+
+/**
+ * 'paid' = đã thu/chi thật, được cộng vào tổng và số dư.
+ * 'planned' = kỳ định kỳ chưa tới, hiện riêng và không cộng vào tổng.
+ */
+export type ExpenseStatus = 'paid' | 'planned'
 export type ThemeKey =
   | 'lavender'
   | 'mint'
@@ -216,6 +228,8 @@ export interface Database {
           /** Hạn mức tháng. Null = không đặt hạn mức (khác với 0). */
           monthly_budget: number | null
           sort_order: number
+          /** Danh mục thu và danh mục chi tách hẳn — bộ chọn lọc theo cột này. */
+          kind: ExpenseKind
           created_at: string
           updated_at: string
         }
@@ -227,6 +241,7 @@ export interface Database {
           color: string
           monthly_budget?: number | null
           sort_order?: number
+          kind?: ExpenseKind
         }
         Update: {
           name?: string
@@ -234,6 +249,7 @@ export interface Database {
           color?: string
           monthly_budget?: number | null
           sort_order?: number
+          kind?: ExpenseKind
         }
         Relationships: []
       }
@@ -252,6 +268,10 @@ export interface Database {
           note: string
           /** 'YYYY-MM-DD' — ngày tiêu, không phải ngày nhập. */
           spent_at: string
+          /** Tiền ra hay tiền vào. `amount` dương ở cả hai trường hợp. */
+          kind: ExpenseKind
+          /** 'planned' = kỳ định kỳ chưa tới; không cộng vào tổng thực chi. */
+          status: ExpenseStatus
           source: ExpenseSource
           /** Câu gốc user nhập, giữ để sửa lại khi AI parse sai. Null với bản nhập tay. */
           raw_text: string | null
@@ -268,6 +288,8 @@ export interface Database {
           currency?: Currency
           note?: string
           spent_at: string
+          kind?: ExpenseKind
+          status?: ExpenseStatus
           source?: ExpenseSource
           raw_text?: string | null
           series_id?: string | null
@@ -278,6 +300,8 @@ export interface Database {
           currency?: Currency
           note?: string
           spent_at?: string
+          kind?: ExpenseKind
+          status?: ExpenseStatus
           source?: ExpenseSource
           raw_text?: string | null
           series_id?: string | null
