@@ -353,6 +353,42 @@ export const ja: Dictionary = {
   expenseSeriesUpdated: '定期支出を更新しました',
   expenseSeriesDeleted: '定期支出を削除しました',
 
+  expenseNoNote: '（メモなし）',
+  expenseKind: '種別',
+  expenseKindExpense: '支出',
+  expenseKindIncome: '収入',
+  expenseIncomeTotal: '収入',
+  expenseExpenseTotal: '支出',
+  expenseBalance: '収支',
+  defaultIncomeCategorySalary: '給与',
+  defaultIncomeCategoryBonus: '賞与',
+  defaultIncomeCategoryInvestment: '投資',
+  defaultIncomeCategoryOther: 'その他収入',
+
+  expensePlannedBadge: '予定',
+  expensePlannedShort: '（予定あり）',
+  expensePlannedNotCounted: '予定分（収支に未計上）:',
+  expensePlannedHint:
+    '未来の回は「予定」として保存され、合計には入りません。実際に支払ったら ✓ を押してください。',
+  expensePlannedEditHint: 'この回は未払いのため、月の合計には入っていません。',
+  expenseMarkPaid: '支払い済みにする',
+  expenseMarkedPaid: '支払い済みにしました',
+
+  reportVsPrevMonthPartial: '前月同期比（{d}日まで）',
+  reportByExpenseCategory: 'カテゴリ別支出',
+  reportByIncomeCategory: 'カテゴリ別収入',
+
+  filterSearchPh: 'メモ・金額で検索…',
+  filterClear: '解除',
+  filterNoResults: '条件に一致する記録がありません',
+  filterKindAll: 'すべて',
+  filterKindExpense: '支出',
+  filterKindIncome: '収入',
+  filterCategoryAll: 'すべてのカテゴリ',
+
+  csvColumnKind: '種別',
+  csvColumnStatus: '状態',
+
   dow: ['月', '火', '水', '木', '金', '土', '日'],
   miniDow: ['月', '火', '水', '木', '金', '土', '日'],
   mon: ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月'],

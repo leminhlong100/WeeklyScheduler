@@ -28,6 +28,16 @@ export function monthRange(month: MonthKey): { startISO: string; endExclusiveISO
   }
 }
 
+/**
+ * Ngày trong tháng của hôm nay, nếu `month` đúng là tháng đang diễn ra — dùng
+ * làm mốc cắt khi so sánh với tháng trước. `null` khi tháng đã kết thúc (hoặc
+ * còn ở tương lai): lúc đó dữ liệu đã đủ tháng nên so trọn tháng mới đúng.
+ */
+export function partialMonthCutoffDay(month: MonthKey): number | null {
+  const now = dayjs()
+  return toMonthKey(now) === month ? now.date() : null
+}
+
 /** Chỉ số 0-11 để tra vào `t.mon`, cộng với năm để dựng nhãn "thg 8 2026". */
 export function monthLabelParts(month: MonthKey): { monthIndex: number; year: number } {
   const d = dayjs(`${month}-01`)

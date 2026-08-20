@@ -306,10 +306,39 @@ export interface Dictionary {
   expenseDate: string
   expenseCategory: string
   expenseUncategorized: string
+  /** Placeholder on rows with no note — NOT the same thing as "uncategorized". */
+  expenseNoNote: string
   /** Badge on rows the AI extracted (as opposed to typed by hand). */
   expenseSourceAi: string
   noExpenses: string
   expenseMonthTotal: string
+
+  /* --- Thu / chi / số dư (migration 0011) --- */
+  expenseKind: string
+  expenseKindExpense: string
+  expenseKindIncome: string
+  expenseIncomeTotal: string
+  expenseExpenseTotal: string
+  expenseBalance: string
+  /* Default income categories seeded alongside the expense ones. */
+  defaultIncomeCategorySalary: string
+  defaultIncomeCategoryBonus: string
+  defaultIncomeCategoryInvestment: string
+  defaultIncomeCategoryOther: string
+
+  /* --- Kỳ dự kiến vs đã trả (migration 0012) --- */
+  /** Badge on a row that hasn't been paid yet. */
+  expensePlannedBadge: string
+  /** Compact marker in a day header: that day holds unpaid rows. */
+  expensePlannedShort: string
+  /** Explains that planned rows are excluded from the totals above. */
+  expensePlannedNotCounted: string
+  /** Shown while picking a repeat length, before anything is saved. */
+  expensePlannedHint: string
+  /** Shown when editing a row that is still planned. */
+  expensePlannedEditHint: string
+  expenseMarkPaid: string
+  expenseMarkedPaid: string
   deleteExpenseConfirm: string
   expenseCreated: string
   expenseUpdated: string
@@ -352,10 +381,26 @@ export interface Dictionary {
   tabReport: string
   reportNoData: string
   reportVsPrevMonth: string
+  /**
+   * Dùng khi tháng đang xem chưa kết thúc: hai bên chỉ so tới cùng một ngày.
+   * "{d}" = ngày trong tháng.
+   */
+  reportVsPrevMonthPartial: string
   reportNoPrevMonth: string
   reportFlat: string
   reportBudget: string
   reportOverBudget: string
+  reportByExpenseCategory: string
+  reportByIncomeCategory: string
+
+  /* --- Lọc & tìm trong danh sách --- */
+  filterSearchPh: string
+  filterClear: string
+  filterNoResults: string
+  filterKindAll: string
+  filterKindExpense: string
+  filterKindIncome: string
+  filterCategoryAll: string
 
   voiceInput: string
   voiceListening: string
@@ -373,6 +418,8 @@ export interface Dictionary {
   expenseBudgetPh: string
   expenseBudgetPositive: string
   exportCsv: string
+  csvColumnKind: string
+  csvColumnStatus: string
   csvColumnSource: string
   csvColumnRawText: string
   expenseRepeat: string

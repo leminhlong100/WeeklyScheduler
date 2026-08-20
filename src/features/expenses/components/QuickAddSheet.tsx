@@ -92,7 +92,10 @@ export function QuickAddSheet({ onDrafts, onEnterManually }: QuickAddSheetProps)
       const items = await parseExpenseText({
         text: trimmed,
         today: todayISO(),
-        categories: categories.map((c) => c.name),
+        // Hai danh sách tách nhau: server dùng chúng làm allowlist theo từng
+        // kind, nên "nhận lương 20tr" không thể rơi vào một danh mục chi.
+        categories: categories.filter((c) => c.kind === 'expense').map((c) => c.name),
+        incomeCategories: categories.filter((c) => c.kind === 'income').map((c) => c.name),
         defaultCurrency: DEFAULT_CURRENCY,
       })
       if (items.length === 0) {
@@ -143,6 +146,10 @@ export function QuickAddSheet({ onDrafts, onEnterManually }: QuickAddSheetProps)
         rows={2}
         placeholder={t.quickAddPh}
         disabled={isPending}
+        // Bàn phím điện thoại đổi nút Enter thành "Gửi" nhờ cái này. Không có nó
+        // thì phím đó là xuống dòng và người dùng không biết phải bấm vào đâu để
+        // xong — nút gửi bên dưới mới là đường chính, đây chỉ là đường thứ hai.
+        enterKeyHint="send"
         // Khoá lúc đang nghe: giá trị hiển thị đang gồm cả đoạn tạm chưa vào
         // state, gõ chen vào lúc này sẽ mất chữ khi đoạn tạm bị thay.
         readOnly={speech.listening}
@@ -171,13 +178,12 @@ export function QuickAddSheet({ onDrafts, onEnterManually }: QuickAddSheetProps)
         </div>
       )}
 
-      <div className="flex items-center justify-end gap-2">
-        {isPending && (
-          <span className="text-xs font-semibold" style={{ color: theme.muted }}>
-            {t.quickAddThinking}
-          </span>
-        )}
-
+      {/* Trên điện thoại nút gửi chiếm hết chiều ngang còn lại và cao 44px: đây
+          là hành động kết thúc việc gõ, và Enter của bàn phím ảo không phải thứ
+          ai cũng nghĩ ra. Từ sm trở lên thì thu về kích thước thường, dồn phải
+          như các thanh hành động khác. `flex-wrap` để hai nút không bao giờ bị
+          đẩy ra ngoài khung trên máy hẹp. */}
+      <div className="flex flex-wrap items-center gap-2 sm:justify-end">
         {/* Trình duyệt không có Web Speech API thì nút biến mất hẳn — hiện nút rồi
             báo "không hỗ trợ" chỉ làm người dùng bấm một lần vô ích. Ô nhập chữ
             luôn còn đó, nên mất nút này không mất đường nào. */}
@@ -188,7 +194,7 @@ export function QuickAddSheet({ onDrafts, onEnterManually }: QuickAddSheetProps)
             disabled={isPending}
             aria-label={speech.listening ? t.voiceListening : t.voiceInput}
             aria-pressed={speech.listening}
-            className="flex h-9 items-center gap-1.5 rounded-[13px] border-[1.5px] px-3 text-[13px] font-bold transition-transform duration-150 active:scale-95 disabled:opacity-60"
+            className="flex h-11 flex-shrink-0 items-center gap-1.5 rounded-[13px] border-[1.5px] px-3 text-[13px] font-bold transition-transform duration-150 active:scale-95 disabled:opacity-60 sm:h-9"
             style={{
               borderColor: speech.listening ? '#d93a3a' : theme.border,
               background: speech.listening ? '#d93a3a1f' : theme.inputBg,
@@ -208,7 +214,7 @@ export function QuickAddSheet({ onDrafts, onEnterManually }: QuickAddSheetProps)
           type="button"
           onClick={() => void submit()}
           disabled={!canSend || speech.listening}
-          className="h-9 px-4 text-[13px]"
+          className="h-11 min-w-[140px] flex-1 text-[14px] sm:h-9 sm:flex-none sm:px-4 sm:text-[13px]"
         >
           {isPending ? t.quickAddThinking : t.quickAddSend}
         </GradientButton>

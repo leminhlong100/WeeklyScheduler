@@ -1,9 +1,16 @@
 import { z } from 'zod'
+import { KINDS } from './expenseSchema'
 
 export const expenseCategorySchema = z.object({
   name: z.string().min(1, 'fieldRequired').max(40),
   emoji: z.string().min(1, 'fieldRequired'),
   color: z.string().regex(/^#[0-9a-fA-F]{6}$/, 'fieldRequired'),
+  /**
+   * Danh mục thu và danh mục chi không dùng lẫn. Chỉ chọn được lúc TẠO: đổi
+   * kind của một danh mục đang có sẽ kéo theo mọi khoản đã gán nó nhảy sang phía
+   * bên kia của số dư, tức sửa lại lịch sử tiền bằng một cú bấm.
+   */
+  kind: z.enum(KINDS),
   /**
    * Chuỗi rỗng = không đặt hạn mức, khớp với `NULL` phía DB. Số 0 không được
    * nhận: cột có check `monthly_budget is null or monthly_budget > 0`, và "0"

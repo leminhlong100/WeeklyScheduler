@@ -33,22 +33,28 @@ export function buildExpensesCsv(
 
   const header = [
     t.expenseDate,
+    t.csvColumnKind,
     t.expenseAmount,
     t.expenseCurrency,
     t.expenseCategory,
     t.expenseNote,
+    t.csvColumnStatus,
     t.csvColumnSource,
     t.csvColumnRawText,
   ]
 
   const rows = expenses.map((e) => [
     e.spent_at,
+    // Mã thô ('expense'/'income'), không phải nhãn đã dịch: cột này để máy lọc
+    // và để hai file xuất ở hai ngôn ngữ vẫn ghép được với nhau.
+    e.kind,
     formatNumber(e.amount),
     e.currency,
     // Tên thô trong DB, không dịch: file xuất ra là dữ liệu, đổi ngôn ngữ giao
     // diện rồi xuất lại mà tên danh mục đổi theo thì hai file không ghép được.
     e.category_id ? (nameById.get(e.category_id) ?? '') : '',
     e.note,
+    e.status,
     e.source,
     e.raw_text ?? '',
   ])

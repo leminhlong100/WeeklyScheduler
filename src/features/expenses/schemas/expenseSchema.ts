@@ -1,6 +1,10 @@
 import { z } from 'zod'
+import type { ExpenseKind } from '@/lib/supabase/database.types'
 
 export const CURRENCIES = ['VND', 'JPY', 'USD'] as const
+
+/** Thứ tự cố định để bộ chọn "Chi / Thu" không đổi vị trí giữa các lần render. */
+export const KINDS = ['expense', 'income'] as const satisfies readonly ExpenseKind[]
 
 /**
  * Đơn vị tiền mặc định của app. Cột `expense_categories.monthly_budget` là
@@ -21,6 +25,11 @@ export const expenseSchema = z.object({
     .min(1, 'fieldRequired')
     .refine((v) => Number.isFinite(Number(v)) && Number(v) > 0, 'expenseAmountPositive'),
   currency: z.enum(CURRENCIES),
+  /**
+   * Tiền ra hay tiền vào. `amount` vẫn dương ở cả hai — dấu nằm ở đây, nên
+   * không chỗ nào phải nhớ quy ước dấu khi cộng tổng.
+   */
+  kind: z.enum(KINDS),
   categoryId: z.string(),
   note: z.string().max(200),
   spentAt: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'fieldRequired'),

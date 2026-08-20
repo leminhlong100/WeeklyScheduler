@@ -355,6 +355,42 @@ export const en: Dictionary = {
   expenseSeriesUpdated: 'Series updated',
   expenseSeriesDeleted: 'Series deleted',
 
+  expenseNoNote: '(no note)',
+  expenseKind: 'Type',
+  expenseKindExpense: 'Expense',
+  expenseKindIncome: 'Income',
+  expenseIncomeTotal: 'Income',
+  expenseExpenseTotal: 'Spent',
+  expenseBalance: 'Balance',
+  defaultIncomeCategorySalary: 'Salary',
+  defaultIncomeCategoryBonus: 'Bonus',
+  defaultIncomeCategoryInvestment: 'Investment',
+  defaultIncomeCategoryOther: 'Other income',
+
+  expensePlannedBadge: 'Planned',
+  expensePlannedShort: '(has planned)',
+  expensePlannedNotCounted: 'Planned, not in the balance:',
+  expensePlannedHint:
+    'Future periods are saved as “planned” and left out of the totals — tap ✓ once actually paid.',
+  expensePlannedEditHint: 'This period is still unpaid, so it is not in the month total.',
+  expenseMarkPaid: 'Mark as paid',
+  expenseMarkedPaid: 'Marked as paid',
+
+  reportVsPrevMonthPartial: 'vs same period last month (through day {d})',
+  reportByExpenseCategory: 'Spending by category',
+  reportByIncomeCategory: 'Income by category',
+
+  filterSearchPh: 'Search notes, amounts…',
+  filterClear: 'Clear',
+  filterNoResults: 'Nothing matches these filters',
+  filterKindAll: 'All',
+  filterKindExpense: 'Expense',
+  filterKindIncome: 'Income',
+  filterCategoryAll: 'All categories',
+
+  csvColumnKind: 'Type',
+  csvColumnStatus: 'Status',
+
   dow: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
   miniDow: ['M', 'T', 'W', 'T', 'F', 'S', 'S'],
   mon: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],

@@ -676,3 +676,90 @@ Làm qua UI thật, đối chiếu bằng truy vấn thẳng vào DB. Dọn sạ
 
 - Thêm `GROQ_API_KEY` vào Netlify **Site settings -> Environment variables**
   (hiện mới chỉ có trong `.env.local`, nên bản deploy sẽ trả `config` error).
+
+---
+
+# Bổ sung 2026-08-20 — thu nhập, kỳ dự kiến, lọc/tìm
+
+Năm việc được sửa sau lần rà soát module. Phần này ghi lại **quyết định**, không
+lặp lại code.
+
+## Migration mới (phải chạy tay trên Supabase SQL editor, theo thứ tự)
+
+| File | Nội dung |
+|---|---|
+| `0011_add_expense_kind.sql` | `kind` ('expense'/'income') cho `expenses` và `expense_categories`; đổi khoá `unique (user_id, name)` -> `unique (user_id, kind, name)`; seed thêm 4 danh mục thu; backfill cho tài khoản đã có |
+| `0012_add_expense_status.sql` | `status` ('paid'/'planned') cho `expenses` |
+
+Cho tới khi hai file này chạy xong, trang `/expenses` sẽ lỗi khi ghi (cột chưa
+tồn tại) — không có đường nào để app tự tạo cột.
+
+## Quyết định
+
+**Thu nhập nằm CÙNG bảng `expenses`, thêm cột `kind`** — không dựng bảng
+`incomes` riêng. RLS, chuỗi định kỳ, báo cáo theo currency, CSV, cache theo
+tháng đều đã xây quanh `expenses`; tách bảng là viết lần thứ hai toàn bộ, và câu
+hỏi quan trọng nhất ("tháng này còn lại bao nhiêu") lại phải join hai bảng mỗi
+lần hỏi.
+
+**`amount` vẫn luôn dương, dấu nằm ở `kind`.** Lưu thu nhập thành số âm thì mọi
+check, mọi tổng, mọi thanh biểu đồ phải nhớ quy ước dấu, và một lần quên là ra
+số sai mà không có gì báo.
+
+**Danh mục thu và danh mục chi tách hẳn** (`kind` trên `expense_categories`,
+khoá unique gồm cả kind). "Đầu tư" hợp lệ ở cả hai phía — mua cổ phiếu là chi,
+cổ tức là thu. Mọi bộ chọn danh mục đều lọc theo kind, và allowlist của AI cũng
+tách hai danh sách: gộp lại thì một khoản chi vẫn gán được danh mục "Lương".
+
+**Hạn mức chỉ có ở danh mục chi.** Ô hạn mức bị ẩn khi kind = income, và
+`monthly_budget` bị ép về NULL lúc lưu để không còn một hạn mức vô hình.
+
+**`status = 'planned'` cho kỳ định kỳ chưa tới.** `0010` sinh sẵn mọi kỳ thành
+dòng thật, nên trước đây mở báo cáo tháng sau đã thấy đủ tiền nhà như thể đã
+trả. Giờ kỳ ở tương lai vào DB là 'planned' và **không** được cộng vào tổng /
+số dư / cảnh báo hạn mức; người dùng bấm ✓ khi trả thật.
+
+**Không tự động chuyển 'planned' -> 'paid' khi ngày trôi qua.** Ngày đến hạn
+không phải bằng chứng đã trả. Quá hạn thì UI tô nhắc, người dùng vẫn là người
+xác nhận.
+
+**So sánh tháng phải cùng cửa sổ.** Xem tháng đang diễn ra thì tháng trước bị
+cắt tới cùng ngày (`partialMonthCutoffDay`), và câu chú thích ghi rõ "đến ngày
+N". Trước đó, 20 ngày của tháng này bị so với trọn tháng trước nên luôn ra
+"giảm mạnh" — một tin vui bịa ra. Kiểm bằng số thật: 1,5tr (đến 20/8) so trọn
+tháng 7 (10tr) ra **−85%**; so cùng kỳ (1tr) ra **+50%**.
+
+**Lọc/tìm làm trong bộ nhớ**, trên dữ liệu một tháng đã fetch sẵn: gõ tới đâu
+thấy tới đó, không thêm round-trip, chạy được cả khi offline. Ô tìm bỏ dấu hai
+phía (`NFD` + `\p{Diacritic}`, `đ`->`d`) vì trên bàn phím điện thoại gần như
+không ai gõ dấu; khớp cả `note`, `raw_text` và con số tiền.
+
+**Bản nháp AI lưu trong `sessionStorage`, không chỉ trong state.** Một bản nháp
+đã tốn một lượt quota và thường đã sửa vài dòng bằng tay. `sessionStorage` chứ
+không `localStorage`: mở app ba ngày sau mà thấy bản nháp cũ hiện lên thì không
+rõ từ đâu ra, và hai tab sẽ ghi đè nhau. Dòng nháp giữ **tên** danh mục AI trả
+về chứ không giữ uuid — ngay sau reload thì danh mục còn chưa fetch xong, quy
+sang uuid lúc đó sẽ ra "chưa phân loại" cho tất cả.
+
+**Cộng tiền qua đơn vị nhỏ nhất** (`utils/money.ts`). DB dùng `numeric` để tránh
+sai số, nhưng supabase-js trả `number` nên phép cộng ở client vẫn là float; số
+dư = tổng thu − tổng chi là chỗ lệch cent lộ ra rõ nhất.
+
+## Đã kiểm gì
+
+- `npm run typecheck`, `npm run lint` (0 error), `npm run build`: đạt.
+- 25 case logic tiền chạy thẳng bằng node trên `report.ts` / `totals.ts` /
+  `filter.ts` / `money.ts`: đạt. Gồm hai case quan trọng nhất — planned không
+  vào số dư, và so sánh cùng kỳ đổi dấu kết luận từ −85% thành +50%.
+- Bộ prompt AI: 6/6 case thu mới đạt (36–41), phần chi không hồi quy.
+- **Chưa kiểm trên trình duyệt**: migration còn chờ chạy, và tài khoản test chỉ
+  đăng nhập bằng Google OAuth.
+
+## Còn mở (đã biết, chưa làm)
+
+- Danh mục có hạn mức nhưng tháng đó không chi thì vẫn không hiện trong báo cáo
+  (đúng ra nên hiện `0 / 2.000.000`).
+- Chưa có hạn mức tổng tháng, chưa có báo cáo nhiều tháng.
+- Chuỗi định kỳ vẫn trần 24 kỳ, không tự gia hạn.
+- Endpoint AI vẫn chưa giới hạn số lượt theo user.
+- Chưa có test runner trong repo; 25 case ở trên chạy bằng script tạm.

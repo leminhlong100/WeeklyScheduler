@@ -353,6 +353,42 @@ export const vi: Dictionary = {
   expenseSeriesUpdated: 'Đã cập nhật chuỗi chi tiêu',
   expenseSeriesDeleted: 'Đã xoá chuỗi chi tiêu',
 
+  expenseNoNote: '(không ghi chú)',
+  expenseKind: 'Loại',
+  expenseKindExpense: 'Chi',
+  expenseKindIncome: 'Thu',
+  expenseIncomeTotal: 'Thu',
+  expenseExpenseTotal: 'Chi',
+  expenseBalance: 'Số dư',
+  defaultIncomeCategorySalary: 'Lương',
+  defaultIncomeCategoryBonus: 'Thưởng',
+  defaultIncomeCategoryInvestment: 'Đầu tư',
+  defaultIncomeCategoryOther: 'Thu khác',
+
+  expensePlannedBadge: 'Dự kiến',
+  expensePlannedShort: '(có kỳ dự kiến)',
+  expensePlannedNotCounted: 'Dự kiến, chưa tính vào số dư:',
+  expensePlannedHint:
+    'Các kỳ ở tương lai được lưu là “dự kiến”, chưa tính vào tổng — bấm ✓ khi đã trả thật.',
+  expensePlannedEditHint: 'Kỳ này chưa trả nên chưa được tính vào tổng tháng.',
+  expenseMarkPaid: 'Đánh dấu đã trả',
+  expenseMarkedPaid: 'Đã đánh dấu đã trả',
+
+  reportVsPrevMonthPartial: 'so với cùng kỳ tháng trước (đến ngày {d})',
+  reportByExpenseCategory: 'Chi theo danh mục',
+  reportByIncomeCategory: 'Thu theo danh mục',
+
+  filterSearchPh: 'Tìm ghi chú, số tiền…',
+  filterClear: 'Bỏ lọc',
+  filterNoResults: 'Không có khoản nào khớp bộ lọc',
+  filterKindAll: 'Tất cả',
+  filterKindExpense: 'Chi',
+  filterKindIncome: 'Thu',
+  filterCategoryAll: 'Mọi danh mục',
+
+  csvColumnKind: 'Loại',
+  csvColumnStatus: 'Trạng thái',
+
   dow: ['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN'],
   miniDow: ['2', '3', '4', '5', '6', '7', 'CN'],
   mon: [
