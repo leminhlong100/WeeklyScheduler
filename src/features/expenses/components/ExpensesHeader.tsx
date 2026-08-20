@@ -60,7 +60,7 @@ export function ExpensesHeader({
 }: ExpensesHeaderProps) {
   return (
     <header
-      className="relative z-[3] flex flex-shrink-0 items-center gap-2 border-b px-3 pb-2.5 pt-[calc(0.625rem+env(safe-area-inset-top))] sm:gap-[13px] sm:px-[22px] sm:pb-[15px] sm:pt-[15px]"
+      className="relative z-[3] flex flex-shrink-0 items-center gap-2 border-b px-3 pb-2.5 pt-[calc(0.625rem+env(safe-area-inset-top)*var(--sched-notch-scale))] sm:gap-[13px] sm:px-[22px] sm:pb-[15px] sm:pt-[15px]"
       style={{ borderColor: theme.border, background: theme.panel }}
     >
       <ChromeButton onClick={onToggleSidebar} theme={theme} title="Menu">

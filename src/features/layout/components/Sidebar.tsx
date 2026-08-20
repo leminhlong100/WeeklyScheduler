@@ -89,10 +89,9 @@ export function Sidebar({
             Trên mobile drawer phủ từ `top: 0` và trang chạy `viewport-fit=cover`,
             nên nếu chỉ padding cố định thì logo và tên app nằm ngay dưới notch —
             đúng dải iOS vẽ lớp kính sau status bar, và chúng trông mờ đi. Cộng
-            thêm safe-area giống Header để nội dung bắt đầu bên dưới dải đó, và
-            34px thay vì 22px vì lớp kính đó loe xuống quá mép dải: sát mép vẫn
-            còn bắt được một chút mờ. */}
-        <div className="relative z-10 flex h-full w-full flex-col justify-start gap-5 overflow-y-auto px-5 pt-[22px] pb-7 max-md:pt-[calc(34px+env(safe-area-inset-top))]">
+            thêm safe-area giống Header, nhân `--sched-notch-scale` vì lớp kính
+            loe xuống quá mép dải — xem chú thích của biến trong `index.css`. */}
+        <div className="relative z-10 flex h-full w-full flex-col justify-start gap-5 overflow-y-auto px-5 pt-[22px] pb-7 max-md:pt-[calc(22px+env(safe-area-inset-top)*var(--sched-notch-scale))]">
           <div className="flex items-center gap-[11px]">
             <div
               className="grid h-11 w-11 flex-shrink-0 place-items-center overflow-hidden rounded-[15px] shadow-lg"

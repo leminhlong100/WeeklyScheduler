@@ -47,6 +47,19 @@
     --radius-4xl: calc(var(--radius) * 2.6);
 }
 
+/*
+ * The app runs edge-to-edge under a translucent iOS status bar, and the glass
+ * iOS paints there blurs a little past the safe-area band — content stopping
+ * exactly at the inset still catches some of it. So every element that touches
+ * the top of the screen pads by `inset * this`, not by the bare inset. It's a
+ * multiplier rather than a flat number on purpose: phones without a notch report
+ * a zero inset and keep their original spacing instead of a dead white strip.
+ * One knob for the whole app — turn it up if the top still reads as hazy.
+ */
+:root {
+    --sched-notch-scale: 1.5;
+}
+
 :root {
     --background: oklch(1 0 0);
     --foreground: oklch(0.145 0 0);
