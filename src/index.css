@@ -55,9 +55,12 @@
  * multiplier rather than a flat number on purpose: phones without a notch report
  * a zero inset and keep their original spacing instead of a dead white strip.
  * One knob for the whole app — turn it up if the top still reads as hazy.
+ *
+ * Calibrated on an iPhone 13 (47px inset): 1.0 left the header text blurred,
+ * 1.5 was clean but sat too low. This splits them.
  */
 :root {
-    --sched-notch-scale: 1.5;
+    --sched-notch-scale: 1.25;
 }
 
 :root {
