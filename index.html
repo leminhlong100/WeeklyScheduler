@@ -12,7 +12,15 @@
     <meta name="theme-color" content="#9b86f0" />
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <!--
+      `black-translucent` would let the iOS status bar overlay the web view, and
+      iOS paints that bar on a glass layer — everything underneath reads as
+      blurred, which no CSS on our side can undo. `default` gives the bar its own
+      band instead, so the app never draws under it. The `env(safe-area-inset-*)`
+      paddings stay: they still earn their keep in a normal Safari tab and around
+      the home indicator.
+    -->
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
     <meta name="apple-mobile-web-app-title" content="Lịch Tuần" />
     <title>Lịch Tuần — Weekly Scheduler</title>
     <meta name="description" content="Cute weekly scheduler with drag &amp; drop tasks, categories, themes and stickers." />
