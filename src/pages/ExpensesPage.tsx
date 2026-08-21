@@ -6,7 +6,6 @@ import { useIsMobile, useIsTouchDevice } from '@/hooks/useMediaQuery'
 import { useSessionStorageState } from '@/hooks/useSessionStorageState'
 import { useTranslation } from '@/features/i18n/LocaleContext'
 import { useTheme } from '@/features/theme/ThemeContext'
-import { useProfilePreferenceSync } from '@/features/profile/hooks/useProfilePreferenceSync'
 import { UserMenu } from '@/features/profile/components/UserMenu'
 import { AppShell } from '@/features/layout/components/AppShell'
 import { Sidebar } from '@/features/layout/components/Sidebar'
@@ -60,8 +59,6 @@ type EditTarget = Expense | 'new' | null
 const DRAFT_STORAGE_KEY = 'weekly-scheduler:expense-draft'
 
 export function ExpensesPage() {
-  useProfilePreferenceSync()
-
   const { t, locale, setLocale } = useTranslation()
   const { theme } = useTheme()
   const isMobile = useIsMobile()

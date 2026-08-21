@@ -6,7 +6,6 @@ import { useTheme } from '@/features/theme/ThemeContext'
 import { ThemePickerModal } from '@/features/theme/components/ThemePickerModal'
 import { ThemeStudioPanel } from '@/features/theme/studio/ThemeStudioPanel'
 import type { CustomThemeRecord } from '@/features/theme/recipe/types'
-import { useProfilePreferenceSync } from '@/features/profile/hooks/useProfilePreferenceSync'
 import { UserMenu } from '@/features/profile/components/UserMenu'
 import { useWeekAnchor } from '@/features/calendar-nav/hooks/useWeekAnchor'
 import { MiniCalendar } from '@/features/calendar-nav/components/MiniCalendar'
@@ -30,8 +29,6 @@ import { Sidebar, type CategorySidebarItem } from '@/features/layout/components/
 import { addDays, toISODate } from '@/lib/utils/date'
 
 export function SchedulerPage() {
-  useProfilePreferenceSync()
-
   const { t, locale, setLocale } = useTranslation()
   const { theme } = useTheme()
   const {

@@ -6,6 +6,7 @@ import { Toaster } from '@/components/ui/sonner'
 import { TooltipProvider } from '@/components/ui/tooltip'
 import { AuthProvider } from '@/features/auth/AuthContext'
 import { ThemeProvider } from '@/features/theme/ThemeContext'
+import { PreferenceSync } from '@/features/profile/components/PreferenceSync'
 import { LocaleProvider } from '@/features/i18n/LocaleContext'
 import { PwaUpdatePrompt } from '@/app/PwaUpdatePrompt'
 import { QUERY_CACHE_BUSTER, queryPersister } from '@/lib/queryPersister'
@@ -34,6 +35,10 @@ export function AppProviders({ children }: { children: ReactNode }) {
       <LocaleProvider>
         <AuthProvider>
           <ThemeProvider>
+            {/* Here rather than in the pages: hydrating the profile row into local
+                state is a once-per-session step, and a per-page mount turned every
+                module switch into another chance to undo the user's last choice. */}
+            <PreferenceSync />
             <TooltipProvider>
               <BrowserRouter>{children}</BrowserRouter>
               <Toaster position="top-center" richColors />
