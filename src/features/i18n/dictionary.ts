@@ -418,6 +418,8 @@ export interface Dictionary {
   expenseBudgetPh: string
   expenseBudgetPositive: string
   exportCsv: string
+  hideAmounts: string
+  showAmounts: string
   csvColumnKind: string
   csvColumnStatus: string
   csvColumnSource: string

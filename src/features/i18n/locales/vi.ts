@@ -340,6 +340,8 @@ export const vi: Dictionary = {
   expenseBudgetPh: 'Bỏ trống nếu không đặt',
   expenseBudgetPositive: 'Hạn mức phải lớn hơn 0',
   exportCsv: 'Xuất CSV',
+  hideAmounts: 'Ẩn số tiền',
+  showAmounts: 'Hiện số tiền',
   csvColumnSource: 'Nguồn',
   csvColumnRawText: 'Câu gốc',
   expenseRepeat: 'Lặp hàng tháng',

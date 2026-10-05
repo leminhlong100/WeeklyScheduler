@@ -3,6 +3,7 @@ import { useTranslation } from '@/features/i18n/LocaleContext'
 import { useTheme } from '@/features/theme/ThemeContext'
 import { translateExpenseCategoryName } from '@/features/i18n/defaultExpenseCategoryNames'
 import { formatMoney } from '@/lib/utils/formatMoney'
+import { MaskedAmount } from './MaskedAmount'
 import type { Expense } from '../api/expensesApi'
 import type { ExpenseCategory } from '../api/expenseCategoriesApi'
 
@@ -88,8 +89,9 @@ export function ExpenseRow({ expense, category, onEdit, onDelete, onMarkPaid }: 
         className="flex-shrink-0 text-[14px] font-extrabold tabular-nums"
         style={{ color: isIncome ? INCOME_COLOR : theme.text }}
       >
-        {isIncome ? '+' : ''}
-        {formatMoney(expense.amount, expense.currency, locale)}
+        <MaskedAmount>
+          {`${isIncome ? '+' : ''}${formatMoney(expense.amount, expense.currency, locale)}`}
+        </MaskedAmount>
       </span>
 
       <div className="flex flex-shrink-0 gap-1">

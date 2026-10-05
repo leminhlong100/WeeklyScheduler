@@ -338,6 +338,8 @@ export const zh: Dictionary = {
   expenseBudgetPh: '留空表示不设预算',
   expenseBudgetPositive: '预算必须大于 0',
   exportCsv: '导出 CSV',
+  hideAmounts: '隐藏金额',
+  showAmounts: '显示金额',
   csvColumnSource: '来源',
   csvColumnRawText: '原始文字',
   expenseRepeat: '每月重复',

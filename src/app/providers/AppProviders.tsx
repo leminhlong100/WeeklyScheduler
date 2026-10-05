@@ -6,6 +6,7 @@ import { Toaster } from '@/components/ui/sonner'
 import { TooltipProvider } from '@/components/ui/tooltip'
 import { AuthProvider } from '@/features/auth/AuthContext'
 import { ThemeProvider } from '@/features/theme/ThemeContext'
+import { AmountVisibilityProvider } from '@/features/expenses/AmountVisibilityContext'
 import { PreferenceSync } from '@/features/profile/components/PreferenceSync'
 import { LocaleProvider } from '@/features/i18n/LocaleContext'
 import { PwaUpdatePrompt } from '@/app/PwaUpdatePrompt'
@@ -39,11 +40,13 @@ export function AppProviders({ children }: { children: ReactNode }) {
                 state is a once-per-session step, and a per-page mount turned every
                 module switch into another chance to undo the user's last choice. */}
             <PreferenceSync />
-            <TooltipProvider>
-              <BrowserRouter>{children}</BrowserRouter>
-              <Toaster position="top-center" richColors />
-              <PwaUpdatePrompt />
-            </TooltipProvider>
+            <AmountVisibilityProvider>
+              <TooltipProvider>
+                <BrowserRouter>{children}</BrowserRouter>
+                <Toaster position="top-center" richColors />
+                <PwaUpdatePrompt />
+              </TooltipProvider>
+            </AmountVisibilityProvider>
           </ThemeProvider>
         </AuthProvider>
       </LocaleProvider>

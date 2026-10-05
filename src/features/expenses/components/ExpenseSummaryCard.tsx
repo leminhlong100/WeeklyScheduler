@@ -1,6 +1,7 @@
 import { useTranslation } from '@/features/i18n/LocaleContext'
 import { useTheme } from '@/features/theme/ThemeContext'
 import { formatMoney } from '@/lib/utils/formatMoney'
+import { MaskedAmount } from './MaskedAmount'
 import type { CurrencySummary } from '../utils/totals'
 
 const INCOME_COLOR = '#2fc39a'
@@ -30,7 +31,7 @@ function Line({
         className={`tabular-nums ${strong ? 'font-heading text-[17px] font-extrabold' : 'text-[13px] font-bold'}`}
         style={{ color }}
       >
-        {value}
+        <MaskedAmount>{value}</MaskedAmount>
       </span>
     </div>
   )
@@ -102,12 +103,12 @@ export function ExpenseSummaryCard({ summaries }: { summaries: CurrencySummary[]
                 <span>{t.expensePlannedNotCounted}</span>
                 {s.plannedExpense > 0 && (
                   <span className="tabular-nums">
-                    −{formatMoney(s.plannedExpense, s.currency, locale)}
+                    <MaskedAmount>{`−${formatMoney(s.plannedExpense, s.currency, locale)}`}</MaskedAmount>
                   </span>
                 )}
                 {s.plannedIncome > 0 && (
                   <span className="tabular-nums">
-                    +{formatMoney(s.plannedIncome, s.currency, locale)}
+                    <MaskedAmount>{`+${formatMoney(s.plannedIncome, s.currency, locale)}`}</MaskedAmount>
                   </span>
                 )}
               </div>

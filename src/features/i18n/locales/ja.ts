@@ -340,6 +340,8 @@ export const ja: Dictionary = {
   expenseBudgetPh: '設定しない場合は空欄',
   expenseBudgetPositive: '予算は 0 より大きい必要があります',
   exportCsv: 'CSV 出力',
+  hideAmounts: '金額を隠す',
+  showAmounts: '金額を表示',
   csvColumnSource: '入力方法',
   csvColumnRawText: '元の文',
   expenseRepeat: '毎月くり返す',

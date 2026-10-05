@@ -341,6 +341,8 @@ export const en: Dictionary = {
   expenseBudgetPh: 'Leave empty for no budget',
   expenseBudgetPositive: 'Budget must be greater than 0',
   exportCsv: 'Export CSV',
+  hideAmounts: 'Hide amounts',
+  showAmounts: 'Show amounts',
   csvColumnSource: 'Source',
   csvColumnRawText: 'Original text',
   expenseRepeat: 'Repeat monthly',

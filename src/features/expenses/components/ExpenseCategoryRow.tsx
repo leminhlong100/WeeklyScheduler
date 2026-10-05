@@ -3,6 +3,7 @@ import { useTheme } from '@/features/theme/ThemeContext'
 import { useTranslation } from '@/features/i18n/LocaleContext'
 import { translateExpenseCategoryName } from '@/features/i18n/defaultExpenseCategoryNames'
 import { formatMoney } from '@/lib/utils/formatMoney'
+import { MaskedAmount } from './MaskedAmount'
 import { DEFAULT_CURRENCY } from '../schemas/expenseSchema'
 import type { ExpenseCategory } from '../api/expenseCategoriesApi'
 
@@ -35,7 +36,8 @@ export function ExpenseCategoryRow({ category, onEdit, onDelete }: ExpenseCatego
         {/* Hạn mức luôn tính bằng đơn vị tiền mặc định — xem chú thích DEFAULT_CURRENCY. */}
         {category.monthly_budget != null && (
           <div className="truncate text-[11.5px] font-semibold" style={{ color: theme.muted }}>
-            {t.reportBudget} {formatMoney(category.monthly_budget, DEFAULT_CURRENCY, locale)}
+            {t.reportBudget}{' '}
+            <MaskedAmount>{formatMoney(category.monthly_budget, DEFAULT_CURRENCY, locale)}</MaskedAmount>
           </div>
         )}
       </div>

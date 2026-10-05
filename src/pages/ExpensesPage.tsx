@@ -1,11 +1,12 @@
 import { useMemo, useState } from 'react'
-import { DownloadIcon, SlidersHorizontalIcon } from 'lucide-react'
+import { DownloadIcon, EyeIcon, EyeOffIcon, SlidersHorizontalIcon } from 'lucide-react'
 import { toast } from 'sonner'
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog'
 import { useIsMobile, useIsTouchDevice } from '@/hooks/useMediaQuery'
 import { useSessionStorageState } from '@/hooks/useSessionStorageState'
 import { useTranslation } from '@/features/i18n/LocaleContext'
 import { useTheme } from '@/features/theme/ThemeContext'
+import { useAmountVisibility } from '@/features/expenses/AmountVisibilityContext'
 import { UserMenu } from '@/features/profile/components/UserMenu'
 import { AppShell } from '@/features/layout/components/AppShell'
 import { Sidebar } from '@/features/layout/components/Sidebar'
@@ -61,6 +62,7 @@ const DRAFT_STORAGE_KEY = 'weekly-scheduler:expense-draft'
 export function ExpensesPage() {
   const { t, locale, setLocale } = useTranslation()
   const { theme } = useTheme()
+  const { hidden: amountsHidden, toggleHidden: toggleAmountsHidden } = useAmountVisibility()
   const isMobile = useIsMobile()
   const isTouch = useIsTouchDevice()
 
@@ -169,6 +171,20 @@ export function ExpensesPage() {
         {/* Hai việc phụ, để cạnh nhau ngay dưới tab: nhét vào header thì thanh
             trên đã có 6 nút và tràn trên máy nhỏ. */}
         <div className="-mt-1 flex flex-wrap justify-end gap-2">
+          <button
+            type="button"
+            onClick={toggleAmountsHidden}
+            aria-label={amountsHidden ? t.showAmounts : t.hideAmounts}
+            title={amountsHidden ? t.showAmounts : t.hideAmounts}
+            className="flex items-center gap-1.5 rounded-[11px] border-[1.5px] px-2.5 py-1.5 text-[12px] font-bold transition-transform duration-150 active:scale-95"
+            style={{ borderColor: theme.border, background: theme.chip, color: theme.muted }}
+          >
+            {amountsHidden ? (
+              <EyeOffIcon className="size-3.5" />
+            ) : (
+              <EyeIcon className="size-3.5" />
+            )}
+          </button>
           <button
             type="button"
             onClick={() => setCategoryManagerOpen(true)}
