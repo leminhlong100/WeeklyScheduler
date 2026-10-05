@@ -1,6 +1,8 @@
+import { EyeIcon, EyeOffIcon } from 'lucide-react'
 import { useTranslation } from '@/features/i18n/LocaleContext'
 import { useTheme } from '@/features/theme/ThemeContext'
 import { formatMoney } from '@/lib/utils/formatMoney'
+import { useAmountVisibility } from '../AmountVisibilityContext'
 import { MaskedAmount } from './MaskedAmount'
 import type { CurrencySummary } from '../utils/totals'
 
@@ -47,6 +49,7 @@ function Line({
 export function ExpenseSummaryCard({ summaries }: { summaries: CurrencySummary[] }) {
   const { t, locale } = useTranslation()
   const { theme } = useTheme()
+  const { hidden, toggleHidden } = useAmountVisibility()
 
   if (summaries.length === 0) return null
   const showCurrencyLabel = summaries.length > 1
@@ -68,11 +71,23 @@ export function ExpenseSummaryCard({ summaries }: { summaries: CurrencySummary[]
               >
                 {t.expenseMonthTotal}
               </span>
-              {showCurrencyLabel && (
-                <span className="text-[11px] font-extrabold" style={{ color: theme.muted }}>
-                  {s.currency}
-                </span>
-              )}
+              <span className="flex items-center gap-2">
+                {showCurrencyLabel && (
+                  <span className="text-[11px] font-extrabold" style={{ color: theme.muted }}>
+                    {s.currency}
+                  </span>
+                )}
+                <button
+                  type="button"
+                  onClick={toggleHidden}
+                  aria-label={hidden ? t.showAmounts : t.hideAmounts}
+                  title={hidden ? t.showAmounts : t.hideAmounts}
+                  className="grid h-6 w-6 flex-shrink-0 place-items-center rounded-md transition-transform duration-150 active:scale-95"
+                  style={{ color: theme.muted }}
+                >
+                  {hidden ? <EyeOffIcon className="size-3.5" /> : <EyeIcon className="size-3.5" />}
+                </button>
+              </span>
             </div>
 
             <Line
