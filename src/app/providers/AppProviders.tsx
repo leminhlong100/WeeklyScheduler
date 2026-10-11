@@ -47,6 +47,7 @@ export function AppProviders({ children }: { children: ReactNode }) {
                   position="top-center"
                   richColors
                   offset={{ top: 'calc(16px + env(safe-area-inset-top) * var(--sched-notch-scale))' }}
+                  mobileOffset={{ top: 'calc(16px + env(safe-area-inset-top) * var(--sched-notch-scale))' }}
                 />
                 <PwaUpdatePrompt />
               </TooltipProvider>
