@@ -150,6 +150,19 @@
 }
 
 /*
+ * iOS Safari tự động zoom khi focus vào input/textarea có font-size < 16px.
+ * Nhiều ô nhập trong app dùng cỡ chữ nhỏ hơn 16px cho vừa layout, nên ép sàn
+ * 16px riêng trên mobile để tắt zoom mà không ảnh hưởng cỡ chữ trên desktop.
+ */
+@media (max-width: 767px) {
+  input:not([type='checkbox']):not([type='radio']):not([type='color']):not([type='range']):not([type='file']),
+  textarea,
+  select {
+    font-size: 16px !important;
+  }
+}
+
+/*
  * Scrollbars follow the active theme's accent. The custom properties are set on
  * `:root` by ThemeContext; the literals here are the lavender default, used
  * before the first paint and if a theme ever drops them.

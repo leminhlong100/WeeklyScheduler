@@ -43,7 +43,11 @@ export function AppProviders({ children }: { children: ReactNode }) {
             <AmountVisibilityProvider>
               <TooltipProvider>
                 <BrowserRouter>{children}</BrowserRouter>
-                <Toaster position="top-center" richColors />
+                <Toaster
+                  position="top-center"
+                  richColors
+                  offset={{ top: 'calc(16px + env(safe-area-inset-top) * var(--sched-notch-scale))' }}
+                />
                 <PwaUpdatePrompt />
               </TooltipProvider>
             </AmountVisibilityProvider>
