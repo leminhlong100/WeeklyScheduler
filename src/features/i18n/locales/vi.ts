@@ -209,6 +209,7 @@ export const vi: Dictionary = {
   categoryName: 'Tên danh mục',
   categoryNamePh: 'Ví dụ: Đọc sách',
   categoryEmoji: 'Emoji',
+  categoryEmojiCustomPh: 'Hoặc gõ / dán emoji từ bàn phím',
   categoryColor: 'Màu sắc',
   deleteCategoryConfirm: 'Xóa danh mục này? Các sự kiện liên quan sẽ chuyển sang chưa phân loại.',
   noCategories: 'Chưa có danh mục nào',

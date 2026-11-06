@@ -209,6 +209,7 @@ export const zh: Dictionary = {
   categoryName: '分类名称',
   categoryNamePh: '例如：阅读',
   categoryEmoji: '表情符号',
+  categoryEmojiCustomPh: '或用键盘输入 / 粘贴表情符号',
   categoryColor: '颜色',
   deleteCategoryConfirm: '删除此分类？相关事件将变为未分类。',
   noCategories: '暂无分类',

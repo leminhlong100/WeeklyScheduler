@@ -10,6 +10,22 @@ import type { ExpenseCategoryFormInput } from '../schemas/expenseCategorySchema'
 import { EXPENSE_COLOR_PRESETS, EXPENSE_EMOJI_PRESETS } from '../data/expenseCategoryPresets'
 
 /**
+ * Emoji (grapheme) cuối cùng trong chuỗi, bỏ khoảng trắng. Cắt theo grapheme chứ
+ * không theo code point: emoji ghép như 👨‍👩‍👧 hay 🇻🇳 gồm nhiều code point, cắt
+ * theo code point sẽ chặt vỡ chúng.
+ */
+function lastGrapheme(value: string): string {
+  const text = value.trim()
+  if (!text) return ''
+  const parts = [...new Intl.Segmenter(undefined, { granularity: 'grapheme' }).segment(text)]
+  // Chỉ nhận emoji/cờ: gõ chữ thường hay số vào ô này không được biến thành icon.
+  const emojiPart = parts
+    .reverse()
+    .find((p) => /\p{Extended_Pictographic}|\p{Regional_Indicator}/u.test(p.segment))
+  return emojiPart?.segment ?? ''
+}
+
+/**
  * Tách khỏi `ExpenseCategoryEditForm` theo đúng cặp
  * `CategoryEditForm` / `CategoryFormFields` của danh mục công việc: form giữ
  * `useForm` và phần lưu, còn các ô nhập nằm riêng.
@@ -127,6 +143,27 @@ export function ExpenseCategoryFormFields({
               {e}
             </button>
           ))}
+        </div>
+        {/* Ngoài bộ có sẵn: gõ hoặc dán một emoji bất kỳ (bàn phím emoji của máy).
+            Chỉ giữ ký tự cuối cùng vừa gõ, nên gõ thêm một emoji là thay luôn emoji
+            cũ chứ không nối đuôi. */}
+        <div className="mt-2 flex items-center gap-2">
+          <span
+            className="grid size-10 flex-shrink-0 place-items-center rounded-xl border-[1.5px] text-xl"
+            style={{ borderColor: theme.accent, background: theme.chip }}
+          >
+            {emoji}
+          </span>
+          <Input
+            aria-label={t.categoryEmoji}
+            placeholder={t.categoryEmojiCustomPh}
+            value=""
+            onChange={(e) => {
+              const last = lastGrapheme(e.target.value)
+              if (last) setValue('emoji', last, { shouldValidate: true })
+            }}
+            style={inputStyle}
+          />
         </div>
       </div>
 

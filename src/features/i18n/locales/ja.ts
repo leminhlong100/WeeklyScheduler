@@ -209,6 +209,7 @@ export const ja: Dictionary = {
   categoryName: 'カテゴリ名',
   categoryNamePh: '例：読書',
   categoryEmoji: '絵文字',
+  categoryEmojiCustomPh: 'またはキーボードから絵文字を入力・貼り付け',
   categoryColor: '色',
   deleteCategoryConfirm: 'このカテゴリを削除しますか？関連する予定は未分類になります。',
   noCategories: 'カテゴリがまだありません',

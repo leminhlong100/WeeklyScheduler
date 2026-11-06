@@ -237,6 +237,7 @@ export interface Dictionary {
   categoryName: string
   categoryNamePh: string
   categoryEmoji: string
+  categoryEmojiCustomPh: string
   categoryColor: string
   deleteCategoryConfirm: string
   noCategories: string

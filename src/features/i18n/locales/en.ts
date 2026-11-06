@@ -210,6 +210,7 @@ export const en: Dictionary = {
   categoryName: 'Category name',
   categoryNamePh: 'e.g. Reading',
   categoryEmoji: 'Emoji',
+  categoryEmojiCustomPh: 'Or type / paste an emoji from your keyboard',
   categoryColor: 'Color',
   deleteCategoryConfirm: 'Delete this category? Its events will become uncategorized.',
   noCategories: 'No categories yet',
