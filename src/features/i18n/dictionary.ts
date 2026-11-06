@@ -421,6 +421,12 @@ export interface Dictionary {
   exportCsv: string
   hideAmounts: string
   showAmounts: string
+  hideCustomTitle: string
+  hideCustomHint: string
+  hideScopeMonth: string
+  hideScopeYear: string
+  hideScopeDay: string
+  hideScopeCategories: string
   csvColumnKind: string
   csvColumnStatus: string
   csvColumnSource: string

@@ -37,7 +37,7 @@ export function ExpenseCategoryRow({ category, onEdit, onDelete }: ExpenseCatego
         {category.monthly_budget != null && (
           <div className="truncate text-[11.5px] font-semibold" style={{ color: theme.muted }}>
             {t.reportBudget}{' '}
-            <MaskedAmount>{formatMoney(category.monthly_budget, DEFAULT_CURRENCY, locale)}</MaskedAmount>
+            <MaskedAmount categoryId={category.id}>{formatMoney(category.monthly_budget, DEFAULT_CURRENCY, locale)}</MaskedAmount>
           </div>
         )}
       </div>

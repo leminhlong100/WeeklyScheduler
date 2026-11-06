@@ -1,5 +1,11 @@
 import { useMemo, useState } from 'react'
-import { DownloadIcon, EyeIcon, EyeOffIcon, SlidersHorizontalIcon } from 'lucide-react'
+import {
+  DownloadIcon,
+  EyeIcon,
+  EyeOffIcon,
+  ListChecksIcon,
+  SlidersHorizontalIcon,
+} from 'lucide-react'
 import { toast } from 'sonner'
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog'
 import { useIsMobile, useIsTouchDevice } from '@/hooks/useMediaQuery'
@@ -17,6 +23,7 @@ import { QuickAddSheet } from '@/features/expenses/components/QuickAddSheet'
 import { ParsedDraftList } from '@/features/expenses/components/ParsedDraftList'
 import { MonthlyReport } from '@/features/expenses/components/MonthlyReport'
 import { ExpenseTabs, type ExpenseTab } from '@/features/expenses/components/ExpenseTabs'
+import { AmountVisibilityDialog } from '@/features/expenses/components/AmountVisibilityDialog'
 import { ExpenseCategoryManagerModal } from '@/features/expenses/components/ExpenseCategoryManagerModal'
 import {
   buildExpensesCsv,
@@ -70,6 +77,7 @@ export function ExpensesPage() {
   const [month, setMonth] = useState(currentMonthKey)
   const [tab, setTab] = useState<ExpenseTab>('list')
   const [categoryManagerOpen, setCategoryManagerOpen] = useState(false)
+  const [hideOptionsOpen, setHideOptionsOpen] = useState(false)
   const [editTarget, setEditTarget] = useState<EditTarget>(null)
   const [filter, setFilter] = useState<ExpenseFilter>(EMPTY_EXPENSE_FILTER)
   /** Không có gì được ghi vào DB cho tới khi user bấm lưu bản nháp này. */
@@ -187,6 +195,16 @@ export function ExpensesPage() {
           </button>
           <button
             type="button"
+            onClick={() => setHideOptionsOpen(true)}
+            aria-label={t.hideCustomTitle}
+            title={t.hideCustomTitle}
+            className="flex items-center gap-1.5 rounded-[11px] border-[1.5px] px-2.5 py-1.5 text-[12px] font-bold transition-transform duration-150 active:scale-95"
+            style={{ borderColor: theme.border, background: theme.chip, color: theme.muted }}
+          >
+            <ListChecksIcon className="size-3.5" />
+          </button>
+          <button
+            type="button"
             onClick={() => setCategoryManagerOpen(true)}
             className="flex items-center gap-1.5 rounded-[11px] border-[1.5px] px-2.5 py-1.5 text-[12px] font-bold transition-transform duration-150 active:scale-95"
             style={{ borderColor: theme.border, background: theme.chip, color: theme.muted }}
@@ -228,6 +246,7 @@ export function ExpensesPage() {
         open={categoryManagerOpen}
         onOpenChange={setCategoryManagerOpen}
       />
+      <AmountVisibilityDialog open={hideOptionsOpen} onOpenChange={setHideOptionsOpen} />
 
       <Dialog open={editTarget !== null} onOpenChange={(next) => !next && setEditTarget(null)}>
         <DialogContent

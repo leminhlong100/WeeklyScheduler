@@ -89,7 +89,7 @@ export function ExpenseRow({ expense, category, onEdit, onDelete, onMarkPaid }: 
         className="flex-shrink-0 text-[14px] font-extrabold tabular-nums"
         style={{ color: isIncome ? INCOME_COLOR : theme.text }}
       >
-        <MaskedAmount>
+        <MaskedAmount categoryId={expense.category_id}>
           {`${isIncome ? '+' : ''}${formatMoney(expense.amount, expense.currency, locale)}`}
         </MaskedAmount>
       </span>

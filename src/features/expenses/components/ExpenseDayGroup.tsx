@@ -63,7 +63,7 @@ export function ExpenseDayGroup({
                   className="text-[12px] font-extrabold tabular-nums"
                   style={{ color: INCOME_COLOR }}
                 >
-                  <MaskedAmount>{`+${formatMoney(s.income, s.currency, locale)}`}</MaskedAmount>
+                  <MaskedAmount scope="day">{`+${formatMoney(s.income, s.currency, locale)}`}</MaskedAmount>
                 </span>
               )}
               {s.expense > 0 && (
@@ -71,7 +71,7 @@ export function ExpenseDayGroup({
                   className="text-[12px] font-extrabold tabular-nums"
                   style={{ color: theme.text }}
                 >
-                  <MaskedAmount>{`−${formatMoney(s.expense, s.currency, locale)}`}</MaskedAmount>
+                  <MaskedAmount scope="day">{`−${formatMoney(s.expense, s.currency, locale)}`}</MaskedAmount>
                 </span>
               )}
               {(s.plannedExpense > 0 || s.plannedIncome > 0) && (

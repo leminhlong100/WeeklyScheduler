@@ -51,6 +51,7 @@ export function ExpenseList({
   const yearSummaries = useMemo(() => summarizeByCurrency(yearExpenses), [yearExpenses])
   const yearCard = (
     <ExpenseSummaryCard
+      scope="year"
       summaries={yearSummaries}
       title={`${t.expenseYearTotal} ${year}`}
       collapsible

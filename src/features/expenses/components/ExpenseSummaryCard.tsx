@@ -3,7 +3,7 @@ import { ChevronDownIcon, ChevronUpIcon, EyeIcon, EyeOffIcon } from 'lucide-reac
 import { useTranslation } from '@/features/i18n/LocaleContext'
 import { useTheme } from '@/features/theme/ThemeContext'
 import { formatMoney } from '@/lib/utils/formatMoney'
-import { useAmountVisibility } from '../AmountVisibilityContext'
+import { useAmountVisibility, type AmountScope } from '../AmountVisibilityContext'
 import { MaskedAmount } from './MaskedAmount'
 import type { CurrencySummary } from '../utils/totals'
 
@@ -15,11 +15,13 @@ function Line({
   value,
   color,
   strong = false,
+  scope,
 }: {
   label: string
   value: string
   color: string
   strong?: boolean
+  scope: AmountScope
 }) {
   const { theme } = useTheme()
   return (
@@ -34,7 +36,7 @@ function Line({
         className={`tabular-nums ${strong ? 'font-heading text-[17px] font-extrabold' : 'text-[13px] font-bold'}`}
         style={{ color }}
       >
-        <MaskedAmount>{value}</MaskedAmount>
+        <MaskedAmount scope={scope}>{value}</MaskedAmount>
       </span>
     </div>
   )
@@ -51,8 +53,11 @@ export function ExpenseSummaryCard({
   summaries,
   title,
   collapsible = false,
+  scope = 'month',
 }: {
   summaries: CurrencySummary[]
+  /** Khối này thuộc nhóm ẩn nào: tổng tháng hay tổng năm. */
+  scope?: AmountScope
   /** Mặc định là "Tổng tháng"; thẻ cả năm truyền nhãn riêng. */
   title?: string
   /** Thu gọn thành một hàng (nhãn + số dư), bấm vào mới sổ ra đủ thu/chi/số dư. */
@@ -90,7 +95,7 @@ export function ExpenseSummaryCard({
                 className="font-heading text-[14px] font-extrabold tabular-nums"
                 style={{ color: s.balance < 0 ? NEGATIVE_COLOR : INCOME_COLOR }}
               >
-                <MaskedAmount>{formatMoney(s.balance, s.currency, locale)}</MaskedAmount>
+                <MaskedAmount scope={scope}>{formatMoney(s.balance, s.currency, locale)}</MaskedAmount>
               </span>
               <ChevronDownIcon className="size-4" style={{ color: theme.muted }} />
             </span>
@@ -149,17 +154,20 @@ export function ExpenseSummaryCard({
             </div>
 
             <Line
+              scope={scope}
               label={t.expenseIncomeTotal}
               value={`+${formatMoney(s.income, s.currency, locale)}`}
               color={INCOME_COLOR}
             />
             <Line
+              scope={scope}
               label={t.expenseExpenseTotal}
               value={`−${formatMoney(s.expense, s.currency, locale)}`}
               color={theme.text}
             />
             <div className="mt-0.5 border-t pt-1.5" style={{ borderColor: theme.border }}>
               <Line
+              scope={scope}
                 label={t.expenseBalance}
                 value={formatMoney(s.balance, s.currency, locale)}
                 // Âm là tín hiệu cần thấy ngay: tháng này tiêu quá thu.
@@ -176,12 +184,12 @@ export function ExpenseSummaryCard({
                 <span>{t.expensePlannedNotCounted}</span>
                 {s.plannedExpense > 0 && (
                   <span className="tabular-nums">
-                    <MaskedAmount>{`−${formatMoney(s.plannedExpense, s.currency, locale)}`}</MaskedAmount>
+                    <MaskedAmount scope={scope}>{`−${formatMoney(s.plannedExpense, s.currency, locale)}`}</MaskedAmount>
                   </span>
                 )}
                 {s.plannedIncome > 0 && (
                   <span className="tabular-nums">
-                    <MaskedAmount>{`+${formatMoney(s.plannedIncome, s.currency, locale)}`}</MaskedAmount>
+                    <MaskedAmount scope={scope}>{`+${formatMoney(s.plannedIncome, s.currency, locale)}`}</MaskedAmount>
                   </span>
                 )}
               </div>

@@ -99,6 +99,7 @@ function CategoryLine({ row, kind, currency, category }: CategoryLineProps) {
   const { theme } = useTheme()
 
   const name = category ? translateExpenseCategoryName(category.name, t) : t.expenseUncategorized
+  const categoryId = row.categoryId === UNCATEGORIZED ? null : row.categoryId
 
   // Hạn mức chỉ đối chiếu trong đơn vị tiền mặc định và chỉ cho khoản CHI — xem
   // chú thích ở DEFAULT_CURRENCY: cột monthly_budget không mang currency, và
@@ -132,7 +133,7 @@ function CategoryLine({ row, kind, currency, category }: CategoryLineProps) {
           className="flex-shrink-0 text-[13px] font-extrabold tabular-nums"
           style={{ color: kind === 'income' ? INCOME_COLOR : theme.text }}
         >
-          <MaskedAmount>{formatMoney(row.total, currency, locale)}</MaskedAmount>
+          <MaskedAmount categoryId={categoryId}>{formatMoney(row.total, currency, locale)}</MaskedAmount>
         </span>
       </div>
 
@@ -158,7 +159,7 @@ function CategoryLine({ row, kind, currency, category }: CategoryLineProps) {
               {overBudget ? t.reportOverBudget : t.reportBudget}
             </span>
             <span className="text-[11px] font-semibold tabular-nums" style={{ color: budgetColor }}>
-              <MaskedAmount>
+              <MaskedAmount categoryId={categoryId}>
                 {`${formatMoney(row.total, currency, locale)} / ${formatMoney(budget, currency, locale)}`}
               </MaskedAmount>
             </span>
@@ -248,7 +249,7 @@ export function MonthlyReport({ month }: { month: MonthKey }) {
                   className="font-heading text-[20px] font-extrabold tabular-nums"
                   style={{ color: report.balance < 0 ? OVER_BUDGET_COLOR : INCOME_COLOR }}
                 >
-                  <MaskedAmount>{formatMoney(report.balance, report.currency, locale)}</MaskedAmount>
+                  <MaskedAmount scope="month">{formatMoney(report.balance, report.currency, locale)}</MaskedAmount>
                 </div>
               </div>
               <span className="text-[11px] font-extrabold" style={{ color: theme.muted }}>
@@ -260,13 +261,13 @@ export function MonthlyReport({ month }: { month: MonthKey }) {
               <span className="text-[12.5px] font-bold" style={{ color: INCOME_COLOR }}>
                 {t.expenseIncomeTotal}{' '}
                 <span className="tabular-nums">
-                  <MaskedAmount>{`+${formatMoney(report.incomeTotal, report.currency, locale)}`}</MaskedAmount>
+                  <MaskedAmount scope="month">{`+${formatMoney(report.incomeTotal, report.currency, locale)}`}</MaskedAmount>
                 </span>
               </span>
               <span className="text-[12.5px] font-bold" style={{ color: theme.text }}>
                 {t.expenseExpenseTotal}{' '}
                 <span className="tabular-nums">
-                  <MaskedAmount>{`−${formatMoney(report.expenseTotal, report.currency, locale)}`}</MaskedAmount>
+                  <MaskedAmount scope="month">{`−${formatMoney(report.expenseTotal, report.currency, locale)}`}</MaskedAmount>
                 </span>
               </span>
             </div>
@@ -281,12 +282,12 @@ export function MonthlyReport({ month }: { month: MonthKey }) {
                 <span>{t.expensePlannedNotCounted}</span>
                 {report.plannedExpense > 0 && (
                   <span className="tabular-nums">
-                    <MaskedAmount>{`−${formatMoney(report.plannedExpense, report.currency, locale)}`}</MaskedAmount>
+                    <MaskedAmount scope="month">{`−${formatMoney(report.plannedExpense, report.currency, locale)}`}</MaskedAmount>
                   </span>
                 )}
                 {report.plannedIncome > 0 && (
                   <span className="tabular-nums">
-                    <MaskedAmount>{`+${formatMoney(report.plannedIncome, report.currency, locale)}`}</MaskedAmount>
+                    <MaskedAmount scope="month">{`+${formatMoney(report.plannedIncome, report.currency, locale)}`}</MaskedAmount>
                   </span>
                 )}
               </div>
