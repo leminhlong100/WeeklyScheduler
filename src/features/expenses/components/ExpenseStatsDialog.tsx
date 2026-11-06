@@ -1,4 +1,5 @@
 import { useMemo } from 'react'
+import { TriangleAlertIcon } from 'lucide-react'
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog'
 import { useTranslation } from '@/features/i18n/LocaleContext'
 import { translateExpenseCategoryName } from '@/features/i18n/defaultExpenseCategoryNames'
@@ -8,7 +9,10 @@ import { useExpenseCategories } from '../hooks/useExpenseCategories'
 import { useExpensesForMonth } from '../hooks/useExpenses'
 import type { MonthKey } from '../utils/month'
 import { buildMonthlyReport, UNCATEGORIZED, type CurrencyReport } from '../utils/report'
+import { DEFAULT_CURRENCY } from '../schemas/expenseSchema'
 import { MaskedAmount } from './MaskedAmount'
+
+const OVER_BUDGET_COLOR = '#d93a3a'
 
 const SIZE = 160
 const STROKE = 28
@@ -30,6 +34,9 @@ interface Slice {
   share: number
   /** Tỉ lệ trên thu nhập; `null` khi tháng chưa có thu. */
   ofIncome: number | null
+  /** Hạn mức tháng của danh mục, `null` nếu không có / không áp dụng. */
+  budget: number | null
+  overBudget: boolean
 }
 
 function Donut({
@@ -101,6 +108,12 @@ function CurrencyStats({ report }: { report: CurrencyReport }) {
           row.categoryId === UNCATEGORIZED
             ? undefined
             : categories.find((c) => c.id === row.categoryId)
+        // Cùng quy tắc với báo cáo tháng: hạn mức không mang đơn vị tiền nên chỉ đối
+        // chiếu trong đơn vị mặc định.
+        const budget =
+          report.currency === DEFAULT_CURRENCY && category?.monthly_budget != null
+            ? category.monthly_budget
+            : null
         return {
           key: row.categoryId,
           name: category ? translateExpenseCategoryName(category.name, t) : t.expenseUncategorized,
@@ -109,6 +122,8 @@ function CurrencyStats({ report }: { report: CurrencyReport }) {
           total: row.total,
           share: row.share,
           ofIncome: report.incomeTotal > 0 ? row.total / report.incomeTotal : null,
+          budget,
+          overBudget: budget !== null && row.total > budget,
         }
       }),
     [report, categories, t, theme.muted],
@@ -132,33 +147,74 @@ function CurrencyStats({ report }: { report: CurrencyReport }) {
       </div>
 
       <div className="flex flex-col gap-2">
-        {slices.map((s) => (
-          <div key={s.key} className="flex items-center gap-2.5 text-[13px]">
-            <span
-              className="size-3 flex-shrink-0 rounded-[4px]"
-              style={{ background: s.color }}
-              aria-hidden
-            />
-            <span>{s.emoji}</span>
-            <span className="min-w-0 flex-1 truncate font-bold" style={{ color: theme.text }}>
-              {s.name}
-            </span>
-            <span
-              className="flex-shrink-0 font-extrabold tabular-nums"
-              style={{ color: theme.text }}
+        {slices.map((s) => {
+          const masked = {
+            categoryId: s.key === UNCATEGORIZED ? null : s.key,
+            scope: 'month' as const,
+          }
+          return (
+            <div
+              key={s.key}
+              className="flex flex-col gap-0.5 rounded-xl px-2 py-1.5"
+              // Vượt hạn mức: nền đỏ nhạt + viền trái đậm để lướt qua cũng thấy.
+              style={
+                s.overBudget
+                  ? {
+                      background: `${OVER_BUDGET_COLOR}1a`,
+                      boxShadow: `inset 3px 0 0 ${OVER_BUDGET_COLOR}`,
+                    }
+                  : undefined
+              }
             >
-              {percent(s.ofIncome ?? s.share)}
-            </span>
-            <span
-              className="w-[92px] flex-shrink-0 text-right text-[12px] font-semibold tabular-nums"
-              style={{ color: theme.muted }}
-            >
-              <MaskedAmount categoryId={s.key === UNCATEGORIZED ? null : s.key} scope="month">
-                {formatMoney(s.total, report.currency, locale)}
-              </MaskedAmount>
-            </span>
-          </div>
-        ))}
+              <div className="flex items-center gap-2.5 text-[13px]">
+                <span
+                  className="size-3 flex-shrink-0 rounded-[4px]"
+                  style={{ background: s.color }}
+                  aria-hidden
+                />
+                <span>{s.emoji}</span>
+                <span
+                  className="min-w-0 flex-1 truncate font-bold"
+                  style={{ color: s.overBudget ? OVER_BUDGET_COLOR : theme.text }}
+                >
+                  {s.name}
+                </span>
+                {s.overBudget && (
+                  <TriangleAlertIcon
+                    className="size-4 flex-shrink-0"
+                    style={{ color: OVER_BUDGET_COLOR }}
+                    aria-label={t.reportOverBudget}
+                  />
+                )}
+                <span
+                  className={`flex-shrink-0 tabular-nums ${s.overBudget ? 'font-black' : 'font-extrabold'}`}
+                  style={{ color: s.overBudget ? OVER_BUDGET_COLOR : theme.text }}
+                >
+                  {percent(s.ofIncome ?? s.share)}
+                </span>
+                <span
+                  className={`w-[92px] flex-shrink-0 text-right text-[12px] tabular-nums ${s.overBudget ? 'font-extrabold' : 'font-semibold'}`}
+                  style={{ color: s.overBudget ? OVER_BUDGET_COLOR : theme.muted }}
+                >
+                  <MaskedAmount {...masked}>
+                    {formatMoney(s.total, report.currency, locale)}
+                  </MaskedAmount>
+                </span>
+              </div>
+              {s.overBudget && s.budget !== null && (
+                <div
+                  className="pl-[22px] text-[11px] font-bold tabular-nums"
+                  style={{ color: OVER_BUDGET_COLOR }}
+                >
+                  {t.reportOverBudget}:{' '}
+                  <MaskedAmount {...masked}>
+                    {`${formatMoney(s.total, report.currency, locale)} / ${formatMoney(s.budget, report.currency, locale)}`}
+                  </MaskedAmount>
+                </div>
+              )}
+            </div>
+          )
+        })}
       </div>
     </section>
   )
