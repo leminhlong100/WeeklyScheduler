@@ -209,29 +209,32 @@ export function ExpensesPage() {
           <button
             type="button"
             onClick={() => setCategoryManagerOpen(true)}
+            aria-label={t.manageExpenseCategories}
+            title={t.manageExpenseCategories}
             className="flex items-center gap-1.5 rounded-[11px] border-[1.5px] px-2.5 py-1.5 text-[12px] font-bold transition-transform duration-150 active:scale-95"
             style={{ borderColor: theme.border, background: theme.chip, color: theme.muted }}
           >
             <SlidersHorizontalIcon className="size-3.5" />
-            {t.manageExpenseCategories}
           </button>
           <button
             type="button"
             onClick={() => setStatsOpen(true)}
+            aria-label={t.expenseStats}
+            title={t.expenseStats}
             className="flex items-center gap-1.5 rounded-[11px] border-[1.5px] px-2.5 py-1.5 text-[12px] font-bold transition-transform duration-150 active:scale-95"
             style={{ borderColor: theme.border, background: theme.chip, color: theme.muted }}
           >
             <PieChartIcon className="size-3.5" />
-            {t.expenseStats}
           </button>
           <button
             type="button"
             onClick={handleExportCsv}
+            aria-label={t.exportCsv}
+            title={t.exportCsv}
             className="flex items-center gap-1.5 rounded-[11px] border-[1.5px] px-2.5 py-1.5 text-[12px] font-bold transition-transform duration-150 active:scale-95"
             style={{ borderColor: theme.border, background: theme.chip, color: theme.muted }}
           >
             <DownloadIcon className="size-3.5" />
-            {t.exportCsv}
           </button>
         </div>
 
