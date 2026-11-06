@@ -45,7 +45,7 @@ export function AmountVisibilityDialog({
 }) {
   const { t } = useTranslation()
   const { theme } = useTheme()
-  const { hiddenScopes, toggleScope } = useAmountVisibility()
+  const { hiddenScopes, toggleScope, setScopes } = useAmountVisibility()
   const { data: categories = [] } = useExpenseCategories()
 
   const scopes = [
@@ -53,6 +53,7 @@ export function AmountVisibilityDialog({
     { key: 'year', label: t.hideScopeYear },
     { key: 'day', label: t.hideScopeDay },
   ] as const
+  const allKeys = [...scopes.map((s) => s.key), ...categories.map((c) => categoryScopeKey(c.id))]
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -64,6 +65,23 @@ export function AmountVisibilityDialog({
         <DialogTitle className="font-heading text-xl font-extrabold" style={{ color: theme.text }}>
           {t.hideCustomTitle}
         </DialogTitle>
+
+        <div className="flex gap-2">
+          {[
+            { label: t.hideSelectAll, onClick: () => setScopes(allKeys) },
+            { label: t.hideClearAll, onClick: () => setScopes([]) },
+          ].map((b) => (
+            <button
+              key={b.label}
+              type="button"
+              onClick={b.onClick}
+              className="flex-1 rounded-[11px] border-[1.5px] px-2.5 py-1.5 text-[12px] font-bold transition-transform duration-150 active:scale-95"
+              style={{ borderColor: theme.border, background: theme.chip, color: theme.muted }}
+            >
+              {b.label}
+            </button>
+          ))}
+        </div>
 
         <div className="flex flex-col gap-2">
           {scopes.map((s) => (

@@ -28,6 +28,8 @@ interface AmountVisibilityContextValue {
   /** Các mục luôn bị che (khối tổng + danh mục) trừ lúc đang xem tạm. */
   hiddenScopes: ReadonlySet<string>
   toggleScope: (key: string) => void
+  /** Thay cả danh sách mục bị che (chọn tất cả / bỏ chọn tất cả). */
+  setScopes: (keys: string[]) => void
   /** Số tiền thuộc `scope` / danh mục `categoryId` có đang bị che không. */
   isMasked: (scope?: AmountScope, categoryId?: string | null) => boolean
 }
@@ -55,6 +57,16 @@ export function AmountVisibilityProvider({ children }: { children: ReactNode }) 
     })
   }, [])
 
+  const setScopes = useCallback((keys: string[]) => {
+    const next = new Set(keys)
+    try {
+      window.localStorage.setItem(SCOPES_KEY, JSON.stringify([...next]))
+    } catch {
+      // Không lưu được thì vẫn dùng được trong phiên này.
+    }
+    setHiddenScopes(next)
+  }, [])
+
   const isMasked = useCallback(
     (scope?: AmountScope, categoryId?: string | null) =>
       hidden &&
@@ -64,8 +76,8 @@ export function AmountVisibilityProvider({ children }: { children: ReactNode }) 
   )
 
   const value = useMemo(
-    () => ({ hidden, toggleHidden, hiddenScopes, toggleScope, isMasked }),
-    [hidden, toggleHidden, hiddenScopes, toggleScope, isMasked],
+    () => ({ hidden, toggleHidden, hiddenScopes, toggleScope, setScopes, isMasked }),
+    [hidden, toggleHidden, hiddenScopes, toggleScope, setScopes, isMasked],
   )
 
   return (

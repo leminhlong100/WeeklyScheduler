@@ -422,6 +422,12 @@ export interface Dictionary {
   hideAmounts: string
   showAmounts: string
   hideCustomTitle: string
+  expenseStats: string
+  statsSpentOfIncome: string
+  statsBasisIncome: string
+  statsBasisExpense: string
+  hideSelectAll: string
+  hideClearAll: string
   hideScopeMonth: string
   hideScopeYear: string
   hideScopeDay: string

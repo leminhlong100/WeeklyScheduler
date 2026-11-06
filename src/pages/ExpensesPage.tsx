@@ -4,6 +4,7 @@ import {
   EyeIcon,
   EyeOffIcon,
   ListChecksIcon,
+  PieChartIcon,
   SlidersHorizontalIcon,
 } from 'lucide-react'
 import { toast } from 'sonner'
@@ -24,6 +25,7 @@ import { ParsedDraftList } from '@/features/expenses/components/ParsedDraftList'
 import { MonthlyReport } from '@/features/expenses/components/MonthlyReport'
 import { ExpenseTabs, type ExpenseTab } from '@/features/expenses/components/ExpenseTabs'
 import { AmountVisibilityDialog } from '@/features/expenses/components/AmountVisibilityDialog'
+import { ExpenseStatsDialog } from '@/features/expenses/components/ExpenseStatsDialog'
 import { ExpenseCategoryManagerModal } from '@/features/expenses/components/ExpenseCategoryManagerModal'
 import {
   buildExpensesCsv,
@@ -78,6 +80,7 @@ export function ExpensesPage() {
   const [tab, setTab] = useState<ExpenseTab>('list')
   const [categoryManagerOpen, setCategoryManagerOpen] = useState(false)
   const [hideOptionsOpen, setHideOptionsOpen] = useState(false)
+  const [statsOpen, setStatsOpen] = useState(false)
   const [editTarget, setEditTarget] = useState<EditTarget>(null)
   const [filter, setFilter] = useState<ExpenseFilter>(EMPTY_EXPENSE_FILTER)
   /** Không có gì được ghi vào DB cho tới khi user bấm lưu bản nháp này. */
@@ -214,6 +217,15 @@ export function ExpensesPage() {
           </button>
           <button
             type="button"
+            onClick={() => setStatsOpen(true)}
+            className="flex items-center gap-1.5 rounded-[11px] border-[1.5px] px-2.5 py-1.5 text-[12px] font-bold transition-transform duration-150 active:scale-95"
+            style={{ borderColor: theme.border, background: theme.chip, color: theme.muted }}
+          >
+            <PieChartIcon className="size-3.5" />
+            {t.expenseStats}
+          </button>
+          <button
+            type="button"
             onClick={handleExportCsv}
             className="flex items-center gap-1.5 rounded-[11px] border-[1.5px] px-2.5 py-1.5 text-[12px] font-bold transition-transform duration-150 active:scale-95"
             style={{ borderColor: theme.border, background: theme.chip, color: theme.muted }}
@@ -247,6 +259,7 @@ export function ExpensesPage() {
         onOpenChange={setCategoryManagerOpen}
       />
       <AmountVisibilityDialog open={hideOptionsOpen} onOpenChange={setHideOptionsOpen} />
+      <ExpenseStatsDialog open={statsOpen} onOpenChange={setStatsOpen} month={month} />
 
       <Dialog open={editTarget !== null} onOpenChange={(next) => !next && setEditTarget(null)}>
         <DialogContent
