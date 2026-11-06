@@ -50,7 +50,11 @@ export function ExpenseList({
   const { data: yearExpenses = [] } = useExpensesForYear(year)
   const yearSummaries = useMemo(() => summarizeByCurrency(yearExpenses), [yearExpenses])
   const yearCard = (
-    <ExpenseSummaryCard summaries={yearSummaries} title={`${t.expenseYearTotal} ${year}`} />
+    <ExpenseSummaryCard
+      summaries={yearSummaries}
+      title={`${t.expenseYearTotal} ${year}`}
+      collapsible
+    />
   )
   const days = useMemo(() => groupByDay(expenses), [expenses])
   const today = todayISO()
@@ -79,8 +83,9 @@ export function ExpenseList({
         </>
       ) : (
         <>
-          <ExpenseSummaryCard summaries={summaries} />
           {yearCard}
+          <ExpenseSummaryCard summaries={summaries} />
+
 
           <div className="flex flex-col gap-3.5">
             {days.map((group) => (

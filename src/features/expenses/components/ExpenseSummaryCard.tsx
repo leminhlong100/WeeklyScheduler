@@ -1,4 +1,5 @@
-import { EyeIcon, EyeOffIcon } from 'lucide-react'
+import { useState } from 'react'
+import { ChevronDownIcon, ChevronUpIcon, EyeIcon, EyeOffIcon } from 'lucide-react'
 import { useTranslation } from '@/features/i18n/LocaleContext'
 import { useTheme } from '@/features/theme/ThemeContext'
 import { formatMoney } from '@/lib/utils/formatMoney'
@@ -49,17 +50,55 @@ function Line({
 export function ExpenseSummaryCard({
   summaries,
   title,
+  collapsible = false,
 }: {
   summaries: CurrencySummary[]
   /** Mặc định là "Tổng tháng"; thẻ cả năm truyền nhãn riêng. */
   title?: string
+  /** Thu gọn thành một hàng (nhãn + số dư), bấm vào mới sổ ra đủ thu/chi/số dư. */
+  collapsible?: boolean
 }) {
   const { t, locale } = useTranslation()
   const { theme } = useTheme()
   const { hidden, toggleHidden } = useAmountVisibility()
+  const [open, setOpen] = useState(false)
 
   if (summaries.length === 0) return null
   const showCurrencyLabel = summaries.length > 1
+
+  if (collapsible && !open) {
+    return (
+      <div className="flex flex-col gap-1.5">
+        {summaries.map((s) => (
+          <button
+            key={s.currency}
+            type="button"
+            onClick={() => setOpen(true)}
+            aria-expanded={false}
+            className="flex items-center justify-between gap-3 rounded-2xl border-[1.5px] px-3.5 py-2 text-left transition-transform duration-150 active:scale-[0.99]"
+            style={{ borderColor: theme.border, background: theme.chip }}
+          >
+            <span
+              className="text-[11px] font-extrabold uppercase tracking-wider"
+              style={{ color: theme.muted }}
+            >
+              {title}
+              {showCurrencyLabel && ` · ${s.currency}`}
+            </span>
+            <span className="flex items-center gap-2">
+              <span
+                className="font-heading text-[14px] font-extrabold tabular-nums"
+                style={{ color: s.balance < 0 ? NEGATIVE_COLOR : INCOME_COLOR }}
+              >
+                <MaskedAmount>{formatMoney(s.balance, s.currency, locale)}</MaskedAmount>
+              </span>
+              <ChevronDownIcon className="size-4" style={{ color: theme.muted }} />
+            </span>
+          </button>
+        ))}
+      </div>
+    )
+  }
 
   return (
     <div className="flex flex-col gap-2">
@@ -94,6 +133,18 @@ export function ExpenseSummaryCard({
                 >
                   {hidden ? <EyeOffIcon className="size-3.5" /> : <EyeIcon className="size-3.5" />}
                 </button>
+                {collapsible && (
+                  <button
+                    type="button"
+                    onClick={() => setOpen(false)}
+                    aria-expanded
+                    aria-label={title}
+                    className="grid h-6 w-6 flex-shrink-0 place-items-center rounded-md transition-transform duration-150 active:scale-95"
+                    style={{ color: theme.muted }}
+                  >
+                    <ChevronUpIcon className="size-4" />
+                  </button>
+                )}
               </span>
             </div>
 
