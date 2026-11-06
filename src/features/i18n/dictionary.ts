@@ -312,6 +312,7 @@ export interface Dictionary {
   expenseSourceAi: string
   noExpenses: string
   expenseMonthTotal: string
+  expenseYearTotal: string
 
   /* --- Thu / chi / số dư (migration 0011) --- */
   expenseKind: string

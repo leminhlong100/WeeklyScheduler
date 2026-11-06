@@ -280,6 +280,7 @@ export const vi: Dictionary = {
   expenseSourceAi: 'AI',
   noExpenses: 'Tháng này chưa có khoản chi nào',
   expenseMonthTotal: 'Tổng tháng',
+  expenseYearTotal: 'Tổng năm',
   deleteExpenseConfirm: 'Xoá khoản chi này? Không thể hoàn tác.',
   expenseCreated: 'Đã thêm khoản chi',
   expenseUpdated: 'Đã cập nhật khoản chi',

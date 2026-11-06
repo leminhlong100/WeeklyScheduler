@@ -280,6 +280,7 @@ export const ja: Dictionary = {
   expenseSourceAi: 'AI',
   noExpenses: '今月の支出はまだありません',
   expenseMonthTotal: '今月の合計',
+  expenseYearTotal: '年間合計',
   deleteExpenseConfirm: 'この支出を削除しますか？元に戻せません。',
   expenseCreated: '支出を追加しました',
   expenseUpdated: '支出を更新しました',

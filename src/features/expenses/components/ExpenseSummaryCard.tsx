@@ -46,7 +46,14 @@ function Line({
  * một mình không trả lời được nó. Kỳ định kỳ chưa tới nằm ở dòng mờ phía dưới và
  * KHÔNG được trừ vào số dư — chưa trả thì tiền vẫn còn đó.
  */
-export function ExpenseSummaryCard({ summaries }: { summaries: CurrencySummary[] }) {
+export function ExpenseSummaryCard({
+  summaries,
+  title,
+}: {
+  summaries: CurrencySummary[]
+  /** Mặc định là "Tổng tháng"; thẻ cả năm truyền nhãn riêng. */
+  title?: string
+}) {
   const { t, locale } = useTranslation()
   const { theme } = useTheme()
   const { hidden, toggleHidden } = useAmountVisibility()
@@ -69,7 +76,7 @@ export function ExpenseSummaryCard({ summaries }: { summaries: CurrencySummary[]
                 className="text-[11px] font-extrabold uppercase tracking-wider"
                 style={{ color: theme.muted }}
               >
-                {t.expenseMonthTotal}
+                {title ?? t.expenseMonthTotal}
               </span>
               <span className="flex items-center gap-2">
                 {showCurrencyLabel && (

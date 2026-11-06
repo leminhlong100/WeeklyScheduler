@@ -281,6 +281,7 @@ export const en: Dictionary = {
   expenseSourceAi: 'AI',
   noExpenses: 'No expenses this month yet',
   expenseMonthTotal: 'Month total',
+  expenseYearTotal: 'Year total',
   deleteExpenseConfirm: 'Delete this expense? This cannot be undone.',
   expenseCreated: 'Expense added',
   expenseUpdated: 'Expense updated',

@@ -279,6 +279,7 @@ export const zh: Dictionary = {
   expenseSourceAi: 'AI',
   noExpenses: '本月还没有开支记录',
   expenseMonthTotal: '本月合计',
+  expenseYearTotal: '全年合计',
   deleteExpenseConfirm: '删除这笔开支？无法撤销。',
   expenseCreated: '已添加开支',
   expenseUpdated: '已更新开支',

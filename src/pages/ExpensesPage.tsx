@@ -208,6 +208,7 @@ export function ExpensesPage() {
         {tab === 'list' ? (
           <ExpenseList
             expenses={visibleExpenses}
+            year={year}
             monthCount={expenses.length}
             categories={categories}
             filter={filter}

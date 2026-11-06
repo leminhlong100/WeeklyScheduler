@@ -5,6 +5,7 @@ import { todayISO } from '@/lib/utils/date'
 import type { Expense } from '../api/expensesApi'
 import type { ExpenseCategory } from '../api/expenseCategoriesApi'
 import { groupByDay, isFilterActive, type ExpenseFilter } from '../utils/filter'
+import { useExpensesForYear } from '../hooks/useExpenses'
 import { summarizeByCurrency } from '../utils/totals'
 import { ExpenseDayGroup } from './ExpenseDayGroup'
 import { ExpenseFilters } from './ExpenseFilters'
@@ -13,6 +14,8 @@ import { ExpenseSummaryCard } from './ExpenseSummaryCard'
 interface ExpenseListProps {
   /** Đã lọc — tổng ở đầu danh sách cố ý tính trên đúng tập đang hiện. */
   expenses: Expense[]
+  /** Năm của tháng đang xem, cho thẻ tổng năm. */
+  year: number
   /** Số dòng của cả tháng, để phân biệt "tháng trống" với "lọc không ra gì". */
   monthCount: number
   categories: ExpenseCategory[]
@@ -25,6 +28,7 @@ interface ExpenseListProps {
 
 export function ExpenseList({
   expenses,
+  year,
   monthCount,
   categories,
   filter,
@@ -41,6 +45,13 @@ export function ExpenseList({
     [categories],
   )
   const summaries = useMemo(() => summarizeByCurrency(expenses), [expenses])
+  // Tổng năm cố ý không bị bộ lọc ảnh hưởng: nó trả lời "năm nay còn bao nhiêu",
+  // không phải "tập đang lọc cộng lại bao nhiêu".
+  const { data: yearExpenses = [] } = useExpensesForYear(year)
+  const yearSummaries = useMemo(() => summarizeByCurrency(yearExpenses), [yearExpenses])
+  const yearCard = (
+    <ExpenseSummaryCard summaries={yearSummaries} title={`${t.expenseYearTotal} ${year}`} />
+  )
   const days = useMemo(() => groupByDay(expenses), [expenses])
   const today = todayISO()
 
@@ -60,12 +71,16 @@ export function ExpenseList({
       )}
 
       {expenses.length === 0 ? (
-        <p className="px-1 py-8 text-center text-sm font-semibold" style={{ color: theme.muted }}>
-          {isFilterActive(filter) && monthCount > 0 ? t.filterNoResults : t.noExpenses}
-        </p>
+        <>
+          {yearCard}
+          <p className="px-1 py-8 text-center text-sm font-semibold" style={{ color: theme.muted }}>
+            {isFilterActive(filter) && monthCount > 0 ? t.filterNoResults : t.noExpenses}
+          </p>
+        </>
       ) : (
         <>
           <ExpenseSummaryCard summaries={summaries} />
+          {yearCard}
 
           <div className="flex flex-col gap-3.5">
             {days.map((group) => (
