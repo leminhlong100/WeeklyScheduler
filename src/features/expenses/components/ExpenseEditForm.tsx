@@ -3,6 +3,7 @@ import { useForm, useWatch, Controller } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { RepeatIcon } from 'lucide-react'
 import { toast } from 'sonner'
+import { describeError } from '@/lib/utils/errorMessage'
 import { GradientButton } from '@/components/common/GradientButton'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -188,8 +189,8 @@ export function ExpenseEditForm({ expense, defaultDate, onDone }: ExpenseEditFor
       })
       toast.success(t.expenseCreated)
       onDone()
-    } catch {
-      toast.error(t.somethingWentWrong)
+    } catch (error) {
+      toast.error(describeError(t, error))
     }
   }
 
@@ -203,7 +204,7 @@ export function ExpenseEditForm({ expense, defaultDate, onDone }: ExpenseEditFor
           toast.success(t.expenseSeriesDeleted)
           onDone()
         },
-        onError: () => toast.error(t.somethingWentWrong),
+        onError: (error) => toast.error(describeError(t, error)),
       },
     )
   }

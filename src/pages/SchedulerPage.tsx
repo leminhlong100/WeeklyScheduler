@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { toast } from 'sonner'
+import { describeError } from '@/lib/utils/errorMessage'
 import { useIsMobile, useIsTouchDevice } from '@/hooks/useMediaQuery'
 import { useTranslation } from '@/features/i18n/LocaleContext'
 import { useTheme } from '@/features/theme/ThemeContext'
@@ -149,7 +150,7 @@ export function SchedulerPage() {
         if (created.length === 0) toast(t.noTasksLastWeek)
         else toast.success(t.weekCopied)
       },
-      onError: () => toast.error(t.somethingWentWrong),
+      onError: (error) => toast.error(describeError(t, error)),
     })
   }
 

@@ -1,6 +1,7 @@
 import { useMemo } from 'react'
 import { Trash2Icon, TriangleAlertIcon } from 'lucide-react'
 import { toast } from 'sonner'
+import { describeError } from '@/lib/utils/errorMessage'
 import { GradientButton } from '@/components/common/GradientButton'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -94,7 +95,7 @@ export function ParsedDraftList({ draft, onChange, onDone }: ParsedDraftListProp
           toast.success(t.expensesSavedCount.replace('{n}', String(created.length)))
           onDone()
         },
-        onError: () => toast.error(t.somethingWentWrong),
+        onError: (error) => toast.error(describeError(t, error)),
       },
     )
   }

@@ -286,9 +286,25 @@ export interface Dictionary {
   weekCopied: string
   noTasksLastWeek: string
   categoryCreated: string
+  categoryNameExists: string
   categoryUpdated: string
   categoryDeleted: string
   somethingWentWrong: string
+  errNetwork: string
+  errSessionExpired: string
+  errDuplicate: string
+  errReference: string
+  errRequired: string
+  errInvalidValue: string
+  errTooLong: string
+  errRateLimit: string
+  errPermission: string
+  errNotFound: string
+  errInvalidLogin: string
+  errEmailTaken: string
+  errEmailNotConfirmed: string
+  errWeakPassword: string
+  errSamePassword: string
 
   /* --- Module switcher (sidebar) --- */
   navScheduler: string

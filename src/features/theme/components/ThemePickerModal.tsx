@@ -1,5 +1,6 @@
 import { MoreHorizontal, Plus } from 'lucide-react'
 import { toast } from 'sonner'
+import { describeError } from '@/lib/utils/errorMessage'
 
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog'
 import {
@@ -66,8 +67,8 @@ export function ThemePickerModal({ open, onOpenChange, onEditTheme }: ThemePicke
     if (!window.confirm(t.themeDeleteConfirm)) return
     try {
       await removeCustomTheme(record.id)
-    } catch {
-      toast.error(t.somethingWentWrong)
+    } catch (error) {
+      toast.error(describeError(t, error))
     }
   }
 

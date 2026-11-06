@@ -8,6 +8,7 @@ import {
 } from 'react'
 import type { Dayjs } from 'dayjs'
 import { toast } from 'sonner'
+import { describeError } from '@/lib/utils/errorMessage'
 import { CheckSquareIcon, PencilIcon, Trash2Icon } from 'lucide-react'
 import type { DerivedTheme } from '@/features/theme/types'
 import type { Dictionary } from '@/features/i18n/dictionary'
@@ -230,7 +231,7 @@ export function WeekGrid({
       },
       {
         onSuccess: () => toast.success(t.taskDuplicated),
-        onError: () => toast.error(t.somethingWentWrong),
+        onError: (error) => toast.error(describeError(t, error)),
       },
     )
   }
@@ -238,7 +239,7 @@ export function WeekGrid({
   const handleDeleteTask = (id: string) => {
     deleteTask.mutate(id, {
       onSuccess: () => toast.success(t.taskDeleted),
-      onError: () => toast.error(t.somethingWentWrong),
+      onError: (error) => toast.error(describeError(t, error)),
     })
     setOpenNoteTaskId((current) => (current === id ? null : current))
   }
@@ -254,7 +255,7 @@ export function WeekGrid({
     if (!task) return
     updateTask.mutate(
       { id, patch: { done: !task.done } },
-      { onError: () => toast.error(t.somethingWentWrong) },
+      { onError: (error) => toast.error(describeError(t, error)) },
     )
   }
 
@@ -275,7 +276,7 @@ export function WeekGrid({
     if (!window.confirm(t.deleteSelectedConfirm.replace('{n}', String(ids.length)))) return
     deleteTasks.mutate(ids, {
       onSuccess: () => toast.success(t.tasksDeletedCount.replace('{n}', String(ids.length))),
-      onError: () => toast.error(t.somethingWentWrong),
+      onError: (error) => toast.error(describeError(t, error)),
     })
     setSelectMode(false)
     setSelectedIds(new Set())
@@ -288,7 +289,7 @@ export function WeekGrid({
       { ids, patch },
       {
         onSuccess: () => toast.success(t.tasksUpdatedCount.replace('{n}', String(ids.length))),
-        onError: () => toast.error(t.somethingWentWrong),
+        onError: (error) => toast.error(describeError(t, error)),
       },
     )
     setBulkEditOpen(false)
@@ -303,7 +304,7 @@ export function WeekGrid({
       tasks.map((task) => task.id),
       {
         onSuccess: () => toast.success(t.tasksCleared),
-        onError: () => toast.error(t.somethingWentWrong),
+        onError: (error) => toast.error(describeError(t, error)),
       },
     )
     setSelectMode(false)

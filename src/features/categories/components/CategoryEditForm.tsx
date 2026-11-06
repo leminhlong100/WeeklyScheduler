@@ -1,6 +1,7 @@
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { toast } from 'sonner'
+import { describeError } from '@/lib/utils/errorMessage'
 import { GradientButton } from '@/components/common/GradientButton'
 import { Button } from '@/components/ui/button'
 import { useTranslation } from '@/features/i18n/LocaleContext'
@@ -33,7 +34,8 @@ export function CategoryEditForm({ category, onDone }: CategoryEditFormProps) {
   })
 
   const onSubmit = (values: CategoryFormInput) => {
-    const onError = () => toast.error(t.somethingWentWrong)
+    const onError = (error: unknown) =>
+      toast.error(describeError(t, error, { duplicate: t.categoryNameExists }))
 
     if (isEdit) {
       updateCategory.mutate(

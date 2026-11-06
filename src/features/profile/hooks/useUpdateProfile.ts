@@ -1,5 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
+import { describeError } from '@/lib/utils/errorMessage'
 import { useAuth } from '@/features/auth/AuthContext'
 import { useTranslation } from '@/features/i18n/LocaleContext'
 import { updateProfile, type ProfileUpdate } from '../api/profileApi'
@@ -21,8 +22,8 @@ export function useUpdateProfile() {
     onSuccess: (profile) => {
       queryClient.setQueryData(profileQueryKey(user?.id), profile)
     },
-    onError: () => {
-      toast.error(t.somethingWentWrong)
+    onError: (error) => {
+      toast.error(describeError(t, error))
     },
   })
 }

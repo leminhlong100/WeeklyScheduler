@@ -8,6 +8,7 @@ import {
   SlidersHorizontalIcon,
 } from 'lucide-react'
 import { toast } from 'sonner'
+import { describeError } from '@/lib/utils/errorMessage'
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog'
 import { useIsMobile, useIsTouchDevice } from '@/hooks/useMediaQuery'
 import { useSessionStorageState } from '@/hooks/useSessionStorageState'
@@ -119,7 +120,7 @@ export function ExpensesPage() {
     if (!window.confirm(t.deleteExpenseConfirm)) return
     deleteExpense.mutate(expense.id, {
       onSuccess: () => toast.success(t.expenseDeleted),
-      onError: () => toast.error(t.somethingWentWrong),
+      onError: (error) => toast.error(describeError(t, error)),
     })
   }
 
@@ -129,7 +130,7 @@ export function ExpensesPage() {
       { id: expense.id, patch: { status: 'paid' } },
       {
         onSuccess: () => toast.success(t.expenseMarkedPaid),
-        onError: () => toast.error(t.somethingWentWrong),
+        onError: (error) => toast.error(describeError(t, error)),
       },
     )
   }

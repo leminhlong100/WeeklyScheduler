@@ -1,4 +1,5 @@
 import { toast } from 'sonner'
+import { describeError } from '@/lib/utils/errorMessage'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import {
   DropdownMenu,
@@ -68,7 +69,7 @@ export function UserMenu() {
         )}
         <DropdownMenuSeparator />
         <DropdownMenuItem
-          onClick={() => signOut.mutate(undefined, { onError: () => toast.error(t.somethingWentWrong) })}
+          onClick={() => signOut.mutate(undefined, { onError: (error) => toast.error(describeError(t, error)) })}
         >
           {t.logout}
         </DropdownMenuItem>

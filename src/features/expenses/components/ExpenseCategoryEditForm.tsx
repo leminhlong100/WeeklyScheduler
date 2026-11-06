@@ -1,6 +1,7 @@
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { toast } from 'sonner'
+import { describeError } from '@/lib/utils/errorMessage'
 import { GradientButton } from '@/components/common/GradientButton'
 import { Button } from '@/components/ui/button'
 import { useTranslation } from '@/features/i18n/LocaleContext'
@@ -44,7 +45,10 @@ export function ExpenseCategoryEditForm({ category, onDone }: ExpenseCategoryEdi
   })
 
   const onSubmit = (values: ExpenseCategoryFormInput) => {
-    const onError = () => toast.error(t.somethingWentWrong)
+    // 23505 ở đây chỉ có thể là unique (user, kind, name): đã có danh mục cùng
+    // loại, cùng tên — nói đúng câu đó thay vì câu trùng lặp chung.
+    const onError = (error: unknown) =>
+      toast.error(describeError(t, error, { duplicate: t.categoryNameExists }))
     const patch = {
       name: values.name.trim(),
       emoji: values.emoji,

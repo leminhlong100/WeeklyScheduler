@@ -1,4 +1,5 @@
 import { toast } from 'sonner'
+import { describeError } from '@/lib/utils/errorMessage'
 import { Button } from '@/components/ui/button'
 import { useTranslation } from '@/features/i18n/LocaleContext'
 import { useTheme } from '@/features/theme/ThemeContext'
@@ -25,7 +26,7 @@ export function GoogleButton() {
         className="h-11 rounded-2xl font-bold"
         style={{ borderColor: theme.border, background: theme.chip, color: theme.text }}
         disabled={googleSignIn.isPending}
-        onClick={() => googleSignIn.mutate(undefined, { onError: () => toast.error(t.somethingWentWrong) })}
+        onClick={() => googleSignIn.mutate(undefined, { onError: (error) => toast.error(describeError(t, error)) })}
       >
         <GoogleIcon />
         {t.continueWithGoogle}

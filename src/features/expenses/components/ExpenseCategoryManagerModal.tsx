@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { PlusIcon } from 'lucide-react'
 import { toast } from 'sonner'
+import { describeError } from '@/lib/utils/errorMessage'
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { useTranslation } from '@/features/i18n/LocaleContext'
@@ -40,7 +41,7 @@ export function ExpenseCategoryManagerModal({
     if (!window.confirm(t.deleteExpenseCategoryConfirm)) return
     deleteCategory.mutate(category.id, {
       onSuccess: () => toast.success(t.categoryDeleted),
-      onError: () => toast.error(t.somethingWentWrong),
+      onError: (error) => toast.error(describeError(t, error)),
     })
   }
 

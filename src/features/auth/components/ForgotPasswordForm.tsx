@@ -2,6 +2,7 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Link } from 'react-router-dom'
 import { toast } from 'sonner'
+import { describeError } from '@/lib/utils/errorMessage'
 import { Input } from '@/components/ui/input'
 import { FormField } from '@/components/form/FormField'
 import { GradientButton } from '@/components/common/GradientButton'
@@ -24,7 +25,7 @@ export function ForgotPasswordForm() {
   const onSubmit = ({ email }: ForgotPasswordInput) => {
     sendReset.mutate(email, {
       onSuccess: () => toast.success(t.resetLinkSent),
-      onError: () => toast.error(t.somethingWentWrong),
+      onError: (error) => toast.error(describeError(t, error)),
     })
   }
 

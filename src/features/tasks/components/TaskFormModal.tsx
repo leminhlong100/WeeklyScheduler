@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { Controller, useForm, useWatch, type Control } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { toast } from 'sonner'
+import { describeError } from '@/lib/utils/errorMessage'
 import { RepeatIcon } from 'lucide-react'
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
@@ -115,7 +116,7 @@ export function TaskFormModal({ draft, weekStartISO, onClose }: TaskFormModalPro
   if (!draft) return null
 
   const onSubmit = (values: TaskFormInput) => {
-    const onError = () => toast.error(t.somethingWentWrong)
+    const onError = (error: unknown) => toast.error(describeError(t, error))
 
     if (isEdit && draft.task) {
       const task = draft.task
@@ -190,7 +191,7 @@ export function TaskFormModal({ draft, weekStartISO, onClose }: TaskFormModalPro
     if (!draft.task) return
     deleteTask.mutate(draft.task.id, {
       onSuccess: () => { toast.success(t.taskDeleted); onClose() },
-      onError: () => toast.error(t.somethingWentWrong),
+      onError: (error) => toast.error(describeError(t, error)),
     })
   }
 
@@ -202,7 +203,7 @@ export function TaskFormModal({ draft, weekStartISO, onClose }: TaskFormModalPro
       { seriesId: task.series_id, fromDate: task.task_date },
       {
         onSuccess: () => { toast.success(t.seriesDeleted); onClose() },
-        onError: () => toast.error(t.somethingWentWrong),
+        onError: (error) => toast.error(describeError(t, error)),
       },
     )
   }
@@ -222,7 +223,7 @@ export function TaskFormModal({ draft, weekStartISO, onClose }: TaskFormModalPro
       },
       {
         onSuccess: () => { toast.success(t.taskDuplicated); onClose() },
-        onError: () => toast.error(t.somethingWentWrong),
+        onError: (error) => toast.error(describeError(t, error)),
       },
     )
   }

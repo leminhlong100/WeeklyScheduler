@@ -2,6 +2,7 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useNavigate } from 'react-router-dom'
 import { toast } from 'sonner'
+import { describeError } from '@/lib/utils/errorMessage'
 import { Input } from '@/components/ui/input'
 import { FormField } from '@/components/form/FormField'
 import { GradientButton } from '@/components/common/GradientButton'
@@ -23,7 +24,7 @@ export function ResetPasswordForm() {
   const onSubmit = ({ password }: ResetPasswordInput) => {
     updatePassword.mutate(password, {
       onSuccess: () => navigate('/', { replace: true }),
-      onError: () => toast.error(t.somethingWentWrong),
+      onError: (error) => toast.error(describeError(t, error)),
     })
   }
 
