@@ -34,7 +34,7 @@ function Option({
 
 /**
  * Chọn từng mục để ẩn số tiền: tổng tháng/năm/ngày và theo danh mục (lương, đầu
- * tư...). Chỉ có tác dụng khi nút ẩn tổng đang tắt — ẩn tổng là "che hết".
+ * tư...). Con mắt bên ngoài dùng để xem tạm các mục đã chọn.
  */
 export function AmountVisibilityDialog({
   open,
@@ -45,7 +45,7 @@ export function AmountVisibilityDialog({
 }) {
   const { t } = useTranslation()
   const { theme } = useTheme()
-  const { hidden, hiddenScopes, toggleScope } = useAmountVisibility()
+  const { hiddenScopes, toggleScope } = useAmountVisibility()
   const { data: categories = [] } = useExpenseCategories()
 
   const scopes = [
@@ -64,12 +64,6 @@ export function AmountVisibilityDialog({
         <DialogTitle className="font-heading text-xl font-extrabold" style={{ color: theme.text }}>
           {t.hideCustomTitle}
         </DialogTitle>
-
-        {hidden && (
-          <p className="text-[12px] font-semibold" style={{ color: theme.muted }}>
-            {t.hideCustomHint}
-          </p>
-        )}
 
         <div className="flex flex-col gap-2">
           {scopes.map((s) => (

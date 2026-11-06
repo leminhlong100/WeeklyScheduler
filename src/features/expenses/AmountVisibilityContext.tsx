@@ -1,22 +1,12 @@
 import { createContext, useCallback, useContext, useMemo, useState, type ReactNode } from 'react'
 
-/** Mặc định ẩn — người ngồi cạnh không nên thấy số tiền ngay khi mở app lên. */
-const HIDDEN_KEY = 'weeklyScheduler.amountsHidden'
-/** Các mục được chọn ẩn riêng, chỉ có tác dụng khi nút ẩn tổng đang tắt. */
+/** Các mục được chọn che. */
 const SCOPES_KEY = 'weeklyScheduler.amountsHiddenScopes'
 
 /** Những khối tổng có thể ẩn riêng; danh mục dùng khoá `cat:<id>`. */
 export type AmountScope = 'month' | 'year' | 'day'
 
 export const categoryScopeKey = (categoryId: string) => `cat:${categoryId}`
-
-function readStoredHidden(): boolean {
-  if (typeof window === 'undefined') return true
-  const stored = window.localStorage.getItem(HIDDEN_KEY)
-  // Chỉ 'false' tường minh mới coi là đã chọn hiện; mọi giá trị khác (kể cả
-  // chưa từng lưu) đều ẩn theo mặc định.
-  return stored !== 'false'
-}
 
 function readStoredScopes(): Set<string> {
   try {
@@ -29,10 +19,13 @@ function readStoredScopes(): Set<string> {
 }
 
 interface AmountVisibilityContextValue {
-  /** Ẩn tất cả. Bật thì mọi số tiền bị che, bất kể danh sách ẩn riêng. */
+  /**
+   * Có đang che các mục đã chọn không. Nút con mắt chỉ bật/tắt "xem tạm" các mục
+   * đó, không phải một nút ẩn tất cả; không lưu, nên mở lại app là che lại ngay.
+   */
   hidden: boolean
   toggleHidden: () => void
-  /** Các mục ẩn riêng (khối tổng + danh mục), áp dụng khi `hidden` là false. */
+  /** Các mục luôn bị che (khối tổng + danh mục) trừ lúc đang xem tạm. */
   hiddenScopes: ReadonlySet<string>
   toggleScope: (key: string) => void
   /** Số tiền thuộc `scope` / danh mục `categoryId` có đang bị che không. */
@@ -42,15 +35,11 @@ interface AmountVisibilityContextValue {
 const AmountVisibilityContext = createContext<AmountVisibilityContextValue | null>(null)
 
 export function AmountVisibilityProvider({ children }: { children: ReactNode }) {
-  const [hidden, setHidden] = useState(readStoredHidden)
+  const [hidden, setHidden] = useState(true)
   const [hiddenScopes, setHiddenScopes] = useState(readStoredScopes)
 
   const toggleHidden = useCallback(() => {
-    setHidden((prev) => {
-      const next = !prev
-      window.localStorage.setItem(HIDDEN_KEY, String(next))
-      return next
-    })
+    setHidden((prev) => !prev)
   }, [])
 
   const toggleScope = useCallback((key: string) => {
@@ -68,9 +57,9 @@ export function AmountVisibilityProvider({ children }: { children: ReactNode }) 
 
   const isMasked = useCallback(
     (scope?: AmountScope, categoryId?: string | null) =>
-      hidden ||
-      (scope !== undefined && hiddenScopes.has(scope)) ||
-      (!!categoryId && hiddenScopes.has(categoryScopeKey(categoryId))),
+      hidden &&
+      ((scope !== undefined && hiddenScopes.has(scope)) ||
+        (!!categoryId && hiddenScopes.has(categoryScopeKey(categoryId)))),
     [hidden, hiddenScopes],
   )
 

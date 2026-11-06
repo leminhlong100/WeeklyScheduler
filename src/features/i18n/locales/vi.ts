@@ -344,7 +344,6 @@ export const vi: Dictionary = {
   hideAmounts: 'Ẩn số tiền',
   showAmounts: 'Hiện số tiền',
   hideCustomTitle: 'Tuỳ chọn ẩn số tiền',
-  hideCustomHint: 'Đang ẩn tất cả. Bấm biểu tượng mắt để hiện; các mục chọn bên dưới sẽ vẫn bị ẩn.',
   hideScopeMonth: 'Tổng tháng',
   hideScopeYear: 'Tổng năm',
   hideScopeDay: 'Tổng ngày',

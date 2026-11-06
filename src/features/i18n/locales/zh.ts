@@ -342,7 +342,6 @@ export const zh: Dictionary = {
   hideAmounts: '隐藏金额',
   showAmounts: '显示金额',
   hideCustomTitle: '自定义隐藏金额',
-  hideCustomHint: '当前全部隐藏。点击眼睛图标显示后，下方勾选的项目仍会保持隐藏。',
   hideScopeMonth: '月合计',
   hideScopeYear: '全年合计',
   hideScopeDay: '日合计',

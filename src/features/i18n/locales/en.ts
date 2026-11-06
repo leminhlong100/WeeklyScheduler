@@ -345,7 +345,6 @@ export const en: Dictionary = {
   hideAmounts: 'Hide amounts',
   showAmounts: 'Show amounts',
   hideCustomTitle: 'Hide amounts selectively',
-  hideCustomHint: 'Everything is hidden. Tap the eye to show; the items ticked below stay hidden.',
   hideScopeMonth: 'Month total',
   hideScopeYear: 'Year total',
   hideScopeDay: 'Day total',

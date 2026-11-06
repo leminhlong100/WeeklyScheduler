@@ -344,7 +344,6 @@ export const ja: Dictionary = {
   hideAmounts: '金額を隠す',
   showAmounts: '金額を表示',
   hideCustomTitle: '金額の個別非表示',
-  hideCustomHint: 'すべて非表示中です。目のアイコンで表示すると、下で選んだ項目だけ非表示のままになります。',
   hideScopeMonth: '月合計',
   hideScopeYear: '年間合計',
   hideScopeDay: '日合計',
