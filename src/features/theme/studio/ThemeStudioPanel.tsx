@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { createPortal } from 'react-dom'
 import { toast } from 'sonner'
 import { AlertTriangle, ChevronUp, Eye, Minus, X } from 'lucide-react'
 
@@ -44,7 +45,14 @@ const TAB_KEYS: { id: StudioTab; labelKey: 'studioTabBasics' | 'studioTabColors'
  *
  * Mount conditionally: unmounting is what clears the live preview.
  */
-export function ThemeStudioPanel({ record, onClose }: ThemeStudioPanelProps) {
+export function ThemeStudioPanel(props: ThemeStudioPanelProps) {
+  // Portaled to <body>: rendered inside AppShell's content well (a z-50 stacking
+  // context) its z-[80] is capped at 50, so the z-60 mobile action bar painted
+  // over the footer and hid the Save button.
+  return createPortal(<ThemeStudioPanelBody {...props} />, document.body)
+}
+
+function ThemeStudioPanelBody({ record, onClose }: ThemeStudioPanelProps) {
   const { t } = useTranslation()
   const { user } = useAuth()
   const isMobile = useIsMobile()
