@@ -16,9 +16,10 @@ interface ExpenseDayGroupProps {
   expenses: Expense[]
   categoryById: Map<string, ExpenseCategory>
   isToday: boolean
-  onEdit: (expense: Expense) => void
-  onDelete: (expense: Expense) => void
-  onMarkPaid: (expense: Expense) => void
+  /** Bỏ trống khi chỉ được xem. */
+  onEdit?: (expense: Expense) => void
+  onDelete?: (expense: Expense) => void
+  onMarkPaid?: (expense: Expense) => void
 }
 
 /**
@@ -90,9 +91,9 @@ export function ExpenseDayGroup({
             key={expense.id}
             expense={expense}
             category={expense.category_id ? (categoryById.get(expense.category_id) ?? null) : null}
-            onEdit={() => onEdit(expense)}
-            onDelete={() => onDelete(expense)}
-            onMarkPaid={() => onMarkPaid(expense)}
+            onEdit={onEdit && (() => onEdit(expense))}
+            onDelete={onDelete && (() => onDelete(expense))}
+            onMarkPaid={onMarkPaid && (() => onMarkPaid(expense))}
           />
         ))}
       </div>

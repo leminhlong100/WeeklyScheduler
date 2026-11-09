@@ -439,6 +439,53 @@ export interface Dictionary {
   voiceErrorGeneric: string
 
   manageExpenseCategories: string
+
+  ledgerPersonal: string
+  ledgerNew: string
+  ledgerCreate: string
+  ledgerCreateTitle: string
+  ledgerCreateHint: string
+  ledgerName: string
+  ledgerNamePh: string
+  ledgerNameRequired: string
+  ledgerEmoji: string
+  ledgerCreated: string
+  ledgerSaved: string
+  ledgerSettings: string
+  ledgerSharedWithMe: string
+  ledgerViewOnly: string
+  ledgerShareTitle: string
+  ledgerShareHint: string
+  ledgerInviteEnable: string
+  ledgerInviteCopy: string
+  ledgerInviteCopied: string
+  ledgerInviteCopyFailed: string
+  ledgerInviteShare: string
+  ledgerInviteShareText: string
+  ledgerInviteRegenerate: string
+  ledgerInviteRegenerateConfirm: string
+  ledgerInviteDisable: string
+  ledgerMembers: string
+  ledgerNoMembers: string
+  ledgerRemoveMember: string
+  ledgerRemoveMemberConfirm: string
+  ledgerMemberRemoved: string
+  ledgerDelete: string
+  ledgerDeleteConfirm: string
+  ledgerDeleted: string
+  ledgerLeave: string
+  ledgerLeaveConfirm: string
+  ledgerLeft: string
+  ledgerBalanceTitle: string
+  ledgerBalanceEmpty: string
+  ledgerBalanceRemaining: string
+  ledgerBalanceIn: string
+  ledgerBalanceOut: string
+  joinLedgerTitle: string
+  joinLedgerLoginHint: string
+  joinLedgerInvalid: string
+  joinLedgerSuccess: string
+  joinLedgerGoToExpenses: string
   addExpenseCategory: string
   editExpenseCategory: string
   deleteExpenseCategoryConfirm: string

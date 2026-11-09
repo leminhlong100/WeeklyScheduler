@@ -21,9 +21,10 @@ interface ExpenseListProps {
   categories: ExpenseCategory[]
   filter: ExpenseFilter
   onFilterChange: (next: ExpenseFilter) => void
-  onEdit: (expense: Expense) => void
-  onDelete: (expense: Expense) => void
-  onMarkPaid: (expense: Expense) => void
+  /** Bỏ trống khi chỉ được xem (sổ người khác chia sẻ). */
+  onEdit?: (expense: Expense) => void
+  onDelete?: (expense: Expense) => void
+  onMarkPaid?: (expense: Expense) => void
 }
 
 export function ExpenseList({

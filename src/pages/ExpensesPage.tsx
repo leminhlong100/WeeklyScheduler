@@ -28,6 +28,13 @@ import { ExpenseTabs, type ExpenseTab } from '@/features/expenses/components/Exp
 import { AmountVisibilityDialog } from '@/features/expenses/components/AmountVisibilityDialog'
 import { ExpenseStatsDialog } from '@/features/expenses/components/ExpenseStatsDialog'
 import { ExpenseCategoryManagerModal } from '@/features/expenses/components/ExpenseCategoryManagerModal'
+import { LedgerBar } from '@/features/expenses/components/LedgerBar'
+import { LedgerBalanceCard } from '@/features/expenses/components/LedgerBalanceCard'
+import {
+  LedgerSettingsDialog,
+  type LedgerDialogTarget,
+} from '@/features/expenses/components/LedgerSettingsDialog'
+import { LedgerProvider, useCurrentLedger } from '@/features/expenses/LedgerContext'
 import {
   buildExpensesCsv,
   downloadCsv,
@@ -69,8 +76,22 @@ type EditTarget = Expense | 'new' | null
  */
 const DRAFT_STORAGE_KEY = 'weekly-scheduler:expense-draft'
 
+/**
+ * Mọi thứ bên trong đọc sổ đang mở từ `LedgerProvider` — danh sách, báo cáo,
+ * thống kê, form sửa và AI nhập nhanh đều tự đi theo sổ.
+ */
 export function ExpensesPage() {
+  return (
+    <LedgerProvider>
+      <ExpensesPageContent />
+    </LedgerProvider>
+  )
+}
+
+function ExpensesPageContent() {
   const { t, locale, setLocale } = useTranslation()
+  const { ledgerId, canEdit } = useCurrentLedger()
+  const [ledgerDialog, setLedgerDialog] = useState<LedgerDialogTarget>(null)
   const { theme } = useTheme()
   const { hidden: amountsHidden, toggleHidden: toggleAmountsHidden } = useAmountVisibility()
   const isMobile = useIsMobile()
@@ -84,6 +105,13 @@ export function ExpensesPage() {
   const [statsOpen, setStatsOpen] = useState(false)
   const [editTarget, setEditTarget] = useState<EditTarget>(null)
   const [filter, setFilter] = useState<ExpenseFilter>(EMPTY_EXPENSE_FILTER)
+  // Bộ lọc danh mục trỏ vào danh mục của chủ sổ; sang sổ của người khác thì
+  // danh mục đó không còn, lọc tiếp chỉ ra một danh sách rỗng khó hiểu.
+  const [filterLedger, setFilterLedger] = useState(ledgerId)
+  if (filterLedger !== ledgerId) {
+    setFilterLedger(ledgerId)
+    setFilter(EMPTY_EXPENSE_FILTER)
+  }
   /** Không có gì được ghi vào DB cho tới khi user bấm lưu bản nháp này. */
   const [draft, setDraft] = useSessionStorageState<ExpenseDraft | null>(
     DRAFT_STORAGE_KEY,
@@ -157,7 +185,7 @@ export function ExpensesPage() {
           onPrevMonth={() => setMonth((m) => shiftMonth(m, -1))}
           onNextMonth={() => setMonth((m) => shiftMonth(m, 1))}
           onThisMonth={() => setMonth(currentMonthKey())}
-          onAddExpense={() => setEditTarget('new')}
+          onAddExpense={canEdit ? () => setEditTarget('new') : undefined}
           userMenu={<UserMenu />}
         />
       }
@@ -165,18 +193,27 @@ export function ExpensesPage() {
       <div className="mx-auto flex w-full max-w-[720px] flex-col gap-4 px-3 py-4 sm:px-5 sm:py-6">
         {/* Bản nháp thay chỗ ô nhập cho tới khi user quyết định: để cả hai cùng
             lúc thì rất dễ gửi câu thứ hai và mất bản nháp đang sửa dở. */}
-        {draft ? (
-          <ParsedDraftList
-            draft={draft}
-            onChange={(rows: DraftRow[]) => setDraft({ ...draft, rows })}
-            onDone={() => setDraft(null)}
-          />
-        ) : (
-          <QuickAddSheet
-            onDrafts={(items, rawText) => setDraft({ rawText, rows: toDraftRows(items) })}
-            onEnterManually={() => setEditTarget('new')}
-          />
-        )}
+        <LedgerBar
+          onCreate={() => setLedgerDialog('new')}
+          onOpenSettings={() => ledgerId && setLedgerDialog(ledgerId)}
+        />
+
+        {ledgerId && <LedgerBalanceCard ledgerId={ledgerId} />}
+
+        {/* Sổ được mời xem thì không có chỗ nhập: người xem không ghi được. */}
+        {canEdit &&
+          (draft ? (
+            <ParsedDraftList
+              draft={draft}
+              onChange={(rows: DraftRow[]) => setDraft({ ...draft, rows })}
+              onDone={() => setDraft(null)}
+            />
+          ) : (
+            <QuickAddSheet
+              onDrafts={(items, rawText) => setDraft({ rawText, rows: toDraftRows(items) })}
+              onEnterManually={() => setEditTarget('new')}
+            />
+          ))}
 
         <ExpenseTabs value={tab} onChange={setTab} />
 
@@ -191,11 +228,7 @@ export function ExpensesPage() {
             className="flex items-center gap-1.5 rounded-[11px] border-[1.5px] px-2.5 py-1.5 text-[12px] font-bold transition-transform duration-150 active:scale-95"
             style={{ borderColor: theme.border, background: theme.chip, color: theme.muted }}
           >
-            {amountsHidden ? (
-              <EyeOffIcon className="size-3.5" />
-            ) : (
-              <EyeIcon className="size-3.5" />
-            )}
+            {amountsHidden ? <EyeOffIcon className="size-3.5" /> : <EyeIcon className="size-3.5" />}
           </button>
           <button
             type="button"
@@ -207,16 +240,18 @@ export function ExpensesPage() {
           >
             <ListChecksIcon className="size-3.5" />
           </button>
-          <button
-            type="button"
-            onClick={() => setCategoryManagerOpen(true)}
-            aria-label={t.manageExpenseCategories}
-            title={t.manageExpenseCategories}
-            className="flex items-center gap-1.5 rounded-[11px] border-[1.5px] px-2.5 py-1.5 text-[12px] font-bold transition-transform duration-150 active:scale-95"
-            style={{ borderColor: theme.border, background: theme.chip, color: theme.muted }}
-          >
-            <SlidersHorizontalIcon className="size-3.5" />
-          </button>
+          {canEdit && (
+            <button
+              type="button"
+              onClick={() => setCategoryManagerOpen(true)}
+              aria-label={t.manageExpenseCategories}
+              title={t.manageExpenseCategories}
+              className="flex items-center gap-1.5 rounded-[11px] border-[1.5px] px-2.5 py-1.5 text-[12px] font-bold transition-transform duration-150 active:scale-95"
+              style={{ borderColor: theme.border, background: theme.chip, color: theme.muted }}
+            >
+              <SlidersHorizontalIcon className="size-3.5" />
+            </button>
+          )}
           <button
             type="button"
             onClick={() => setStatsOpen(true)}
@@ -247,9 +282,9 @@ export function ExpensesPage() {
             categories={categories}
             filter={filter}
             onFilterChange={setFilter}
-            onEdit={setEditTarget}
-            onDelete={handleDelete}
-            onMarkPaid={handleMarkPaid}
+            onEdit={canEdit ? setEditTarget : undefined}
+            onDelete={canEdit ? handleDelete : undefined}
+            onMarkPaid={canEdit ? handleMarkPaid : undefined}
           />
         ) : (
           // Báo cáo cố ý KHÔNG chịu ảnh hưởng của bộ lọc: nó là bức tranh cả
@@ -258,6 +293,7 @@ export function ExpensesPage() {
         )}
       </div>
 
+      <LedgerSettingsDialog target={ledgerDialog} onClose={() => setLedgerDialog(null)} />
       <ExpenseCategoryManagerModal
         open={categoryManagerOpen}
         onOpenChange={setCategoryManagerOpen}
@@ -265,7 +301,10 @@ export function ExpensesPage() {
       <AmountVisibilityDialog open={hideOptionsOpen} onOpenChange={setHideOptionsOpen} />
       <ExpenseStatsDialog open={statsOpen} onOpenChange={setStatsOpen} month={month} />
 
-      <Dialog open={editTarget !== null} onOpenChange={(next) => !next && setEditTarget(null)}>
+      <Dialog
+        open={canEdit && editTarget !== null}
+        onOpenChange={(next) => !next && setEditTarget(null)}
+      >
         <DialogContent
           showCloseButton={false}
           className="max-h-[85dvh] w-full max-w-full overflow-y-auto rounded-t-[26px] rounded-b-none border-[1.5px] p-5 max-sm:pb-[calc(1.25rem+env(safe-area-inset-bottom))] sm:w-[calc(100%-2rem)] sm:max-w-[440px] sm:rounded-[26px] sm:p-6"

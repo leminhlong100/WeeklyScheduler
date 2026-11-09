@@ -43,6 +43,10 @@ export type ExpenseKind = 'expense' | 'income'
  * 'planned' = kỳ định kỳ chưa tới, hiện riêng và không cộng vào tổng.
  */
 export type ExpenseStatus = 'paid' | 'planned'
+
+/** Quyền của người được mời vào một sổ chia sẻ. Hiện chỉ có xem. */
+export type LedgerRole = 'viewer'
+
 export type ThemeKey =
   | 'lavender'
   | 'mint'
@@ -305,6 +309,8 @@ export interface Database {
           raw_text: string | null
           /** Chung cho mọi kỳ của một chuỗi lặp hàng tháng. Null = khoản chi lẻ. */
           series_id: string | null
+          /** Null = sổ cá nhân của `user_id`; khác null = sổ chia sẻ (xem `ledgers`). */
+          ledger_id: string | null
           created_at: string
           updated_at: string
         }
@@ -321,6 +327,7 @@ export interface Database {
           source?: ExpenseSource
           raw_text?: string | null
           series_id?: string | null
+          ledger_id?: string | null
         }
         Update: {
           category_id?: string | null
@@ -336,8 +343,77 @@ export interface Database {
         }
         Relationships: []
       }
+      ledgers: {
+        Row: {
+          id: string
+          owner_id: string
+          name: string
+          emoji: string
+          /** Null = link mời đang tắt. */
+          invite_code: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          owner_id: string
+          name: string
+          emoji?: string
+        }
+        Update: {
+          name?: string
+          emoji?: string
+        }
+        Relationships: []
+      }
+      ledger_members: {
+        Row: {
+          ledger_id: string
+          user_id: string
+          role: LedgerRole
+          created_at: string
+        }
+        Insert: {
+          ledger_id: string
+          user_id: string
+          role?: LedgerRole
+        }
+        Update: Record<string, never>
+        Relationships: []
+      }
     }
     Views: Record<string, never>
-    Functions: Record<string, never>
+    Functions: {
+      list_my_ledgers: {
+        Args: Record<string, never>
+        Returns: {
+          id: string
+          name: string
+          emoji: string
+          owner_id: string
+          owner_name: string
+          role: 'owner' | LedgerRole
+          /** Chỉ có giá trị với sổ mình sở hữu. */
+          invite_code: string | null
+          created_at: string
+        }[]
+      }
+      list_ledger_members: {
+        Args: { p_ledger_id: string }
+        Returns: { user_id: string; display_name: string; joined_at: string }[]
+      }
+      set_ledger_invite: {
+        Args: { p_ledger_id: string; p_enabled: boolean }
+        Returns: string | null
+      }
+      join_ledger: {
+        Args: { p_code: string }
+        Returns: string
+      }
+      ledger_balance: {
+        Args: { p_ledger_id: string }
+        Returns: { currency: Currency; income: number; expense: number }[]
+      }
+    }
   }
 }

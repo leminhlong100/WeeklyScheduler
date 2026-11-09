@@ -12,7 +12,8 @@ interface ExpensesHeaderProps {
   onPrevMonth: () => void
   onNextMonth: () => void
   onThisMonth: () => void
-  onAddExpense: () => void
+  /** Bỏ trống khi đang xem sổ người khác: ẩn nút thêm. */
+  onAddExpense?: () => void
   userMenu: ReactNode
 }
 
@@ -90,14 +91,16 @@ export function ExpensesHeader({
         {monthLabel}
       </div>
 
-      <GradientButton
-        onClick={onAddExpense}
-        aria-label={t.addExpense}
-        className="h-10 gap-1.5 px-3 text-[13.5px] sm:px-[18px]"
-      >
-        <PlusIcon className="size-4" />
-        <span className="hidden sm:inline">{t.addExpense}</span>
-      </GradientButton>
+      {onAddExpense && (
+        <GradientButton
+          onClick={onAddExpense}
+          aria-label={t.addExpense}
+          className="h-10 gap-1.5 px-3 text-[13.5px] sm:px-[18px]"
+        >
+          <PlusIcon className="size-4" />
+          <span className="hidden sm:inline">{t.addExpense}</span>
+        </GradientButton>
+      )}
 
       {userMenu}
     </header>

@@ -14,10 +14,11 @@ interface ExpenseRowProps {
   expense: Expense
   /** Null khi danh mục đã bị xoá — hàng vẫn hiện, chỉ mất nhãn. */
   category: ExpenseCategory | null
-  onEdit: () => void
-  onDelete: () => void
+  /** Bỏ trống cả ba khi chỉ được xem (sổ người khác chia sẻ): ẩn hết nút thao tác. */
+  onEdit?: () => void
+  onDelete?: () => void
   /** Chỉ gọi được với dòng `status = 'planned'`: xác nhận đã trả/đã nhận thật. */
-  onMarkPaid: () => void
+  onMarkPaid?: () => void
 }
 
 export function ExpenseRow({ expense, category, onEdit, onDelete, onMarkPaid }: ExpenseRowProps) {
@@ -94,40 +95,46 @@ export function ExpenseRow({ expense, category, onEdit, onDelete, onMarkPaid }: 
         </MaskedAmount>
       </span>
 
-      <div className="flex flex-shrink-0 gap-1">
-        {/* Chuyển 'planned' -> 'paid' là hành động chính của một kỳ chưa trả, nên
+      {(onEdit || onDelete || onMarkPaid) && (
+        <div className="flex flex-shrink-0 gap-1">
+          {/* Chuyển 'planned' -> 'paid' là hành động chính của một kỳ chưa trả, nên
             nó đứng ngay đây thay vì bắt mở form sửa rồi tìm một ô chọn. */}
-        {isPlanned && (
-          <button
-            type="button"
-            onClick={onMarkPaid}
-            aria-label={t.expenseMarkPaid}
-            title={t.expenseMarkPaid}
-            className="grid h-8 w-8 place-items-center rounded-lg transition-transform duration-150 active:scale-95"
-            style={{ color: INCOME_COLOR }}
-          >
-            <CheckIcon className="size-4" />
-          </button>
-        )}
-        <button
-          type="button"
-          onClick={onEdit}
-          aria-label={t.editExpense}
-          className="grid h-8 w-8 place-items-center rounded-lg transition-transform duration-150 active:scale-95"
-          style={{ color: theme.muted }}
-        >
-          <PencilIcon className="size-4" />
-        </button>
-        <button
-          type="button"
-          onClick={onDelete}
-          aria-label={t.delete}
-          className="grid h-8 w-8 place-items-center rounded-lg transition-transform duration-150 active:scale-95"
-          style={{ color: theme.muted }}
-        >
-          <Trash2Icon className="size-4" />
-        </button>
-      </div>
+          {isPlanned && onMarkPaid && (
+            <button
+              type="button"
+              onClick={onMarkPaid}
+              aria-label={t.expenseMarkPaid}
+              title={t.expenseMarkPaid}
+              className="grid h-8 w-8 place-items-center rounded-lg transition-transform duration-150 active:scale-95"
+              style={{ color: INCOME_COLOR }}
+            >
+              <CheckIcon className="size-4" />
+            </button>
+          )}
+          {onEdit && (
+            <button
+              type="button"
+              onClick={onEdit}
+              aria-label={t.editExpense}
+              className="grid h-8 w-8 place-items-center rounded-lg transition-transform duration-150 active:scale-95"
+              style={{ color: theme.muted }}
+            >
+              <PencilIcon className="size-4" />
+            </button>
+          )}
+          {onDelete && (
+            <button
+              type="button"
+              onClick={onDelete}
+              aria-label={t.delete}
+              className="grid h-8 w-8 place-items-center rounded-lg transition-transform duration-150 active:scale-95"
+              style={{ color: theme.muted }}
+            >
+              <Trash2Icon className="size-4" />
+            </button>
+          )}
+        </div>
+      )}
     </div>
   )
 }

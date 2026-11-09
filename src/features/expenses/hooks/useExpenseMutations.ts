@@ -1,5 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useAuth } from '@/features/auth/AuthContext'
+import { useCurrentLedger } from '../LedgerContext'
 import {
   bulkCreateExpenses,
   createExpense,
@@ -26,13 +27,18 @@ export function useInvalidateExpenses() {
   return () => queryClient.invalidateQueries({ queryKey: ['expenses', user?.id] })
 }
 
+/**
+ * Khoản mới luôn vào sổ đang mở. Chỉ chủ sổ ghi được — với sổ được mời xem, UI
+ * không có nút thêm, và RLS cũng từ chối nếu có ai cố gọi.
+ */
 export function useCreateExpense() {
   const { user } = useAuth()
+  const { ledgerId } = useCurrentLedger()
   const invalidate = useInvalidateExpenses()
 
   return useMutation({
-    mutationFn: (input: Omit<ExpenseInsert, 'user_id'>) =>
-      createExpense({ ...input, user_id: user!.id }),
+    mutationFn: (input: Omit<ExpenseInsert, 'user_id' | 'ledger_id'>) =>
+      createExpense({ ...input, user_id: user!.id, ledger_id: ledgerId }),
     onSuccess: invalidate,
   })
 }
@@ -40,11 +46,14 @@ export function useCreateExpense() {
 /** Lưu cả bảng nháp AI một lần — dùng ở Bước 4 (QuickAddSheet). */
 export function useBulkCreateExpenses() {
   const { user } = useAuth()
+  const { ledgerId } = useCurrentLedger()
   const invalidate = useInvalidateExpenses()
 
   return useMutation({
-    mutationFn: (inputs: Omit<ExpenseInsert, 'user_id'>[]) =>
-      bulkCreateExpenses(inputs.map((input) => ({ ...input, user_id: user!.id }))),
+    mutationFn: (inputs: Omit<ExpenseInsert, 'user_id' | 'ledger_id'>[]) =>
+      bulkCreateExpenses(
+        inputs.map((input) => ({ ...input, user_id: user!.id, ledger_id: ledgerId })),
+      ),
     onSuccess: invalidate,
   })
 }

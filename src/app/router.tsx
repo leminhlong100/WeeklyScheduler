@@ -18,6 +18,9 @@ const SchedulerPage = lazy(() =>
 const ExpensesPage = lazy(() =>
   import('@/pages/ExpensesPage').then((m) => ({ default: m.ExpensesPage })),
 )
+const JoinLedgerPage = lazy(() =>
+  import('@/pages/JoinLedgerPage').then((m) => ({ default: m.JoinLedgerPage })),
+)
 const DevTestUserMenu = lazy(() =>
   import('@/features/profile/components/UserMenu').then((m) => ({ default: m.UserMenu })),
 )
@@ -37,6 +40,10 @@ export function AppRouter() {
             this route is intentionally outside both PublicOnlyRoute and
             ProtectedRoute. */}
         <Route path="/reset-password" element={<ResetPasswordPage />} />
+
+        {/* Ledger invite link: signed-out visitors are asked to sign in first
+            (the code is kept until they do), signed-in ones join right away. */}
+        <Route path="/join/:code" element={<JoinLedgerPage />} />
 
         <Route element={<ProtectedRoute />}>
           <Route path="/" element={<SchedulerPage />} />

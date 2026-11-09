@@ -5,20 +5,29 @@ export type Expense = Database['public']['Tables']['expenses']['Row']
 export type ExpenseInsert = Database['public']['Tables']['expenses']['Insert']
 export type ExpenseUpdate = Database['public']['Tables']['expenses']['Update']
 
+/** Sổ cần đọc: `ledgerId = null` là sổ cá nhân của `ownerId`. */
+export interface ExpenseScope {
+  ownerId: string
+  ledgerId: string | null
+}
+
 /**
  * Một tháng chi tiêu, mới nhất lên đầu. Khoảng ngày là nửa mở `[start, end)` —
  * truyền mốc đầu tháng sau làm `endExclusiveISO` thì khỏi phải tính "ngày cuối
  * tháng" (28/29/30/31) ở chỗ gọi.
  */
 export async function listExpensesInRange(
-  userId: string,
+  scope: ExpenseScope,
   startISO: string,
   endExclusiveISO: string,
 ): Promise<Expense[]> {
-  const { data, error } = await supabase
-    .from('expenses')
-    .select('*')
-    .eq('user_id', userId)
+  let query = supabase.from('expenses').select('*')
+  // Sổ cá nhân phải lọc cả `ledger_id IS NULL`: chủ sổ chia sẻ cũng là
+  // `user_id` của các khoản trong sổ đó, thiếu điều kiện này là trộn hai sổ.
+  query = scope.ledgerId
+    ? query.eq('ledger_id', scope.ledgerId)
+    : query.eq('user_id', scope.ownerId).is('ledger_id', null)
+  const { data, error } = await query
     .gte('spent_at', startISO)
     .lt('spent_at', endExclusiveISO)
     .order('spent_at', { ascending: false })
