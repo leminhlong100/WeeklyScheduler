@@ -243,8 +243,21 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     }
     // The studio pushes a new preview on every slider tick; without this check
     // that would write to `document.head` at pointer-move rate.
-    if (meta.content !== theme.accent) meta.content = theme.accent
-  }, [theme.accent])
+    if (meta.content !== theme.panel) meta.content = theme.panel
+  }, [theme.panel])
+
+  // iOS paints the status bar (black-translucent) as a glass layer whose
+  // material follows the page's `color-scheme` and samples the root
+  // background. With the default white `body` and a light scheme, dark themes
+  // got a milky white haze across the notch band — so the root has to track
+  // the active theme too, not just the app shell.
+  useEffect(() => {
+    const scheme = theme.dark ? 'dark' : 'light'
+    for (const el of [document.documentElement, document.body]) {
+      el.style.colorScheme = scheme
+      el.style.backgroundColor = theme.panel
+    }
+  }, [theme.dark, theme.panel])
 
   // Scrollbars are painted by the browser, outside React's tree and outside the
   // app shell's subtree — portalled dialogs scroll too — so their colours ride
