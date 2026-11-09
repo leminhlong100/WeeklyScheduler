@@ -275,7 +275,7 @@ export function TaskFormModal({ draft, weekStartISO, onClose }: TaskFormModalPro
           <FormField label={t.eventContent} htmlFor="content">
             <textarea
               id="content"
-              rows={3}
+              rows={5}
               placeholder={t.eventContentPh}
               className="w-full resize-y rounded-lg border px-2.5 py-2 text-sm outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
               style={{ background: theme.inputBg, borderColor: theme.border, color: theme.text }}

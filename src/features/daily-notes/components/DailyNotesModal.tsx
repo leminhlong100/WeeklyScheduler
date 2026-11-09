@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from 'react'
+import { useState } from 'react'
 import { CheckIcon, PlusIcon, Trash2Icon } from 'lucide-react'
 import { toast } from 'sonner'
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog'
@@ -38,7 +38,7 @@ export function DailyNotesModal({ open, onOpenChange, defaultDate }: DailyNotesM
   const [pickedDate, setPickedDate] = useState<string | null>(null)
   const noteDate = pickedDate ?? defaultDate
 
-  const handleSubmit = (e: FormEvent) => {
+  const handleSubmit = (e: { preventDefault: () => void }) => {
     e.preventDefault()
     const value = text.trim()
     if (!value) return
@@ -62,46 +62,51 @@ export function DailyNotesModal({ open, onOpenChange, defaultDate }: DailyNotesM
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
         showCloseButton={false}
-        className="w-full max-w-full overflow-hidden rounded-t-[26px] rounded-b-none border-[1.5px] p-0 max-sm:pb-0 sm:w-[calc(100%-2rem)] sm:max-w-[460px] sm:rounded-[26px]"
+        className="w-full max-w-full overflow-hidden rounded-t-[26px] rounded-b-none border-[1.5px] p-0 max-sm:pb-0 sm:w-[calc(100%-2rem)] sm:max-w-[680px] sm:rounded-[26px]"
         style={{ background: theme.modalBg, borderColor: theme.border, color: theme.text }}
       >
         <div className="h-2" style={{ background: theme.brandGrad }} />
-        <div className="flex max-h-[85dvh] flex-col gap-4 px-5 pt-5 pb-[calc(1.25rem+env(safe-area-inset-bottom))] sm:px-6 sm:pb-5">
+        <div className="flex max-h-[90dvh] min-w-0 flex-col gap-4 px-5 pt-5 pb-[calc(1.25rem+env(safe-area-inset-bottom))] sm:px-6 sm:pb-5">
           <DialogTitle className="font-heading text-xl font-extrabold" style={{ color: theme.text }}>
             📝 {t.dailyNotes}
           </DialogTitle>
 
-          <form onSubmit={handleSubmit} className="flex flex-col gap-2">
-            <div className="flex gap-2">
-              <Input
-                value={text}
-                onChange={(e) => setText(e.target.value)}
-                placeholder={t.dailyNotePh}
-                maxLength={500}
-                style={{ background: theme.inputBg, borderColor: theme.border, color: theme.text }}
-              />
+          <form onSubmit={handleSubmit} className="flex min-w-0 flex-col gap-2.5">
+            <textarea
+              value={text}
+              onChange={(e) => setText(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) handleSubmit(e)
+              }}
+              placeholder={t.dailyNotePh}
+              rows={5}
+              maxLength={2000}
+              className="min-h-[120px] w-full resize-y rounded-xl border px-3 py-2.5 text-sm outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
+              style={{ background: theme.inputBg, borderColor: theme.border, color: theme.text }}
+            />
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <label className="flex items-center gap-2 text-xs font-extrabold" style={{ color: theme.muted }}>
+                {t.dailyNoteDate}
+                <Input
+                  type="date"
+                  value={noteDate}
+                  onChange={(e) => e.target.value && setPickedDate(e.target.value)}
+                  className="h-9 w-auto text-[13px]"
+                  style={{ background: theme.inputBg, borderColor: theme.border, color: theme.text }}
+                />
+              </label>
               <GradientButton
                 type="submit"
                 disabled={create.isPending || text.trim().length === 0}
-                aria-label={t.dailyNoteAdd}
-                className="h-9 gap-1 px-3.5"
+                className="h-10 gap-1.5 px-5"
               >
                 <PlusIcon className="size-4" />
+                {t.dailyNoteAdd}
               </GradientButton>
             </div>
-            <label className="flex items-center gap-2 text-xs font-extrabold" style={{ color: theme.muted }}>
-              {t.dailyNoteDate}
-              <Input
-                type="date"
-                value={noteDate}
-                onChange={(e) => e.target.value && setPickedDate(e.target.value)}
-                className="h-8 w-auto text-[13px]"
-                style={{ background: theme.inputBg, borderColor: theme.border, color: theme.text }}
-              />
-            </label>
           </form>
 
-          <div className="flex min-h-0 flex-col gap-3 overflow-y-auto">
+          <div className="flex min-h-0 min-w-0 flex-col gap-3 overflow-x-hidden overflow-y-auto">
             {groups.length === 0 && (
               <p className="py-6 text-center text-sm font-semibold" style={{ color: theme.muted }}>
                 {t.dailyNotesEmpty}
@@ -116,7 +121,7 @@ export function DailyNotesModal({ open, onOpenChange, defaultDate }: DailyNotesM
                   {group.items.map((note) => (
                     <li
                       key={note.id}
-                      className="flex items-start gap-2.5 rounded-xl px-3 py-2"
+                      className="flex min-w-0 items-start gap-2.5 rounded-xl px-3 py-2"
                       style={{ background: theme.chip }}
                     >
                       <button
@@ -133,7 +138,7 @@ export function DailyNotesModal({ open, onOpenChange, defaultDate }: DailyNotesM
                         {note.done && <CheckIcon className="size-3.5 text-white" strokeWidth={4} />}
                       </button>
                       <span
-                        className={`min-w-0 flex-1 break-words text-[13.5px] font-semibold ${note.done ? 'line-through' : ''}`}
+                        className={`min-w-0 flex-1 whitespace-pre-wrap text-[13.5px] [overflow-wrap:anywhere] font-semibold ${note.done ? 'line-through' : ''}`}
                         style={{ opacity: note.done ? 0.5 : 1 }}
                       >
                         {note.text}
