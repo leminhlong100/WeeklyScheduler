@@ -15,6 +15,8 @@ export interface TaskWithCategory {
   /** The task's own colour. Null follows `categoryColor`. */
   color: string | null
   notes: TaskNoteItem[]
+  /** Free-text description of the event. */
+  content: string
   done: boolean
   /** Set when the task came from a "repeat weekly" run; shared with its sibling occurrences. */
   seriesId: string | null

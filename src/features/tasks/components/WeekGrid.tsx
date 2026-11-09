@@ -148,6 +148,7 @@ export function WeekGrid({
         categoryColor: category?.color ?? UNCATEGORIZED_COLOR,
         color: task.color ?? null,
         notes: task.notes ?? [],
+        content: task.content ?? '',
         done: task.done,
         seriesId: task.series_id,
       })
@@ -228,6 +229,7 @@ export function WeekGrid({
         durationMinute: task.duration_minute,
         color: task.color,
         notes: cloneNotes(task.notes),
+        content: task.content,
       },
       {
         onSuccess: () => toast.success(t.taskDuplicated),

@@ -87,6 +87,16 @@ export interface Dictionary {
   editNote: string
   closeNote: string
 
+  eventContent: string
+  eventContentPh: string
+
+  dailyNotes: string
+  dailyNotePh: string
+  dailyNotesEmpty: string
+  dailyNoteDate: string
+  dailyNoteAdd: string
+  dailyNoteDelete: string
+
   stickers: string
   editStickers: string
   stickerTitle: string

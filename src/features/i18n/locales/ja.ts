@@ -74,6 +74,16 @@ export const ja: Dictionary = {
   editNote: 'メモを編集',
   closeNote: 'メモを閉じる',
 
+  eventContent: '内容',
+  eventContentPh: 'イベントの内容を入力…',
+
+  dailyNotes: '日別メモ',
+  dailyNotePh: 'メモを書く…',
+  dailyNotesEmpty: 'メモはまだありません ✨',
+  dailyNoteDate: 'メモの日付',
+  dailyNoteAdd: '追加',
+  dailyNoteDelete: 'メモを削除',
+
   stickers: 'ステッカー',
   editStickers: 'アイコン編集',
   stickerTitle: 'ステッカー箱',

@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react'
-import { ChartColumnIcon, CopyIcon, PlusIcon, SearchIcon } from 'lucide-react'
+import { ChartColumnIcon, CopyIcon, NotebookPenIcon, PlusIcon, SearchIcon } from 'lucide-react'
 import type { Dictionary } from '@/features/i18n/dictionary'
 import type { DerivedTheme } from '@/features/theme/types'
 import { GradientButton } from '@/components/common/GradientButton'
@@ -18,6 +18,7 @@ interface HeaderProps {
   onCopyLastWeek: () => void
   onOpenSearch: () => void
   onOpenStats: () => void
+  onOpenNotes: () => void
   copyLastWeekPending: boolean
   userMenu: ReactNode
 }
@@ -65,6 +66,7 @@ export function Header({
   onCopyLastWeek,
   onOpenSearch,
   onOpenStats,
+  onOpenNotes,
   copyLastWeekPending,
   userMenu,
 }: HeaderProps) {
@@ -108,6 +110,10 @@ export function Header({
           phone, where only one day is on screen at a time. */}
       <ChromeButton onClick={onOpenSearch} theme={theme} className="w-10" title={t.search}>
         <SearchIcon className="size-4" />
+      </ChromeButton>
+
+      <ChromeButton onClick={onOpenNotes} theme={theme} className="w-10 max-sm:hidden" title={t.dailyNotes}>
+        <NotebookPenIcon className="size-4" />
       </ChromeButton>
 
       <div

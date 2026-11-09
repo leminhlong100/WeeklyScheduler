@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react'
-import { ChartColumnIcon, CopyIcon, EllipsisIcon, PlusIcon, SearchIcon } from 'lucide-react'
+import { ChartColumnIcon, CopyIcon, EllipsisIcon, NotebookPenIcon, PlusIcon, SearchIcon } from 'lucide-react'
 import type { Dictionary } from '@/features/i18n/dictionary'
 import type { DerivedTheme } from '@/features/theme/types'
 import { GradientButton } from '@/components/common/GradientButton'
@@ -24,6 +24,7 @@ interface MobileActionBarProps {
   onToggleStickerPanel: () => void
   onOpenSearch: () => void
   onOpenStats: () => void
+  onOpenNotes: () => void
 }
 
 function BarButton({
@@ -71,6 +72,7 @@ export function MobileActionBar({
   onToggleStickerPanel,
   onOpenSearch,
   onOpenStats,
+  onOpenNotes,
 }: MobileActionBarProps) {
   return (
     <nav
@@ -101,6 +103,10 @@ export function MobileActionBar({
           <DropdownMenuItem onClick={onOpenSearch}>
             <SearchIcon className="size-4" />
             {t.search}
+          </DropdownMenuItem>
+          <DropdownMenuItem onClick={onOpenNotes}>
+            <NotebookPenIcon className="size-4" />
+            {t.dailyNotes}
           </DropdownMenuItem>
           <DropdownMenuItem onClick={onOpenStats}>
             <ChartColumnIcon className="size-4" />

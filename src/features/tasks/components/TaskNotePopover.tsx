@@ -130,6 +130,15 @@ export function TaskNotePopover({ task, theme, side, onClose, onSave }: TaskNote
         </div>
       </div>
 
+      {task.content.trim() && (
+        <p
+          className="relative mt-2.5 max-h-[110px] overflow-y-auto whitespace-pre-wrap break-words rounded-xl px-2.5 py-2 text-[12.5px]"
+          style={{ background: theme.chip, color: theme.text }}
+        >
+          {task.content}
+        </p>
+      )}
+
       <div className="relative mt-3 flex max-h-[260px] flex-col gap-2 overflow-y-auto">
         {items.map((item) =>
           isEditing ? (

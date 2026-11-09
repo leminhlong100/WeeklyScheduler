@@ -140,6 +140,8 @@ export interface Database {
           series_id: string | null
           /** Overrides the category's colour. Null follows the category. */
           color: string | null
+          /** Free-text description of the event. */
+          content: string
           created_at: string
           updated_at: string
         }
@@ -155,6 +157,7 @@ export interface Database {
           done?: boolean
           series_id?: string | null
           color?: string | null
+          content?: string
         }
         Update: {
           category_id?: string | null
@@ -166,6 +169,31 @@ export interface Database {
           done?: boolean
           series_id?: string | null
           color?: string | null
+          content?: string
+        }
+        Relationships: []
+      }
+      daily_notes: {
+        Row: {
+          id: string
+          user_id: string
+          note_date: string
+          text: string
+          done: boolean
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          note_date?: string
+          text: string
+          done?: boolean
+        }
+        Update: {
+          note_date?: string
+          text?: string
+          done?: boolean
         }
         Relationships: []
       }

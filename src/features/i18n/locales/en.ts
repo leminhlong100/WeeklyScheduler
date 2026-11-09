@@ -75,6 +75,16 @@ export const en: Dictionary = {
   editNote: 'Edit note',
   closeNote: 'Close note',
 
+  eventContent: 'Details',
+  eventContentPh: 'Describe this event…',
+
+  dailyNotes: 'Daily notes',
+  dailyNotePh: 'Write a note…',
+  dailyNotesEmpty: 'No notes yet ✨',
+  dailyNoteDate: 'Note date',
+  dailyNoteAdd: 'Add',
+  dailyNoteDelete: 'Delete note',
+
   stickers: 'Stickers',
   editStickers: 'Edit icons',
   stickerTitle: 'Sticker box',

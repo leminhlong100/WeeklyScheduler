@@ -79,6 +79,7 @@ export function TaskFormModal({ draft, weekStartISO, onClose }: TaskFormModalPro
     resolver: zodResolver(taskSchema),
     defaultValues: {
       title: '',
+      content: '',
       categoryId: null,
       taskDate: draft?.taskDate ?? '',
       startMinute: draft?.startMinute ?? startOptions[0].value,
@@ -94,6 +95,7 @@ export function TaskFormModal({ draft, weekStartISO, onClose }: TaskFormModalPro
     const baseDate = task?.task_date ?? draft.taskDate
     form.reset({
       title: task?.title ?? '',
+      content: task?.content ?? '',
       categoryId: task?.category_id ?? categories[0]?.id ?? null,
       taskDate: baseDate,
       startMinute: task?.start_minute ?? draft.startMinute,
@@ -122,6 +124,7 @@ export function TaskFormModal({ draft, weekStartISO, onClose }: TaskFormModalPro
       const task = draft.task
       const sharedPatch = {
         title: values.title,
+        content: values.content,
         category_id: values.categoryId,
         start_minute: values.startMinute,
         duration_minute: values.durationMinute,
@@ -165,6 +168,7 @@ export function TaskFormModal({ draft, weekStartISO, onClose }: TaskFormModalPro
       createOccurrences.mutate(
         {
           title: values.title,
+          content: values.content,
           categoryId: values.categoryId,
           taskDates: targetDates,
           startMinute: values.startMinute,
@@ -220,6 +224,7 @@ export function TaskFormModal({ draft, weekStartISO, onClose }: TaskFormModalPro
         durationMinute: task.duration_minute,
         color: task.color,
         notes: cloneNotes(task.notes),
+        content: task.content,
       },
       {
         onSuccess: () => { toast.success(t.taskDuplicated); onClose() },
@@ -264,6 +269,17 @@ export function TaskFormModal({ draft, weekStartISO, onClose }: TaskFormModalPro
               placeholder={t.titlePh}
               style={{ background: theme.inputBg, borderColor: theme.border, color: theme.text }}
               {...form.register('title')}
+            />
+          </FormField>
+
+          <FormField label={t.eventContent} htmlFor="content">
+            <textarea
+              id="content"
+              rows={3}
+              placeholder={t.eventContentPh}
+              className="w-full resize-y rounded-lg border px-2.5 py-2 text-sm outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
+              style={{ background: theme.inputBg, borderColor: theme.border, color: theme.text }}
+              {...form.register('content')}
             />
           </FormField>
 

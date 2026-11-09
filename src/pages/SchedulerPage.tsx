@@ -21,6 +21,7 @@ import { WeekGrid } from '@/features/tasks/components/WeekGrid'
 import { TaskFormModal, type TaskDraft } from '@/features/tasks/components/TaskFormModal'
 import { TaskSearchModal } from '@/features/tasks/components/TaskSearchModal'
 import { WeekStatsModal } from '@/features/tasks/components/WeekStatsModal'
+import { DailyNotesModal } from '@/features/daily-notes/components/DailyNotesModal'
 import { StickersOverlay } from '@/features/stickers/components/StickersOverlay'
 import { IosInstallBanner } from '@/features/pwa/IosInstallBanner'
 import { AppShell } from '@/features/layout/components/AppShell'
@@ -61,6 +62,7 @@ export function SchedulerPage() {
   const [taskDraft, setTaskDraft] = useState<TaskDraft | null>(null)
   const [searchOpen, setSearchOpen] = useState(false)
   const [statsOpen, setStatsOpen] = useState(false)
+  const [notesOpen, setNotesOpen] = useState(false)
   const [stickerTrayOpen, setStickerTrayOpen] = useState(false)
   const [stickerEditMode, setStickerEditMode] = useState(false)
 
@@ -83,6 +85,7 @@ export function SchedulerPage() {
       setTaskDraft(null)
       setSearchOpen(false)
       setStatsOpen(false)
+      setNotesOpen(false)
     }
     window.addEventListener('keydown', onKeyDown)
     return () => window.removeEventListener('keydown', onKeyDown)
@@ -201,6 +204,7 @@ export function SchedulerPage() {
           copyLastWeekPending={copyPreviousWeek.isPending}
           onOpenSearch={() => setSearchOpen(true)}
           onOpenStats={() => setStatsOpen(true)}
+          onOpenNotes={() => setNotesOpen(true)}
           userMenu={<UserMenu />}
         />
       }
@@ -218,6 +222,7 @@ export function SchedulerPage() {
           copyLastWeekPending={copyPreviousWeek.isPending}
           onOpenSearch={() => setSearchOpen(true)}
           onOpenStats={() => setStatsOpen(true)}
+          onOpenNotes={() => setNotesOpen(true)}
           onToggleStickerPanel={toggleStickerPanel}
         />
       }
@@ -253,6 +258,7 @@ export function SchedulerPage() {
 
       <TaskFormModal draft={taskDraft} weekStartISO={weekStartISO} onClose={() => setTaskDraft(null)} />
       <TaskSearchModal open={searchOpen} onOpenChange={setSearchOpen} onPickDate={handlePickDay} />
+      <DailyNotesModal open={notesOpen} onOpenChange={setNotesOpen} defaultDate={toISODate(selected)} />
       <WeekStatsModal
         open={statsOpen}
         onOpenChange={setStatsOpen}

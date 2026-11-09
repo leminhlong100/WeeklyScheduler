@@ -74,6 +74,16 @@ export const zh: Dictionary = {
   editNote: '编辑备注',
   closeNote: '关闭备注',
 
+  eventContent: '内容',
+  eventContentPh: '输入事件内容…',
+
+  dailyNotes: '每日备注',
+  dailyNotePh: '写备注…',
+  dailyNotesEmpty: '还没有备注 ✨',
+  dailyNoteDate: '备注日期',
+  dailyNoteAdd: '添加',
+  dailyNoteDelete: '删除备注',
+
   stickers: '贴纸',
   editStickers: '编辑图标',
   stickerTitle: '贴纸盒',

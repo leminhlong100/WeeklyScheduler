@@ -2,6 +2,7 @@ import { z } from 'zod'
 
 export const taskSchema = z.object({
   title: z.string().min(1, 'fieldRequired').max(120),
+  content: z.string().max(5000),
   categoryId: z.string().nullable(),
   taskDate: z.string().min(1, 'fieldRequired'),
   startMinute: z.number().int(),

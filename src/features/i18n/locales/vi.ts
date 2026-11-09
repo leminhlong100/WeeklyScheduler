@@ -74,6 +74,16 @@ export const vi: Dictionary = {
   editNote: 'Sửa ghi chú',
   closeNote: 'Đóng ghi chú',
 
+  eventContent: 'Nội dung',
+  eventContentPh: 'Nhập nội dung của sự kiện…',
+
+  dailyNotes: 'Ghi chú theo ngày',
+  dailyNotePh: 'Viết ghi chú…',
+  dailyNotesEmpty: 'Chưa có ghi chú nào ✨',
+  dailyNoteDate: 'Ngày ghi chú',
+  dailyNoteAdd: 'Thêm',
+  dailyNoteDelete: 'Xoá ghi chú',
+
   stickers: 'Nhãn dán',
   editStickers: 'Sửa icon',
   stickerTitle: 'Kho nhãn dán',
