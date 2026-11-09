@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
-import { Plus, X } from 'lucide-react'
+import { Crop, Plus, X } from 'lucide-react'
 
+import { ImageCropDialog, type CropAspectOption } from '@/components/form/ImageCropDialog'
 import { ImageDropField } from '@/components/form/ImageDropField'
 import { Slider } from '@/components/ui/slider'
 import { Switch } from '@/components/ui/switch'
@@ -29,6 +30,30 @@ interface ArtTabProps extends StudioTabProps {
 
 type SlotState = { busy: boolean; error?: string }
 
+/** An image waiting in the crop editor before it is encoded and uploaded. */
+type CropRequest = {
+  slot: ArtSlot
+  kind: ThemeImageKind
+  figureIndex?: number
+  source: Blob
+  name: string
+}
+
+/** First entry is the default frame for each slot. */
+const CROP_RATIOS: Record<ThemeImageKind, (number | null)[]> = {
+  scene: [16 / 9, 21 / 9, 4 / 3, null],
+  sideScene: [9 / 16, 3 / 4, null],
+  figure: [null, 1, 3 / 4, 4 / 3],
+}
+const RATIO_LABELS = new Map<number, string>([
+  [16 / 9, '16:9'],
+  [21 / 9, '21:9'],
+  [4 / 3, '4:3'],
+  [9 / 16, '9:16'],
+  [3 / 4, '3:4'],
+  [1, '1:1'],
+])
+
 const POSITION_LABEL_KEYS: Record<ScenePosition, keyof StudioTabProps['t']> = {
   'center bottom': 'studioPosCenterBottom',
   'center center': 'studioPosCenterCenter',
@@ -41,6 +66,11 @@ export function ArtTab({ draft, chrome, t, userId, onBusyChange }: ArtTabProps) 
   const { state, dispatch, definition } = draft
   const art = state.art
   const [slots, setSlots] = useState<Record<string, SlotState>>({})
+  const [crop, setCrop] = useState<CropRequest | null>(null)
+
+  // Uncropped originals keyed by the URL they ended up at, so re-cropping in
+  // the same session starts from the full image instead of the last crop.
+  const originals = useRef<Map<string, Blob>>(new Map())
 
   // Blob URLs handed to the preview before the upload finishes. Revoked when the
   // remote URL replaces them, and on unmount so closing mid-upload doesn't leak.
@@ -75,7 +105,13 @@ export function ArtTab({ draft, chrome, t, userId, onBusyChange }: ArtTabProps) 
    * this can work — the check lives at the persistence boundary, and `cssUrl()`
    * still escapes whatever reaches the sink.
    */
-  const pick = async (slot: ArtSlot, kind: ThemeImageKind, file: File, figureIndex?: number) => {
+  const pick = async (
+    slot: ArtSlot,
+    kind: ThemeImageKind,
+    file: File,
+    figureIndex?: number,
+    original?: Blob,
+  ) => {
     setSlot(slot, { busy: true })
     let localUrl: string | null = null
     try {
@@ -84,7 +120,13 @@ export function ArtTab({ draft, chrome, t, userId, onBusyChange }: ArtTabProps) 
       localUrls.current.add(localUrl)
 
       const previous =
-        kind === 'scene' ? art?.scene : kind === 'sideScene' ? art?.sideScene : undefined
+        kind === 'scene'
+          ? art?.scene
+          : kind === 'sideScene'
+            ? art?.sideScene
+            : figureIndex !== undefined
+              ? art?.figures?.[figureIndex]?.src
+              : undefined
 
       if (kind === 'figure') {
         if (figureIndex === undefined) {
@@ -125,8 +167,12 @@ export function ArtTab({ draft, chrome, t, userId, onBusyChange }: ArtTabProps) 
         URL.revokeObjectURL(localUrl)
         localUrls.current.delete(localUrl)
       }
+      if (original) originals.current.set(remoteUrl, original)
       // Best effort: the once-per-session orphan sweep reconciles anything left.
-      if (previous) void removeThemeArt([previous]).catch(() => {})
+      if (previous) {
+        originals.current.delete(previous)
+        void removeThemeArt([previous]).catch(() => {})
+      }
 
       setSlot(slot, { busy: false, error: prepared.warning })
     } catch (error) {
@@ -149,6 +195,41 @@ export function ArtTab({ draft, chrome, t, userId, onBusyChange }: ArtTabProps) 
     }
   }
 
+  /** Every new image goes through the crop editor before encoding. */
+  const requestCrop = (slot: ArtSlot, kind: ThemeImageKind, file: File, figureIndex?: number) =>
+    setCrop({ slot, kind, figureIndex, source: file, name: file.name })
+
+  /** Re-open the editor on an image already in the theme. */
+  const editExisting = async (
+    slot: ArtSlot,
+    kind: ThemeImageKind,
+    url: string,
+    figureIndex?: number,
+  ) => {
+    const kept = originals.current.get(url)
+    if (kept) {
+      setCrop({ slot, kind, figureIndex, source: kept, name: slot })
+      return
+    }
+    setSlot(slot, { busy: true })
+    try {
+      const response = await fetch(url)
+      if (!response.ok) throw new Error(String(response.status))
+      const blob = await response.blob()
+      setSlot(slot, { busy: false })
+      setCrop({ slot, kind, figureIndex, source: blob, name: slot })
+    } catch {
+      setSlot(slot, { busy: false, error: t.themeImageFailed })
+    }
+  }
+
+  const cropAspects: CropAspectOption[] = crop
+    ? CROP_RATIOS[crop.kind].map((ratio) => ({
+        ratio,
+        label: ratio === null ? t.studioCropOriginal : (RATIO_LABELS.get(ratio) ?? ''),
+      }))
+    : []
+
   const sceneOpacity = art?.sceneOpacity ?? DEFAULT_SCENE_OPACITY
   const sceneIssue = draft.issues.find((issue) => issue.code === 'themeIssueScene')
   const figures = art?.figures ?? []
@@ -159,7 +240,9 @@ export function ArtTab({ draft, chrome, t, userId, onBusyChange }: ArtTabProps) 
         label={t.studioScene}
         hint={t.studioSceneHint}
         value={art?.scene ?? null}
-        onPick={(file) => void pick('scene', 'scene', file)}
+        onPick={(file) => requestCrop('scene', 'scene', file)}
+        onEdit={art?.scene ? () => void editExisting('scene', 'scene', art.scene!) : undefined}
+        editLabel={t.studioCropEdit}
         onClear={() =>
           dispatch({
             type: 'art',
@@ -263,7 +346,13 @@ export function ArtTab({ draft, chrome, t, userId, onBusyChange }: ArtTabProps) 
         label={t.studioSideScene}
         hint={t.studioSideSceneHint}
         value={art?.sideScene ?? null}
-        onPick={(file) => void pick('side', 'sideScene', file)}
+        onPick={(file) => requestCrop('side', 'sideScene', file)}
+        onEdit={
+          art?.sideScene
+            ? () => void editExisting('side', 'sideScene', art.sideScene!)
+            : undefined
+        }
+        editLabel={t.studioCropEdit}
         onClear={() => dispatch({ type: 'art', patch: { sideScene: undefined } })}
         colors={chrome}
         busy={slots.side?.busy}
@@ -303,6 +392,19 @@ export function ArtTab({ draft, chrome, t, userId, onBusyChange }: ArtTabProps) 
               <span className="flex-1 text-[11px] font-extrabold" style={{ color: chrome.text }}>
                 {index + 1}
               </span>
+              <button
+                type="button"
+                disabled={busy}
+                onClick={() =>
+                  void editExisting(`figure${index + 1}` as ArtSlot, 'figure', figure.src, index)
+                }
+                aria-label={t.studioCropEdit}
+                title={t.studioCropEdit}
+                className="grid size-6 place-items-center rounded-md disabled:opacity-40"
+                style={{ color: chrome.muted }}
+              >
+                <Crop className="size-3.5" />
+              </button>
               <button
                 type="button"
                 onClick={() => dispatch({ type: 'removeFigure', index })}
@@ -375,11 +477,37 @@ export function ArtTab({ draft, chrome, t, userId, onBusyChange }: ArtTabProps) 
             busy={busy}
             error={slots[`figure${figures.length + 1}`]?.error}
             onPick={(file) =>
-              void pick(`figure${figures.length + 1}` as ArtSlot, 'figure', file)
+              requestCrop(`figure${figures.length + 1}` as ArtSlot, 'figure', file)
             }
           />
         )}
       </div>
+
+      {crop && (
+        <ImageCropDialog
+          key={`${crop.slot}-${crop.figureIndex ?? 'new'}`}
+          source={crop.source}
+          fileName={crop.name}
+          aspects={cropAspects}
+          colors={chrome}
+          labels={{
+            title: t.studioCropTitle,
+            hint: t.studioCropHint,
+            zoom: t.studioCropZoom,
+            aspect: t.studioCropAspect,
+            reset: t.studioCropReset,
+            cancel: t.studioCropCancel,
+            apply: t.studioCropApply,
+            failed: t.themeImageFailed,
+          }}
+          onCancel={() => setCrop(null)}
+          onConfirm={(file) => {
+            const request = crop
+            setCrop(null)
+            void pick(request.slot, request.kind, file, request.figureIndex, request.source)
+          }}
+        />
+      )}
     </div>
   )
 }

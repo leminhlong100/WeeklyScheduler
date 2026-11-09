@@ -195,6 +195,15 @@ export interface Dictionary {
   studioFigureFlip: string
   studioFigureOpacity: string
   studioRemove: string
+  studioCropEdit: string
+  studioCropTitle: string
+  studioCropHint: string
+  studioCropZoom: string
+  studioCropAspect: string
+  studioCropOriginal: string
+  studioCropReset: string
+  studioCropCancel: string
+  studioCropApply: string
 
   // --- advanced tab ---
   studioAdvancedNote: string

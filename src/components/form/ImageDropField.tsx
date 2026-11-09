@@ -1,5 +1,5 @@
 import { useId, useRef, useState, type DragEvent } from 'react'
-import { ImagePlus, Loader2, X } from 'lucide-react'
+import { Crop, ImagePlus, Loader2, X } from 'lucide-react'
 
 import { cn } from '@/lib/utils'
 import type { FieldColors } from './fieldColors'
@@ -15,6 +15,9 @@ interface ImageDropFieldProps {
   hint?: string
   error?: string
   clearLabel?: string
+  /** Shows a crop button next to clear when set. */
+  onEdit?: () => void
+  editLabel?: string
   /** CSS `aspect-ratio` for the drop zone, so it previews at the real shape. */
   aspect?: string
   className?: string
@@ -31,6 +34,8 @@ export function ImageDropField({
   hint,
   error,
   clearLabel,
+  onEdit,
+  editLabel,
   aspect = '16 / 9',
   className,
 }: ImageDropFieldProps) {
@@ -51,6 +56,18 @@ export function ImageDropField({
         <label htmlFor={inputId} className="text-[11px] font-extrabold" style={{ color: colors.muted }}>
           {label}
         </label>
+        {value && !busy && onEdit && (
+          <button
+            type="button"
+            onClick={onEdit}
+            aria-label={editLabel}
+            title={editLabel}
+            className="ml-auto grid size-5 place-items-center rounded-md"
+            style={{ color: colors.muted }}
+          >
+            <Crop className="size-3.5" />
+          </button>
+        )}
         {value && !busy && (
           <button
             type="button"
