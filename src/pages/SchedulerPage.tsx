@@ -9,7 +9,7 @@ import { ThemeStudioPanel } from '@/features/theme/studio/ThemeStudioPanel'
 import type { CustomThemeRecord } from '@/features/theme/recipe/types'
 import { UserMenu } from '@/features/profile/components/UserMenu'
 import { useWeekAnchor } from '@/features/calendar-nav/hooks/useWeekAnchor'
-import { MiniCalendar } from '@/features/calendar-nav/components/MiniCalendar'
+import { MiniCalendar, type DayNoteMarks } from '@/features/calendar-nav/components/MiniCalendar'
 import { formatWeekRange } from '@/features/calendar-nav/utils/formatWeekRange'
 import { useCategories } from '@/features/categories/hooks/useCategories'
 import { translateCategoryName } from '@/features/i18n/defaultCategoryNames'
@@ -22,6 +22,7 @@ import { TaskFormModal, type TaskDraft } from '@/features/tasks/components/TaskF
 import { TaskSearchModal } from '@/features/tasks/components/TaskSearchModal'
 import { WeekStatsModal } from '@/features/tasks/components/WeekStatsModal'
 import { DailyNotesModal } from '@/features/daily-notes/components/DailyNotesModal'
+import { useDailyNotes } from '@/features/daily-notes/hooks/useDailyNotes'
 import { StickersOverlay } from '@/features/stickers/components/StickersOverlay'
 import { IosInstallBanner } from '@/features/pwa/IosInstallBanner'
 import { AppShell } from '@/features/layout/components/AppShell'
@@ -50,6 +51,15 @@ export function SchedulerPage() {
   const { isActive, toggle } = useActiveCategoryFilter()
   const { data: tasks = [] } = useTasksForWeek(weekStart)
   const copyPreviousWeek = useCopyPreviousWeek(weekStart)
+  const { data: dailyNotes = [] } = useDailyNotes()
+  const noteMarks = useMemo<DayNoteMarks>(() => {
+    const marks = new Map<string, { special: boolean }>()
+    for (const note of dailyNotes) {
+      const prev = marks.get(note.note_date)
+      marks.set(note.note_date, { special: (prev?.special ?? false) || note.special })
+    }
+    return marks
+  }, [dailyNotes])
 
   const isMobile = useIsMobile()
   const isTouch = useIsTouchDevice()
@@ -184,6 +194,7 @@ export function SchedulerPage() {
               onPrevMonth={miniPrevMonth}
               onNextMonth={miniNextMonth}
               onPickDay={handlePickDay}
+              noteMarks={noteMarks}
             />
           }
         />

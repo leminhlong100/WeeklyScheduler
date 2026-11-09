@@ -84,6 +84,7 @@ export const en: Dictionary = {
   dailyNoteDate: 'Note date',
   dailyNoteAdd: 'Add',
   dailyNoteDelete: 'Delete note',
+  dailyNoteSpecial: 'Special day (birthday, party…)',
 
   stickers: 'Stickers',
   editStickers: 'Edit icons',

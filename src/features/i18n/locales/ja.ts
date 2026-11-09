@@ -83,6 +83,7 @@ export const ja: Dictionary = {
   dailyNoteDate: 'メモの日付',
   dailyNoteAdd: '追加',
   dailyNoteDelete: 'メモを削除',
+  dailyNoteSpecial: '特別な日（誕生日・パーティー…）',
 
   stickers: 'ステッカー',
   editStickers: 'アイコン編集',

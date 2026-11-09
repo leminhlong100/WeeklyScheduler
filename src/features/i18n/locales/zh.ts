@@ -83,6 +83,7 @@ export const zh: Dictionary = {
   dailyNoteDate: '备注日期',
   dailyNoteAdd: '添加',
   dailyNoteDelete: '删除备注',
+  dailyNoteSpecial: '特别的日子（生日、聚会…）',
 
   stickers: '贴纸',
   editStickers: '编辑图标',

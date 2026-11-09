@@ -96,6 +96,8 @@ export interface Dictionary {
   dailyNoteDate: string
   dailyNoteAdd: string
   dailyNoteDelete: string
+  /** Toggle marking a note's day as special (birthday, party…). */
+  dailyNoteSpecial: string
 
   stickers: string
   editStickers: string

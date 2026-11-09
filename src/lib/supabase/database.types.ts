@@ -184,6 +184,8 @@ export interface Database {
           note_date: string
           text: string
           done: boolean
+          /** Birthday, party, anniversary… — highlighted on the mini calendar. */
+          special: boolean
           created_at: string
           updated_at: string
         }
@@ -193,11 +195,13 @@ export interface Database {
           note_date?: string
           text: string
           done?: boolean
+          special?: boolean
         }
         Update: {
           note_date?: string
           text?: string
           done?: boolean
+          special?: boolean
         }
         Relationships: []
       }

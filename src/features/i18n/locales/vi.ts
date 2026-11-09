@@ -83,6 +83,7 @@ export const vi: Dictionary = {
   dailyNoteDate: 'Ngày ghi chú',
   dailyNoteAdd: 'Thêm',
   dailyNoteDelete: 'Xoá ghi chú',
+  dailyNoteSpecial: 'Ngày đặc biệt (sinh nhật, tiệc…)',
 
   stickers: 'Nhãn dán',
   editStickers: 'Sửa icon',

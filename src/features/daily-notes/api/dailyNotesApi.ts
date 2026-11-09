@@ -18,10 +18,17 @@ export async function createDailyNote(input: {
   userId: string
   text: string
   noteDate: string
+  special: boolean
 }): Promise<DailyNote> {
   const { data, error } = await supabase
     .from('daily_notes')
-    .insert({ user_id: input.userId, text: input.text, note_date: input.noteDate })
+    .insert({
+      user_id: input.userId,
+      text: input.text,
+      note_date: input.noteDate,
+      // Omitted when false so plain notes still save on a DB without migration 0015.
+      ...(input.special ? { special: true } : {}),
+    })
     .select('*')
     .single()
   if (error) throw error
@@ -30,6 +37,11 @@ export async function createDailyNote(input: {
 
 export async function setDailyNoteDone(id: string, done: boolean): Promise<void> {
   const { error } = await supabase.from('daily_notes').update({ done }).eq('id', id)
+  if (error) throw error
+}
+
+export async function setDailyNoteSpecial(id: string, special: boolean): Promise<void> {
+  const { error } = await supabase.from('daily_notes').update({ special }).eq('id', id)
   if (error) throw error
 }
 

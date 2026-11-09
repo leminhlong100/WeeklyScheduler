@@ -13,7 +13,9 @@ import {
   useDailyNotes,
   useDeleteDailyNote,
   useToggleDailyNote,
+  useToggleDailyNoteSpecial,
 } from '../hooks/useDailyNotes'
+import { SPECIAL_DAY_COLOR } from '../constants'
 
 interface DailyNotesModalProps {
   open: boolean
@@ -33,7 +35,9 @@ export function DailyNotesModal({ open, onOpenChange, defaultDate }: DailyNotesM
   const create = useCreateDailyNote()
   const toggle = useToggleDailyNote()
   const remove = useDeleteDailyNote()
+  const toggleSpecial = useToggleDailyNoteSpecial()
   const [text, setText] = useState('')
+  const [special, setSpecial] = useState(false)
   // null = follow the day on screen until the user picks one explicitly.
   const [pickedDate, setPickedDate] = useState<string | null>(null)
   const noteDate = pickedDate ?? defaultDate
@@ -43,9 +47,12 @@ export function DailyNotesModal({ open, onOpenChange, defaultDate }: DailyNotesM
     const value = text.trim()
     if (!value) return
     create.mutate(
-      { text: value, noteDate },
+      { text: value, noteDate, special },
       {
-        onSuccess: () => setText(''),
+        onSuccess: () => {
+          setText('')
+          setSpecial(false)
+        },
         onError: (error) => toast.error(describeError(t, error)),
       },
     )
@@ -95,6 +102,19 @@ export function DailyNotesModal({ open, onOpenChange, defaultDate }: DailyNotesM
                   style={{ background: theme.inputBg, borderColor: theme.border, color: theme.text }}
                 />
               </label>
+              <button
+                type="button"
+                aria-pressed={special}
+                onClick={() => setSpecial((v) => !v)}
+                className="flex h-9 items-center gap-1.5 rounded-full border-[1.5px] px-3 text-xs font-extrabold transition-colors"
+                style={{
+                  borderColor: special ? SPECIAL_DAY_COLOR : theme.border,
+                  background: special ? `${SPECIAL_DAY_COLOR}22` : 'transparent',
+                  color: special ? SPECIAL_DAY_COLOR : theme.muted,
+                }}
+              >
+                🎉 {t.dailyNoteSpecial}
+              </button>
               <GradientButton
                 type="submit"
                 disabled={create.isPending || text.trim().length === 0}
@@ -121,8 +141,11 @@ export function DailyNotesModal({ open, onOpenChange, defaultDate }: DailyNotesM
                   {group.items.map((note) => (
                     <li
                       key={note.id}
-                      className="flex min-w-0 items-start gap-2.5 rounded-xl px-3 py-2"
-                      style={{ background: theme.chip }}
+                      className="flex min-w-0 items-start gap-2.5 rounded-xl border-l-4 px-3 py-2"
+                      style={{
+                        background: theme.chip,
+                        borderLeftColor: note.special ? SPECIAL_DAY_COLOR : 'transparent',
+                      }}
                     >
                       <button
                         type="button"
@@ -143,6 +166,22 @@ export function DailyNotesModal({ open, onOpenChange, defaultDate }: DailyNotesM
                       >
                         {note.text}
                       </span>
+                      <button
+                        type="button"
+                        aria-label={t.dailyNoteSpecial}
+                        title={t.dailyNoteSpecial}
+                        aria-pressed={note.special}
+                        onClick={() =>
+                          toggleSpecial.mutate(
+                            { id: note.id, special: !note.special },
+                            { onError: (error) => toast.error(describeError(t, error)) },
+                          )
+                        }
+                        className="mt-0.5 flex-shrink-0 text-[15px] leading-none transition-all hover:opacity-100"
+                        style={{ opacity: note.special ? 1 : 0.3, filter: note.special ? 'none' : 'grayscale(1)' }}
+                      >
+                        🎉
+                      </button>
                       <button
                         type="button"
                         aria-label={t.dailyNoteDelete}

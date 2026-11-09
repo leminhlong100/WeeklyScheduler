@@ -5,6 +5,7 @@ import {
   deleteDailyNote,
   listDailyNotes,
   setDailyNoteDone,
+  setDailyNoteSpecial,
   type DailyNote,
 } from '../api/dailyNotesApi'
 
@@ -30,7 +31,7 @@ export function useCreateDailyNote() {
   const { user } = useAuth()
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: (input: { text: string; noteDate: string }) =>
+    mutationFn: (input: { text: string; noteDate: string; special: boolean }) =>
       createDailyNote({ userId: user!.id, ...input }),
     onSuccess: (created) => {
       queryClient.setQueryData<DailyNote[]>(key(user?.id), (prev) =>
@@ -49,6 +50,25 @@ export function useToggleDailyNote() {
       const previous = queryClient.getQueryData<DailyNote[]>(key(user?.id))
       queryClient.setQueryData<DailyNote[]>(key(user?.id), (prev) =>
         (prev ?? []).map((n) => (n.id === id ? { ...n, done } : n)),
+      )
+      return { previous }
+    },
+    onError: (_e, _v, ctx) => {
+      if (ctx?.previous) queryClient.setQueryData(key(user?.id), ctx.previous)
+    },
+  })
+}
+
+export function useToggleDailyNoteSpecial() {
+  const { user } = useAuth()
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: ({ id, special }: { id: string; special: boolean }) =>
+      setDailyNoteSpecial(id, special),
+    onMutate: ({ id, special }) => {
+      const previous = queryClient.getQueryData<DailyNote[]>(key(user?.id))
+      queryClient.setQueryData<DailyNote[]>(key(user?.id), (prev) =>
+        (prev ?? []).map((n) => (n.id === id ? { ...n, special } : n)),
       )
       return { previous }
     },
