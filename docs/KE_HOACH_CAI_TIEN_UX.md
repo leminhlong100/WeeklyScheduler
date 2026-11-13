@@ -455,12 +455,12 @@ làm mặc định thay cho `DEFAULT_CURRENCY` cố định (`QuickAddSheet.tsx:
 - [x] **B2** token màu theo theme, ≥ 4.5:1, xoá 7 màu viết cứng
 - [x] **B3** thuật ngữ, nhãn theo kind, lỗi zod i18n
 - [x] **B4** vùng chạm 44px, ô AI 16px, ARIA
-- [ ] **C1** tháng + tab vào URL
-- [ ] **C2** `ExpenseBottomNav` + sidebar desktop
-- [ ] **C3** Tổng quan: `SpendableCard`, `BudgetProgressList`, Sắp tới, Gần đây, trạng thái trống
-- [ ] **C4** Giao dịch: thanh kết quả lọc, nhãn ngày, nhóm Sắp tới, Quá hạn, tìm số tiền
-- [ ] **C5** Báo cáo gộp biểu đồ tròn, xoá `ExpenseStatsDialog`
-- [ ] **C6** tab Thêm, xoá hàng 5 icon
+- [x] **C1** tháng + tab vào URL
+- [x] **C2** `ExpenseBottomNav` + sidebar desktop
+- [x] **C3** Tổng quan: `SpendableCard`, `BudgetProgressList`, Sắp tới, Gần đây, trạng thái trống
+- [x] **C4** Giao dịch: thanh kết quả lọc, nhãn ngày, nhóm Sắp tới, Quá hạn, tìm số tiền
+- [x] **C5** Báo cáo gộp biểu đồ tròn, xoá `ExpenseStatsDialog`
+- [x] **C6** tab Thêm, xoá hàng 5 icon
 - [ ] **D1** bảng Thêm giao dịch: tự focus, lưới danh mục, chip ngày, nhớ lựa chọn, Lưu & thêm tiếp
 - [ ] **D2** hoàn tác cho xoá / đã trả / thêm; `ConfirmDialog` thay 7 `window.confirm`
 - [ ] **D3** bấm cả hàng để sửa, cột tiền thẳng hàng
@@ -485,3 +485,5 @@ làm mặc định thay cho `DEFAULT_CURRENCY` cố định (`QuickAddSheet.tsx:
 - 2026-11-13 — B3 xong: thuật ngữ (giao dịch, Tiền tệ, Ngày, Đã trả/Đã nhận, lần lặp thay cho kỳ/chuỗi, Xoá thống nhất). Toast/tiêu đề theo kind. CSV thêm cột nhãn đã dịch, tên file theo locale. GIỮ 'Sức khỏe' của danh mục lịch tuần vì phải khớp tên seed trong DB.
 - 2026-11-13 — B4 xong: Button size='touch', Input/SelectTrigger/SelectItem cao 44px dưới sm (ảnh hưởng cả app, chỉ trên mobile), Chi/Thu là radiogroup, chip tiền 44px, ô AI 16px, lưới emoji 6 cột. Đo trên trang thử 375px: không còn ô/nút nào < 44px trong form và bảng nháp.
 - 2026-11-13 — **KIỂM CHỨNG ĐỢT B: ĐẠT** — 118 test (thêm test tương phản cho mọi theme), typecheck/lint(0 lỗi)/build sạch, kiểm trang thử 375px.
+- 2026-11-13 — Đợt C xong trong MỘT commit (các bước phụ thuộc nhau). Khác kế hoạch: (1) desktop dùng hàng tab ở đầu nội dung (ExpenseTopNav) thay vì đưa nav vào sidebar; (2) LedgerBar (chip sổ) giữ nguyên dưới header thay vì dropdown; (3) bảng Thêm giao dịch (AddTransactionSheet: AI | Nhập tay, nhớ chế độ) làm luôn ở đây vì nút ＋ cần nó. Logic con số chính ở utils/overview.ts (+test).
+- 2026-11-13 — **KIỂM CHỨNG ĐỢT C: ĐẠT** — 129 test, typecheck/lint(0 lỗi)/build sạch. Trang thử harness.html dựng ExpensesPage thật với dữ liệu giả nạp vào cache TanStack Query: Tổng quan ra 5.930.000 (=8.8tr−2.87tr), 329.444/ngày; 4 tab đổi URL đúng; ＋ mở sheet, Nhập tay tự focus ô tiền; chọn tháng 3 → ?m=2026-03, chip Về tháng này quay lại; desktop có tab trên + nút có chữ, không thanh dưới.
