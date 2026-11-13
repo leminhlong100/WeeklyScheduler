@@ -376,6 +376,10 @@ export const ja: Dictionary = {
   offlineNotice: 'オフライン · {time} 時点のデータ',
   dataUpdatedAtTime: '{time} に更新',
   refreshData: '再読み込み',
+  budgetCycleRange: '期間 {start} – {end}',
+  budgetCycleStartLabel: '予算期間の開始日',
+  budgetCycleStartHint:
+    '例：給料日が5日なら5を選ぶと、5日から翌月4日までが1期間になります。1を選ぶと暦月で計算します。',
   loadingLabel: '読み込み中…',
   expenseMonthTotal: '今月の合計',
   expenseYearTotal: '年間合計',

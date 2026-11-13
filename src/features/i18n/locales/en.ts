@@ -377,6 +377,10 @@ export const en: Dictionary = {
   offlineNotice: 'Offline · data from {time}',
   dataUpdatedAtTime: 'Updated at {time}',
   refreshData: 'Refresh',
+  budgetCycleRange: 'Period {start} – {end}',
+  budgetCycleStartLabel: 'Budget period starts on day',
+  budgetCycleStartHint:
+    'E.g. paid on the 5th? Pick 5: the period runs from the 5th to the 4th of next month. Pick 1 for calendar months.',
   loadingLabel: 'Loading…',
   expenseMonthTotal: 'Month total',
   expenseYearTotal: 'Year total',

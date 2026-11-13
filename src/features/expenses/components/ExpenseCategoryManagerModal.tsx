@@ -14,6 +14,44 @@ import { KINDS } from '../schemas/expenseSchema'
 import type { ExpenseCategory } from '../api/expenseCategoriesApi'
 import { ExpenseCategoryRow } from './ExpenseCategoryRow'
 import { ExpenseCategoryEditForm } from './ExpenseCategoryEditForm'
+import { useCurrentLedger } from '../LedgerContext'
+import { useBudgetCycleStartDay } from '../hooks/useBudgetCycle'
+import { MAX_BUDGET_CYCLE_START_DAY } from '../utils/month'
+
+const CYCLE_DAYS = Array.from({ length: MAX_BUDGET_CYCLE_START_DAY }, (_, i) => i + 1)
+
+/** Ngày bắt đầu kỳ hạn mức — vd. lương về ngày 5 thì kỳ là 5 → 4 tháng sau. */
+function BudgetCycleField() {
+  const { t } = useTranslation()
+  const { theme } = useTheme()
+  const { startDay, setStartDay, saving } = useBudgetCycleStartDay()
+  return (
+    <div
+      className="flex flex-col gap-1.5 rounded-[14px] border-[1.5px] p-3"
+      style={{ borderColor: theme.border }}
+    >
+      <label className="flex items-center justify-between gap-3 text-[13px] font-extrabold">
+        <span>{t.budgetCycleStartLabel}</span>
+        <select
+          value={startDay}
+          disabled={saving}
+          onChange={(e) => setStartDay(Number(e.target.value))}
+          className="min-h-11 rounded-[10px] border-[1.5px] px-3 text-[15px] font-bold tabular-nums"
+          style={{ background: theme.inputBg, borderColor: theme.border, color: theme.text }}
+        >
+          {CYCLE_DAYS.map((d) => (
+            <option key={d} value={d}>
+              {d}
+            </option>
+          ))}
+        </select>
+      </label>
+      <p className="text-[12px] font-semibold" style={{ color: theme.mutedText }}>
+        {t.budgetCycleStartHint}
+      </p>
+    </div>
+  )
+}
 
 interface ExpenseCategoryManagerModalProps {
   open: boolean
@@ -32,6 +70,7 @@ export function ExpenseCategoryManagerModal({
   const { data: categories = [] } = useExpenseCategories()
   const deleteCategory = useDeleteExpenseCategory()
   const [editTarget, setEditTarget] = useState<EditTarget>(null)
+  const { ledgerId } = useCurrentLedger()
 
   const close = () => {
     setEditTarget(null)
@@ -102,6 +141,9 @@ export function ExpenseCategoryManagerModal({
                 </p>
               )}
             </div>
+            {/* Hạn mức là của sổ cá nhân (sổ chung xem số dư quỹ), nên kỳ của
+                nó cũng chỉ chỉnh ở đây. */}
+            {ledgerId === null && <BudgetCycleField />}
             <Button
               size="touch"
               type="button"

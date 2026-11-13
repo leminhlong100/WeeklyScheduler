@@ -28,6 +28,39 @@ export function monthRange(month: MonthKey): { startISO: string; endExclusiveISO
   }
 }
 
+export interface DateRange {
+  startISO: string
+  endExclusiveISO: string
+}
+
+/** Ngày bắt đầu kỳ hạn mức lớn nhất: tháng nào cũng có ngày 28. */
+export const MAX_BUDGET_CYCLE_START_DAY = 28
+
+/**
+ * Giá trị từ DB về số hợp lệ. Cột chưa có (DB chưa chạy migration 0016) hay
+ * giá trị lạ thì về 1 — tức tính theo tháng dương lịch như trước.
+ */
+export function normalizeCycleStartDay(value: unknown): number {
+  const n = Math.trunc(Number(value))
+  return n >= 1 && n <= MAX_BUDGET_CYCLE_START_DAY ? n : 1
+}
+
+/**
+ * Kỳ hạn mức ứng với tháng đang xem, khi kỳ bắt đầu vào ngày `startDay`
+ * (vd. lương về ngày 5 → kỳ 5/11 – 4/12 là "kỳ tháng 11").
+ *
+ * Riêng tháng hiện tại mà chưa tới ngày bắt đầu (hôm nay 3/11, kỳ bắt đầu
+ * ngày 5) thì kỳ đang chạy là 5/10 – 4/11: trang Tổng quan phải nói về kỳ
+ * mình đang tiêu, không phải kỳ chưa bắt đầu.
+ */
+export function budgetCycleRange(month: MonthKey, startDay: number, todayISO: string): DateRange {
+  if (startDay <= 1) return monthRange(month)
+  let start = dayjs(`${month}-01`).date(startDay)
+  const today = dayjs(todayISO)
+  if (toMonthKey(today) === month && today.date() < startDay) start = start.subtract(1, 'month')
+  return { startISO: toISODate(start), endExclusiveISO: toISODate(start.add(1, 'month')) }
+}
+
 /**
  * Ngày trong tháng của hôm nay, nếu `month` đúng là tháng đang diễn ra — dùng
  * làm mốc cắt khi so sánh với tháng trước. `null` khi tháng đã kết thúc (hoặc

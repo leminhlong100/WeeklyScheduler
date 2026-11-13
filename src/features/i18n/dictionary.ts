@@ -413,6 +413,10 @@ export interface Dictionary {
   /** Dòng nhỏ dưới thẻ chính của Tổng quan: "Cập nhật lúc {time}". */
   dataUpdatedAtTime: string
   refreshData: string
+  /** Kỳ hạn mức không theo tháng: "Kỳ {start} – {end}". */
+  budgetCycleRange: string
+  budgetCycleStartLabel: string
+  budgetCycleStartHint: string
   loadingLabel: string
   expenseMonthTotal: string
   expenseYearTotal: string

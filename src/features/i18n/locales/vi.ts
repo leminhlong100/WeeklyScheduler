@@ -376,6 +376,10 @@ export const vi: Dictionary = {
   offlineNotice: 'Đang ngoại tuyến · dữ liệu lúc {time}',
   dataUpdatedAtTime: 'Cập nhật lúc {time}',
   refreshData: 'Làm mới',
+  budgetCycleRange: 'Kỳ {start} – {end}',
+  budgetCycleStartLabel: 'Kỳ hạn mức bắt đầu ngày',
+  budgetCycleStartHint:
+    'Vd. lương về ngày 5 thì chọn 5: kỳ chạy từ ngày 5 tới ngày 4 tháng sau. Chọn 1 để tính theo tháng.',
   loadingLabel: 'Đang tải…',
   expenseMonthTotal: 'Tổng tháng',
   expenseYearTotal: 'Tổng năm',

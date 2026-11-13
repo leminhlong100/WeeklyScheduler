@@ -2,6 +2,10 @@ import { describe, expect, it } from 'vitest'
 import type { Expense } from '../api/expensesApi'
 import type { ExpenseCategory } from '../api/expenseCategoriesApi'
 import { buildBudgetProgress, computeSpendable, isOverdue, upcomingPlanned } from './overview'
+import { budgetCycleRange, monthRange, normalizeCycleStartDay } from './month'
+
+const NOV = monthRange('2026-11')
+const OCT = monthRange('2026-10')
 
 let n = 0
 const e = (p: Partial<Expense>): Expense =>
@@ -45,7 +49,7 @@ const salary = c({ id: 'salary', kind: 'income', monthly_budget: null })
 
 describe('computeSpendable', () => {
   it('chưa có hạn mức → mode balance', () => {
-    expect(computeSpendable([], [fun, salary], '2026-11', '2026-11-13').mode).toBe('balance')
+    expect(computeSpendable([], [fun, salary], NOV, '2026-11-13').mode).toBe('balance')
   })
 
   it('còn được tiêu = Σ hạn mức − đã trả trong các danh mục đó (VND)', () => {
@@ -57,7 +61,7 @@ describe('computeSpendable', () => {
       e({ category_id: 'food', amount: 300_000, status: 'planned', spent_at: '2026-11-20' }),
       e({ category_id: 'salary', kind: 'income', amount: 15_000_000 }),
     ]
-    const s = computeSpendable(data, [food, move, fun, salary], '2026-11', '2026-11-13')
+    const s = computeSpendable(data, [food, move, fun, salary], NOV, '2026-11-13')
     expect(s).toMatchObject({
       mode: 'budget',
       budgetTotal: 4_000_000,
@@ -70,7 +74,7 @@ describe('computeSpendable', () => {
   })
 
   it('tháng khác tháng hiện tại → không có tiền/ngày', () => {
-    const s = computeSpendable([], [food], '2026-10', '2026-11-13')
+    const s = computeSpendable([], [food], OCT, '2026-11-13')
     expect(s.mode === 'budget' && s.perDay).toBeNull()
   })
 
@@ -78,7 +82,7 @@ describe('computeSpendable', () => {
     const s = computeSpendable(
       [e({ category_id: 'move', amount: 1_500_000 })],
       [move],
-      '2026-11',
+      NOV,
       '2026-11-30',
     )
     expect(s).toMatchObject({ remaining: -500_000, perDay: 0, daysLeft: 1 })
@@ -115,5 +119,58 @@ describe('upcomingPlanned', () => {
     )
     expect(list.map((x) => x.note)).toEqual(['a', 'b'])
     expect(isOverdue(list[0], '2026-11-13')).toBe(true)
+  })
+})
+
+describe('kỳ hạn mức', () => {
+  it('ngày 1 = tháng dương lịch', () => {
+    expect(budgetCycleRange('2026-11', 1, '2026-11-14')).toEqual(NOV)
+  })
+
+  it('lương ngày 5: kỳ tháng 11 là 5/11 – 4/12', () => {
+    expect(budgetCycleRange('2026-11', 5, '2026-11-14')).toEqual({
+      startISO: '2026-11-05',
+      endExclusiveISO: '2026-12-05',
+    })
+  })
+
+  it('tháng hiện tại nhưng chưa tới ngày bắt đầu → kỳ đang chạy là kỳ trước', () => {
+    expect(budgetCycleRange('2026-11', 5, '2026-11-03')).toEqual({
+      startISO: '2026-10-05',
+      endExclusiveISO: '2026-11-05',
+    })
+  })
+
+  it('kỳ qua năm mới', () => {
+    expect(budgetCycleRange('2026-12', 25, '2027-03-01')).toEqual({
+      startISO: '2026-12-25',
+      endExclusiveISO: '2027-01-25',
+    })
+  })
+
+  it('giá trị lạ về 1', () => {
+    expect([undefined, 0, 29, 'x', 5].map(normalizeCycleStartDay)).toEqual([1, 1, 1, 1, 5])
+  })
+
+  it('chỉ tính khoản trong kỳ, đếm ngày tới hết kỳ', () => {
+    const cycle = budgetCycleRange('2026-11', 5, '2026-11-14')
+    const s = computeSpendable(
+      [
+        e({ category_id: 'food', amount: 100_000, spent_at: '2026-11-04' }), // kỳ trước
+        e({ category_id: 'food', amount: 200_000, spent_at: '2026-11-05' }),
+        e({ category_id: 'food', amount: 300_000, spent_at: '2026-12-04' }),
+        e({ category_id: 'food', amount: 400_000, spent_at: '2026-12-05' }), // kỳ sau
+      ],
+      [food],
+      cycle,
+      '2026-11-14',
+    )
+    expect(s).toMatchObject({ spent: 500_000, daysLeft: 21 }) // 14/11 → 4/12
+    const rows = buildBudgetProgress(
+      [e({ category_id: 'food', amount: 1, spent_at: '2026-11-01' })],
+      [food],
+      cycle,
+    )
+    expect(rows[0].spent).toBe(0)
   })
 })

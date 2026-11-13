@@ -3,7 +3,7 @@ import type { Expense } from '../api/expensesApi'
 import type { ExpenseCategory } from '../api/expenseCategoriesApi'
 import { DEFAULT_CURRENCY } from '../schemas/expenseSchema'
 import { subtractAmounts, sumAmounts } from './money'
-import type { MonthKey } from './month'
+import type { DateRange } from './month'
 
 /**
  * Con số chính của trang Tổng quan.
@@ -25,7 +25,7 @@ export type Spendable =
       planned: number
       /** 0..∞, `spent / budgetTotal`. */
       usedRatio: number
-      /** Số ngày còn lại tính cả hôm nay; `null` khi không xem tháng hiện tại. */
+      /** Số ngày còn lại của kỳ, tính cả hôm nay; `null` khi kỳ đang xem không chứa hôm nay. */
       daysLeft: number | null
       /** `max(remaining, 0) / daysLeft`; `null` khi `daysLeft` null. */
       perDay: number | null
@@ -36,10 +36,17 @@ const isBudgeted = (c: ExpenseCategory) => c.kind === 'expense' && c.monthly_bud
 
 const inDefaultCurrency = (e: Expense) => e.currency === DEFAULT_CURRENCY && e.kind === 'expense'
 
+const inRange = (e: Expense, range: DateRange) =>
+  e.spent_at >= range.startISO && e.spent_at < range.endExclusiveISO
+
+/**
+ * `cycle` là kỳ hạn mức (xem `budgetCycleRange`) — trùng tháng dương lịch khi
+ * kỳ bắt đầu ngày 1. `expenses` phải phủ hết kỳ; dòng ngoài kỳ bị bỏ qua.
+ */
 export function computeSpendable(
   expenses: Expense[],
   categories: ExpenseCategory[],
-  month: MonthKey,
+  cycle: DateRange,
   todayISO: string,
 ): Spendable {
   const budgeted = categories.filter(isBudgeted)
@@ -47,16 +54,17 @@ export function computeSpendable(
 
   const ids = new Set(budgeted.map((c) => c.id))
   const rows = expenses.filter(
-    (e) => inDefaultCurrency(e) && e.category_id !== null && ids.has(e.category_id),
+    (e) =>
+      inDefaultCurrency(e) && inRange(e, cycle) && e.category_id !== null && ids.has(e.category_id),
   )
   const budgetTotal = sumAmounts(budgeted.map((c) => c.monthly_budget ?? 0))
   const spent = sumAmounts(rows.filter((e) => e.status === 'paid').map((e) => e.amount))
   const planned = sumAmounts(rows.filter((e) => e.status === 'planned').map((e) => e.amount))
   const remaining = subtractAmounts(budgetTotal, spent)
 
-  const today = dayjs(todayISO)
-  const isCurrent = today.format('YYYY-MM') === month
-  const daysLeft = isCurrent ? today.daysInMonth() - today.date() + 1 : null
+  // Tính cả hôm nay: còn bao nhiêu ngày (kể cả hôm nay) trước khi kỳ mới bắt đầu.
+  const isCurrent = todayISO >= cycle.startISO && todayISO < cycle.endExclusiveISO
+  const daysLeft = isCurrent ? dayjs(cycle.endExclusiveISO).diff(dayjs(todayISO), 'day') : null
   const perDay = daysLeft ? Math.floor(Math.max(remaining, 0) / daysLeft) : null
 
   return {
@@ -89,6 +97,8 @@ export interface BudgetProgressRow {
 export function buildBudgetProgress(
   expenses: Expense[],
   categories: ExpenseCategory[],
+  /** Kỳ hạn mức; bỏ trống thì tính mọi dòng được đưa vào. */
+  cycle?: DateRange,
 ): BudgetProgressRow[] {
   return categories
     .filter(isBudgeted)
@@ -97,7 +107,11 @@ export function buildBudgetProgress(
       const spent = sumAmounts(
         expenses
           .filter(
-            (e) => inDefaultCurrency(e) && e.status === 'paid' && e.category_id === category.id,
+            (e) =>
+              inDefaultCurrency(e) &&
+              e.status === 'paid' &&
+              e.category_id === category.id &&
+              (!cycle || inRange(e, cycle)),
           )
           .map((e) => e.amount),
       )

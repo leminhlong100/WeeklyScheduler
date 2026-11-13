@@ -4,11 +4,21 @@ import { useTranslation } from '@/features/i18n/LocaleContext'
 import { useTheme } from '@/features/theme/ThemeContext'
 import { translateExpenseCategoryName } from '@/features/i18n/defaultExpenseCategoryNames'
 import { formatMoney, formatPercent, formatSignedMoney } from '@/lib/utils/formatMoney'
-import { todayISO } from '@/lib/utils/date'
+import dayjs from 'dayjs'
+import { todayISO, toISODate } from '@/lib/utils/date'
 import type { Expense } from '../api/expensesApi'
 import type { ExpenseCategory } from '../api/expenseCategoriesApi'
 import { DEFAULT_CURRENCY } from '../schemas/expenseSchema'
-import { currentMonthKey, monthLabelParts, type MonthKey } from '../utils/month'
+import {
+  budgetCycleRange,
+  currentMonthKey,
+  monthLabelParts,
+  monthRange,
+  type DateRange,
+  type MonthKey,
+} from '../utils/month'
+import { useBudgetCycleStartDay } from '../hooks/useBudgetCycle'
+import { useExpensesInRange } from '../hooks/useExpenses'
 import { buildBudgetProgress, computeSpendable, upcomingPlanned } from '../utils/overview'
 import { summarizeByCurrency } from '../utils/totals'
 import { LedgerBalanceCard } from './LedgerBalanceCard'
@@ -58,7 +68,18 @@ export function OverviewTab({
     () => new Map(categories.map((c) => [c.id, c] as const)),
     [categories],
   )
-  const budgets = useMemo(() => buildBudgetProgress(expenses, categories), [expenses, categories])
+  // Kỳ hạn mức có thể vắt qua hai tháng (lương về ngày 5 → kỳ 5/11 – 4/12):
+  // khi đó tải riêng khoảng ngày của kỳ, còn trùng tháng thì dùng luôn dữ liệu
+  // tháng đang có. Sổ chung không có hạn mức nên không tải.
+  const { startDay } = useBudgetCycleStartDay()
+  const cycle = useMemo(() => budgetCycleRange(month, startDay, today), [month, startDay, today])
+  const cycleIsMonth = sameRange(cycle, monthRange(month))
+  const cycleQuery = useExpensesInRange(cycle, !ledgerId && !cycleIsMonth)
+  const cycleExpenses = cycleIsMonth ? expenses : cycleQuery.data
+  const budgets = useMemo(
+    () => (cycleExpenses ? buildBudgetProgress(cycleExpenses, categories, cycle) : []),
+    [cycleExpenses, categories, cycle],
+  )
   const upcoming = useMemo(() => upcomingPlanned(expenses, today), [expenses, today])
   const recent = useMemo(() => expenses.filter((e) => e.status === 'paid').slice(0, 5), [expenses])
 
@@ -77,6 +98,9 @@ export function OverviewTab({
         <SpendableCard
           month={month}
           expenses={expenses}
+          cycle={cycle}
+          cycleExpenses={cycleExpenses}
+          showCycle={!cycleIsMonth}
           categories={categories}
           onSetBudget={canEdit ? onOpenCategories : undefined}
         />
@@ -132,6 +156,16 @@ export function OverviewTab({
   )
 }
 
+const sameRange = (a: DateRange, b: DateRange) =>
+  a.startISO === b.startISO && a.endExclusiveISO === b.endExclusiveISO
+
+/** "5/11" / "11/5" / "11月5日" theo ngôn ngữ đang dùng. */
+const formatDayMonth = (iso: string, locale: string) =>
+  new Date(`${iso}T00:00:00`).toLocaleDateString(locale, { day: 'numeric', month: 'numeric' })
+
+/** Ngày cuối của kỳ (mốc cuối là nửa mở). */
+const lastDayOf = (range: DateRange) => toISODate(dayjs(range.endExclusiveISO).subtract(1, 'day'))
+
 function Section({
   title,
   action,
@@ -183,19 +217,28 @@ function Card({ children }: { children: ReactNode }) {
 function SpendableCard({
   month,
   expenses,
+  cycle,
+  cycleExpenses,
+  showCycle,
   categories,
   onSetBudget,
 }: {
   month: MonthKey
+  /** Dữ liệu tháng đang xem — cho dòng Thu/Chi và số dư tháng. */
   expenses: Expense[]
+  /** Kỳ hạn mức và dữ liệu của kỳ; `undefined` khi kỳ chưa tải xong. */
+  cycle: DateRange
+  cycleExpenses: Expense[] | undefined
+  /** Kỳ không trùng tháng dương lịch → ghi rõ khoảng ngày lên thẻ. */
+  showCycle: boolean
   categories: ExpenseCategory[]
   onSetBudget?: () => void
 }) {
   const { t, locale } = useTranslation()
   const { theme } = useTheme()
   const spendable = useMemo(
-    () => computeSpendable(expenses, categories, month, todayISO()),
-    [expenses, categories, month],
+    () => computeSpendable(cycleExpenses ?? [], categories, cycle, todayISO()),
+    [cycleExpenses, categories, cycle],
   )
   const summaries = useMemo(() => summarizeByCurrency(expenses), [expenses])
   const main = summaries.find((s) => s.currency === DEFAULT_CURRENCY) ?? summaries[0]
@@ -215,6 +258,13 @@ function SpendableCard({
         <div className="flex items-start justify-between gap-2">
           <div className="text-[13px] font-bold" style={{ color: theme.mutedText }}>
             {over ? t.spendableOver : t.spendableTitle}
+            {showCycle && (
+              <span className="block text-[12px] font-semibold">
+                {t.budgetCycleRange
+                  .replace('{start}', formatDayMonth(cycle.startISO, locale))
+                  .replace('{end}', formatDayMonth(lastDayOf(cycle), locale))}
+              </span>
+            )}
           </div>
           <EyeToggle />
         </div>
@@ -222,9 +272,13 @@ function SpendableCard({
           className="font-heading text-[34px] leading-tight font-extrabold tabular-nums"
           style={{ color: over ? theme.danger : theme.text }}
         >
-          <MaskedAmount scope="month">
-            {formatSignedMoney(spendable.remaining, DEFAULT_CURRENCY, locale, 'auto')}
-          </MaskedAmount>
+          {cycleExpenses ? (
+            <MaskedAmount scope="month">
+              {formatSignedMoney(spendable.remaining, DEFAULT_CURRENCY, locale, 'auto')}
+            </MaskedAmount>
+          ) : (
+            '…'
+          )}
         </div>
         {spendable.perDay !== null && spendable.daysLeft !== null && !over && (
           <div className="text-[13.5px] font-bold" style={{ color: theme.text }}>

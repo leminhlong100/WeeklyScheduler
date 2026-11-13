@@ -3,7 +3,7 @@ import type { QueryKey } from '@tanstack/react-query'
 import { useAuth } from '@/features/auth/AuthContext'
 import { listExpensesInRange } from '../api/expensesApi'
 import { ledgerCacheKey, useCurrentLedger } from '../LedgerContext'
-import { monthRange, type MonthKey } from '../utils/month'
+import { monthRange, type DateRange, type MonthKey } from '../utils/month'
 
 /**
  * Tháng nằm trong key: mỗi tháng là một entry cache riêng, nên chuyển tháng qua
@@ -45,6 +45,31 @@ export function useExpensesForMonth(month: MonthKey) {
     queryFn: () => listExpensesInRange({ ownerId: ownerId!, ledgerId }, startISO, endExclusiveISO),
     placeholderData: keepWithinLedger(ledgerCacheKey(ledgerId)),
     enabled: !!user && !!ownerId,
+  })
+}
+
+/**
+ * Một khoảng ngày bất kỳ — dùng cho kỳ hạn mức không trùng tháng dương lịch
+ * (vd. 5/11 – 4/12 vắt qua hai tháng). Key vẫn dưới tiền tố
+ * `['expenses', userId]` nên mọi mutation đều invalidate nó.
+ */
+export function useExpensesInRange(range: DateRange, enabled = true) {
+  const { user } = useAuth()
+  const { ledgerId, ownerId } = useCurrentLedger()
+
+  return useQuery({
+    queryKey: [
+      'expenses',
+      user?.id,
+      ledgerCacheKey(ledgerId),
+      'range',
+      range.startISO,
+      range.endExclusiveISO,
+    ] as const,
+    queryFn: () =>
+      listExpensesInRange({ ownerId: ownerId!, ledgerId }, range.startISO, range.endExclusiveISO),
+    placeholderData: keepWithinLedger(ledgerCacheKey(ledgerId)),
+    enabled: enabled && !!user && !!ownerId,
   })
 }
 

@@ -82,6 +82,8 @@ export interface Database {
            * a hard-coded default. Always written in the same patch as `theme`.
            */
           custom_theme_id: string | null
+          /** Ngày bắt đầu kỳ hạn mức, 1–28 (1 = theo tháng dương lịch). */
+          budget_cycle_start_day: number
           created_at: string
           updated_at: string
         }
@@ -92,6 +94,7 @@ export interface Database {
           locale?: Locale
           theme?: ThemeKey
           custom_theme_id?: string | null
+          budget_cycle_start_day?: number
         }
         Update: {
           display_name?: string
@@ -99,6 +102,7 @@ export interface Database {
           locale?: Locale
           theme?: ThemeKey
           custom_theme_id?: string | null
+          budget_cycle_start_day?: number
         }
         Relationships: []
       }

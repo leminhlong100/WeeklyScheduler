@@ -4,6 +4,7 @@ import { formatSignedMoney } from '@/lib/utils/formatMoney'
 import { useLedgerBalance } from '../hooks/useLedgers'
 import { subtractAmounts } from '../utils/money'
 import { MaskedAmount } from './MaskedAmount'
+import { EyeToggle } from './EyeToggle'
 
 /**
  * Số dư của cả sổ từ ngày đầu tới nay — câu hỏi chính khi giữ tiền hộ: "tiền
@@ -22,8 +23,13 @@ export function LedgerBalanceCard({ ledgerId }: { ledgerId: string }) {
       className="flex flex-col gap-2.5 rounded-[18px] border-[1.5px] px-4 py-3.5"
       style={{ borderColor: theme.accent, background: theme.chip }}
     >
-      <div className="text-[12px] font-extrabold" style={{ color: theme.mutedText }}>
-        {t.ledgerBalanceTitle}
+      {/* Sổ chung thay thẻ "Còn được tiêu" bằng thẻ này, nên nút con mắt duy
+          nhất của trang phải đi theo — không thì ở sổ chung không ẩn số được. */}
+      <div className="flex items-start justify-between gap-2">
+        <div className="text-[12px] font-extrabold" style={{ color: theme.mutedText }}>
+          {t.ledgerBalanceTitle}
+        </div>
+        <EyeToggle />
       </div>
 
       {balances.length === 0 ? (
