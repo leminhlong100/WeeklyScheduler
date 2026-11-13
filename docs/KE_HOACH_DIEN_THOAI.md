@@ -5,8 +5,8 @@
 > 1. Làm trên nhánh **`feat/ux-overhaul`** (`git switch feat/ux-overhaul`). Không làm trên `main`, không push.
 > 2. Đây là kế hoạch **tiếp sau** `KE_HOACH_CAI_TIEN_UX.md` (Đợt A–D đã xong). Không đổi các
 >    "Quyết định đã chốt" ở mục 0 của tài liệu đó.
-> 3. **Chưa làm bước nào.** Trước khi bắt đầu, đọc mục 4 "Câu hỏi cho chủ repo": một số bước
->    (M1.2, M1.5, M2.1, Đợt M4) phụ thuộc câu trả lời hoặc kết quả thử trên máy thật.
+> 3. **Đã làm M1.1, M1.2 (phần harness), M1.3, M1.4, M1.6, M2.2 (bước 1–4), M3.1, M3.2, M3.5** — xem mục
+>    "Trạng thái cuối" ở cuối file. Còn chờ: M1.5 (Q6), M2.1 (Q7), M3.3 (Q8), M3.4, Đợt M4 (Q9), và thử trên máy thật.
 > 4. Xong mỗi bước: `npm test && npm run typecheck && npm run lint && npm run build`, đánh dấu
 >    `[x]` ở Checklist, ghi 1–3 dòng vào Nhật ký, `git commit` (một commit mỗi bước, message tiếng Anh).
 > 5. Không sửa DB, không tạo migration trước Đợt M4 (và M4 cần chủ repo duyệt).
@@ -425,3 +425,47 @@ nếu cấu hình sai, khiến app không mở được offline). Thông báo ph
 - [TanStack Query — Network Mode](https://tanstack.com/query/latest/docs/framework/react/guides/network-mode)
 - vite-plugin-pwa: [Periodic SW updates](https://vite-pwa-org.netlify.app/guide/periodic-sw-updates.html), [injectManifest](https://vite-pwa-org.netlify.app/guide/inject-manifest.html)
 - Lịch gửi: [Supabase Cron](https://supabase.com/docs/guides/cron), [Netlify Scheduled Functions](https://docs.netlify.com/functions/scheduled-functions/)
+
+---
+
+## Trạng thái cuối (2026-11-13, nhánh `feat/ux-overhaul`, chưa push)
+
+**Câu trả lời của chủ repo lúc làm:** Q2, Q6, Q7 còn trống → **không làm M1.5, M2.1**; M1.2 làm phần harness.
+Không làm M3.3, M3.4, Đợt M4 (chờ chủ repo quyết).
+
+| Bước | Trạng thái | Commit |
+|---|---|---|
+| M1.1 Back đóng sheet/drawer/hộp xác nhận | ✅ Xong trên harness | `057bb95` |
+| M1.3 Ẩn thanh dưới khi bàn phím mở | ✅ Xong trên harness | `30103c9` |
+| M1.4 Lưu offline: báo ngay, giữ form | ✅ Xong trên harness | `292b7b1` |
+| M1.6 Kiểm tra bản mới khi quay lại từ nền | ✅ Xong trên `vite preview` | `8ffadcb` |
+| M1.2 Sheet khung cố định + `visualViewport` | ⚠️ Phần harness xong, **chưa xác nhận trên iPhone** (chưa đánh [x]) | `10eb47f` |
+| M2.2 Danh sách dài | ⚠️ Bước 1–4 xong; gõ phím đạt (ước tính), **chuyển tab ước tính chưa đạt** < 200 ms ở throttle 6× (chưa đánh [x]) | `9bc3056` |
+| M3.1 Lối tắt "Thêm giao dịch" + `?add=1` | ✅ Xong trên harness + manifest build. **Icon 96×96 là bản thu nhỏ tạm** của `icon-192.png` | `b9d93c5` |
+| M3.2 Rung nhẹ khi lưu | ✅ Xong trên harness (đường "Đã trả"; đường "thêm" dùng cùng hàm) | `2d5b1d2` |
+| M3.5 "Cập nhật lúc … · Làm mới" | ✅ Xong trên harness | `3d1ce21` |
+| M1.5, M2.1 | ⏸ Không làm — Q6, Q7 chưa trả lời | — |
+| M3.3, M3.4, M4 | ⏸ Không làm — ngoài phạm vi lần này | — |
+
+**Giới hạn của lần kiểm này:** pane trình duyệt bị ẩn nên trang không có focus hệ thống và không tự bắn `resize`;
+các sự kiện `focusin`/`focusout`/`resize` ở M1.3 và M1.2 được bắn tay sau khi đổi viewport. Không bật được CPU throttle
+của DevTools, nên số đo M2.2 là không throttle (đã đo cả dev lẫn bản build). Harness không có Supabase/user: M1.4, M3.2, M3.5
+giả `fetch` / `supabase.rest.fetch`.
+
+### Việc chủ repo cần thử trên máy thật
+
+**Android (Chrome, PWA đã cài và trong trình duyệt):**
+1. **M1.1** — Mở ＋, Sửa, menu ☰, Danh mục → Xoá (hộp xác nhận): bấm Back cứng / vuốt Back → chỉ lớp trên cùng đóng, **không thoát app**. Đổi tab rồi Back → về tab trước.
+2. **M1.3** — Tab Giao dịch, chạm ô tìm → thanh dưới biến mất trong lúc gõ, đóng bàn phím → hiện lại.
+3. **M1.4** — Bản build + đăng nhập: bật chế độ máy bay → ＋ → Nhập tay → Lưu → trong ≤ 2 giây có toast "…chưa được lưu…", số tiền còn trong ô. Tắt chế độ máy bay → Lưu → DB có **đúng 1** dòng.
+4. **M1.6** — Deploy bản A, mở PWA, đưa xuống nền; deploy bản B; mở lại sau hơn 1 giờ → toast "Có bản mới" hiện mà không phải tắt hẳn app.
+5. **M2.2** — Tháng có nhiều giao dịch (hoặc `harness/perf.html?n=500` qua `npm run dev -- --host`): chuyển sang tab Giao dịch và gõ ô tìm có khựng không. Nếu cần số: Chrome remote DevTools → Performance. Chuyển tab > 200 ms thì quyết có làm bước 5 (ảo hoá) không.
+6. **M3.1** — Nhấn giữ icon app → thấy "Thêm giao dịch" → chạm → mở thẳng form; Back đóng form, không mở lại. (Có thể phải gỡ/cài lại PWA để Android đọc manifest mới.) Thay `public/icons/shortcut-add-96.png` bằng icon riêng nếu muốn.
+7. **M3.2** — Lưu một khoản / bấm "Đã trả" → cảm thấy rung nhẹ; lỗi thì không rung. (Q10: có cần nút tắt?)
+
+**iPhone (Safari và PWA đã thêm vào màn hình chính):**
+1. **M1.2 (quan trọng nhất)** — ＋ → Nhập tay, gõ số → **nút Lưu nằm ngay trên bàn phím**, bấm được mà không đóng bàn phím. Mở Sửa một dòng, gõ Ghi chú → ô ghi chú và nút Lưu đều thấy. Kéo quá đầu/cuối sheet → sheet không nảy cả khối. Nếu sheet nhảy lung tung: phương án dự phòng là đưa nút Lưu lên đầu sheet trên iOS (xem M1.2 "Rủi ro").
+2. **M1.1** — Vuốt từ mép trái khi sheet đang mở (PWA) → sheet đóng hay app quay trang? (Q4)
+3. **M1.3** — Chạm ô tìm → thanh dưới ẩn (iOS dựa vào `visualViewport`).
+4. **M3.2** — Lưu không lỗi gì (iOS không rung).
+5. **M3.5** — Dòng "Cập nhật lúc … · Làm mới" dưới thẻ chính, bấm Làm mới → giờ đổi.
