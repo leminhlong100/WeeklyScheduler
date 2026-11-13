@@ -3,6 +3,7 @@ import { useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import { useTranslation } from '@/features/i18n/LocaleContext'
 import { describeError } from '@/lib/utils/errorMessage'
+import { haptic } from '@/lib/utils/haptic'
 import { deleteExpense } from '../api/expensesApi'
 import type { Expense } from '../api/expensesApi'
 import { useUpdateExpense } from './useExpenseMutations'
@@ -91,7 +92,8 @@ export function useUndoableActions() {
       updateExpense(
         { id: expense.id, patch: { status: 'paid' } },
         {
-          onSuccess: () =>
+          onSuccess: () => {
+            haptic()
             toast.success(
               expense.kind === 'income' ? t.incomeMarkedReceived : t.expenseMarkedPaid,
               {
@@ -101,7 +103,8 @@ export function useUndoableActions() {
                   onClick: () => updateExpense({ id: expense.id, patch: { status: 'planned' } }),
                 },
               },
-            ),
+            )
+          },
           onError: (error) => toast.error(describeError(t, error)),
         },
       )
@@ -112,6 +115,8 @@ export function useUndoableActions() {
   /** Toast "đã thêm" có Hoàn tác = xoá đúng các dòng vừa tạo. */
   const announceCreated = useCallback(
     (message: string, created: Pick<Expense, 'id'>[]) => {
+      // Chỉ gọi sau khi đã lưu xong — rung là "đã vào sổ", không phải "đã bấm".
+      haptic()
       toast.success(message, {
         duration: UNDO_MS,
         action: {

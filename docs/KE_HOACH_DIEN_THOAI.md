@@ -347,7 +347,7 @@ nếu cấu hình sai, khiến app không mở được offline). Thông báo ph
 - [ ] **M2.1** Mở app vào thẳng Chi tiêu (chờ Q7)
 - [ ] **M2.2** Danh sách dài: đo → `memo` → `useDeferredValue` → `content-visibility` — *bước 1–4 đã làm; tiêu chí chuyển tab < 200 ms ở throttle 6× **ước tính chưa đạt**, xem Nhật ký*
 - [x] **M3.1** Manifest `shortcuts` + `?add=1`
-- [ ] **M3.2** Rung nhẹ khi lưu (Android)
+- [x] **M3.2** Rung nhẹ khi lưu (Android)
 - [ ] **M3.3** Web Share Target cho SMS ngân hàng (chờ Q8)
 - [ ] **M3.4** Vuốt trái để xoá
 - [ ] **M3.5** "Cập nhật lúc … · Làm mới"
@@ -402,6 +402,10 @@ nếu cấu hình sai, khiến app không mở được offline). Thông báo ph
   đẩy mục lịch sử) rồi mở sheet. `harness.html?tab=report&add=1` → sheet mở, URL `?tab=report`, Back đóng sheet và không mở lại.
   **Icon tạm:** `public/icons/shortcut-add-96.png` chỉ là `icon-192.png` thu nhỏ (chưa có dấu ＋) — chủ repo nên thay bằng icon riêng.
   Cần chủ repo thử trên Android (PWA đã cài): nhấn giữ icon → "Thêm giao dịch" → mở thẳng form (có thể phải gỡ/cài lại PWA để Android nhận manifest mới).
+- 2026-11-13 — **M3.2 xong (harness).** `src/lib/utils/haptic.ts` (`navigator.vibrate?.(12)`, nuốt lỗi; có test), gọi trong `announceCreated` (thêm 1 khoản,
+  chuỗi định kỳ, bản nháp AI) và `onSuccess` của `markPaidWithUndo`. Harness (giả `navigator.vibrate` đếm, giả `supabase.rest.fetch`): "Đã trả" lỗi mạng →
+  **0** lần rung; "Đã trả" thành công → **1** lần (`12`). Đường "thêm khoản" không thử được trên harness (không có user) — cùng hàm, có unit test.
+  Q10 chưa trả lời: bật mặc định, chưa có nút tắt. Cần chủ repo cảm nhận rung trên Android; iOS không rung, không lỗi.
 
 ---
 
