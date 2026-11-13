@@ -284,6 +284,7 @@ export const ja: Dictionary = {
   categoryDeleted: 'カテゴリを削除しました',
   somethingWentWrong: 'エラーが発生しました。もう一度お試しください',
   errNetwork: 'ネットワークに接続できません。接続を確認してもう一度お試しください。',
+  errNetworkNotSaved: 'ネットワークに接続できません — 取引はまだ保存されていません。接続が戻ったらもう一度お試しください。',
   errSessionExpired: 'セッションの有効期限が切れました。もう一度ログインしてください。',
   errDuplicate: 'すでに存在します（重複）。別の値を使ってください。',
   errReference: '関連する項目が存在しないか、他の場所で使用されています。',

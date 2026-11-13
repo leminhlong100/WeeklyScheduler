@@ -284,6 +284,7 @@ export const vi: Dictionary = {
   categoryDeleted: 'Đã xoá danh mục',
   somethingWentWrong: 'Có lỗi xảy ra, vui lòng thử lại',
   errNetwork: 'Không có kết nối mạng. Kiểm tra internet rồi thử lại.',
+  errNetworkNotSaved: 'Không có mạng — giao dịch chưa được lưu. Thử lại khi có mạng.',
   errSessionExpired: 'Phiên đăng nhập đã hết hạn. Hãy đăng nhập lại.',
   errDuplicate: 'Dữ liệu này đã tồn tại (bị trùng). Hãy dùng giá trị khác.',
   errReference: 'Mục liên quan không còn tồn tại hoặc đang được dùng ở nơi khác.',

@@ -229,7 +229,8 @@ export function ExpenseEditForm({
       }
       onDone()
     } catch (error) {
-      toast.error(describeError(t, error))
+      // Form không bị reset: số đã gõ còn nguyên để bấm Lưu lại.
+      toast.error(describeError(t, error, { network: t.errNetworkNotSaved }))
     }
   }
 

@@ -312,6 +312,8 @@ export interface Dictionary {
   categoryDeleted: string
   somethingWentWrong: string
   errNetwork: string
+  /** Lỗi mạng khi lưu giao dịch: nói rõ là CHƯA lưu. */
+  errNetworkNotSaved: string
   errSessionExpired: string
   errDuplicate: string
   errReference: string

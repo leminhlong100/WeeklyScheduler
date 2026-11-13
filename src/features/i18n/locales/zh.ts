@@ -283,6 +283,7 @@ export const zh: Dictionary = {
   categoryDeleted: '分类已删除',
   somethingWentWrong: '出错了，请重试',
   errNetwork: '没有网络连接，请检查网络后重试。',
+  errNetworkNotSaved: '没有网络 — 交易尚未保存。请在恢复网络后重试。',
   errSessionExpired: '登录已过期，请重新登录。',
   errDuplicate: '该内容已存在（重复），请使用其他值。',
   errReference: '相关项目已不存在，或正在其他地方使用。',

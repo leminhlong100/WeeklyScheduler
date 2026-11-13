@@ -341,7 +341,7 @@ nếu cấu hình sai, khiến app không mở được offline). Thông báo ph
 - [x] **M1.1** Back đóng sheet/drawer/hộp xác nhận (`useBackToClose`)
 - [ ] **M1.2** SheetDialog khung cố định + `visualViewport` cho iOS (cần iPhone để chốt)
 - [x] **M1.3** Ẩn thanh dưới khi bàn phím mở
-- [ ] **M1.4** Lưu offline báo ngay, giữ form (`networkMode: 'always'` + thông điệp)
+- [x] **M1.4** Lưu offline báo ngay, giữ form (`networkMode: 'always'` + thông điệp)
 - [ ] **M1.5** Bỏ cache Supabase REST trong SW (chờ Q6)
 - [ ] **M1.6** Kiểm tra bản mới khi app quay lại từ nền
 - [ ] **M2.1** Mở app vào thẳng Chi tiêu (chờ Q7)
@@ -371,6 +371,10 @@ nếu cấu hình sai, khiến app không mở được offline). Thông báo ph
 - 2026-11-13 — **M1.3 xong (harness).** `useKeyboardOpen()` trong `src/hooks/useVisualViewport.ts`, hàm thuần `src/lib/utils/viewport.ts` (có test).
   `harness.html?tab=transactions`: 812 + focus ô tìm → thanh dưới vẫn `flex`; thu còn 375×470 → `display: none`, vùng cuộn 348 → **405px**; blur → `flex`.
   Pane trình duyệt bị ẩn nên `resize`/`focusin`/`focusout` phải bắn tay (trang không có focus hệ thống). Cần chủ repo thử gõ ô tìm trên Android + iPhone.
+- 2026-11-13 — **M1.4 xong (harness).** `networkMode: 'always'` cho mọi mutation trong `useExpenseMutations.ts`; `isNetworkError()` (có test) +
+  `errNetworkNotSaved` đủ vi/en/ja/zh, dùng ở ExpenseEditForm + ParsedDraftList. Harness: giả offline (`fetch` reject `TypeError`, `navigator.onLine=false`,
+  bắn sự kiện `offline`) → Nhập tay 45.000 → Lưu → toast "…chưa được lưu…" sau **62 ms**, ô tiền vẫn `45.000`, nút Lưu bấm được. Harness không có user nên lỗi
+  đến từ `mutationFn` chứ không phải `fetch` thật. Cần chủ repo: bản build + đăng nhập, DevTools Offline → Lưu → bật mạng → Lưu → DB đúng 1 dòng.
 
 ---
 

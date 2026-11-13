@@ -285,6 +285,7 @@ export const en: Dictionary = {
   categoryDeleted: 'Category deleted',
   somethingWentWrong: 'Something went wrong, please try again',
   errNetwork: 'No network connection. Check your internet and try again.',
+  errNetworkNotSaved: 'No connection — the transaction was not saved. Try again when you are back online.',
   errSessionExpired: 'Your session has expired. Please sign in again.',
   errDuplicate: 'This already exists (duplicate). Use a different value.',
   errReference: 'The related item no longer exists or is in use elsewhere.',

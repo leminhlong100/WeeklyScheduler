@@ -117,7 +117,7 @@ export function ParsedDraftList({ draft, onChange, onDone, onSaved }: ParsedDraf
           announceCreated(t.expensesSavedCount.replace('{n}', String(created.length)), created)
           ;(onSaved ?? onDone)()
         },
-        onError: (error) => toast.error(describeError(t, error)),
+        onError: (error) => toast.error(describeError(t, error, { network: t.errNetworkNotSaved })),
       },
     )
   }

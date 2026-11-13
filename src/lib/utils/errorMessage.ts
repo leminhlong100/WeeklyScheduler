@@ -11,10 +11,27 @@ interface ErrorLike {
 export interface ErrorOverrides {
   /** Vi phạm unique, ví dụ "đã có danh mục tên này". */
   duplicate?: string
+  /** Lỗi mạng, ví dụ "giao dịch chưa được lưu". */
+  network?: string
 }
 
 const NETWORK_RE = /failed to fetch|networkerror|load failed|network request failed/i
 const MAX_DETAIL = 140
+
+/**
+ * Lỗi do không tới được máy chủ (mất mạng, DNS, CORS chặn…), không phải máy chủ
+ * từ chối. Dựa vào lỗi thật của `fetch` trước; cờ `navigator.onLine` chỉ là phụ
+ * vì trên iOS nó đôi khi báo sai.
+ */
+export function isNetworkError(
+  error: unknown,
+  online: boolean = typeof navigator === 'undefined' ? true : navigator.onLine,
+): boolean {
+  if (!online) return true
+  const e: ErrorLike = typeof error === 'object' && error !== null ? error : {}
+  const message = typeof e.message === 'string' ? e.message : ''
+  return NETWORK_RE.test(message)
+}
 
 /**
  * Đổi một lỗi bắt được thành câu nói thẳng NGUYÊN NHÂN để người dùng biết sửa
@@ -35,9 +52,7 @@ export function describeError(
   const status = typeof e.status === 'number' ? e.status : 0
   const message = typeof e.message === 'string' ? e.message : ''
 
-  if ((typeof navigator !== 'undefined' && !navigator.onLine) || NETWORK_RE.test(message)) {
-    return t.errNetwork
-  }
+  if (isNetworkError(error)) return overrides.network ?? t.errNetwork
 
   switch (code) {
     case '23505':
