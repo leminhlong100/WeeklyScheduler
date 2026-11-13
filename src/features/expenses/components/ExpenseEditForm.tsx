@@ -15,6 +15,7 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { FormField } from '@/components/form/FormField'
+import { MoneyInput } from '@/components/form/MoneyInput'
 import { useTranslation } from '@/features/i18n/LocaleContext'
 import { useTheme } from '@/features/theme/ThemeContext'
 import { translateExpenseCategoryName } from '@/features/i18n/defaultExpenseCategoryNames'
@@ -81,13 +82,14 @@ export function ExpenseEditForm({ expense, defaultDate, onDone }: ExpenseEditFor
   const {
     register,
     control,
-    formState: { errors },
+    formState: { errors, isSubmitting },
   } = form
 
   // useWatch chứ không phải form.watch: form.watch trả về một hàm không memo hoá
   // được, React Compiler thấy vậy là bỏ luôn việc memo cả component này.
   const kind = useWatch({ control, name: 'kind' })
   const repeatMonths = useWatch({ control, name: 'repeatMonths' })
+  const currency = useWatch({ control, name: 'currency' })
 
   // Danh mục thu và danh mục chi tách hẳn, nên bộ chọn chỉ hiện nhóm khớp kind
   // đang chọn — tránh gán "Lương" cho một khoản chi.
@@ -115,7 +117,7 @@ export function ExpenseEditForm({ expense, defaultDate, onDone }: ExpenseEditFor
     // Không đưa `status` vào đây: mỗi kỳ giữ trạng thái đã trả / chưa trả của
     // riêng nó, một bản vá chung cho cả chuỗi sẽ ghi đè hết.
     const shared = {
-      amount: parseAmount(values.amount),
+      amount: parseAmount(values.amount, values.currency),
       currency: values.currency,
       kind: values.kind,
       category_id: values.categoryId === NO_CATEGORY ? null : values.categoryId,
@@ -214,7 +216,10 @@ export function ExpenseEditForm({ expense, defaultDate, onDone }: ExpenseEditFor
     bulkCreate.isPending ||
     updateExpense.isPending ||
     updateSeries.isPending ||
-    deleteSeries.isPending
+    deleteSeries.isPending ||
+    // isPending chỉ bật SAU khi zodResolver (async) chạy xong; chạm đúp nhanh lọt
+    // vào khe đó sẽ tạo hai khoản. isSubmitting bật ngay từ lần bấm đầu.
+    isSubmitting
   const inputStyle = { background: theme.inputBg, borderColor: theme.border, color: theme.text }
   const contentStyle = { background: theme.modalBg, borderColor: theme.border, color: theme.text }
 
@@ -272,15 +277,27 @@ export function ExpenseEditForm({ expense, defaultDate, onDone }: ExpenseEditFor
             htmlFor="amount"
             error={translateFieldError(t, errors.amount?.message)}
           >
-            <Input
-              id="amount"
-              type="number"
-              inputMode="decimal"
-              step="any"
-              min="0"
-              placeholder={t.expenseAmountPh}
-              style={inputStyle}
-              {...register('amount')}
+            <Controller
+              control={control}
+              name="amount"
+              render={({ field }) => (
+                <MoneyInput
+                  id="amount"
+                  name={field.name}
+                  value={field.value}
+                  onChange={field.onChange}
+                  onBlur={field.onBlur}
+                  currency={currency}
+                  size="lg"
+                  showChips
+                  // Mở form thêm mới là để gõ số tiền: bật bàn phím số ngay.
+                  autoFocus={!isEdit}
+                  invalid={!!errors.amount}
+                  placeholder={t.expenseAmountPh}
+                  style={inputStyle}
+                  chipStyle={{ borderColor: theme.border, background: theme.chip, color: theme.text }}
+                />
+              )}
             />
           </FormField>
         </div>
@@ -342,7 +359,13 @@ export function ExpenseEditForm({ expense, defaultDate, onDone }: ExpenseEditFor
         htmlFor="note"
         error={translateFieldError(t, errors.note?.message)}
       >
-        <Input id="note" placeholder={t.expenseNotePh} style={inputStyle} {...register('note')} />
+        <Input
+          id="note"
+          maxLength={200}
+          placeholder={t.expenseNotePh}
+          style={inputStyle}
+          {...register('note')}
+        />
       </FormField>
 
       <FormField
@@ -454,6 +477,7 @@ export function ExpenseEditForm({ expense, defaultDate, onDone }: ExpenseEditFor
           type="button"
           variant="outline"
           onClick={onDone}
+          disabled={isPending}
           style={{ background: 'transparent', borderColor: theme.border, color: theme.text }}
         >
           {t.cancel}

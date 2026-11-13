@@ -5,6 +5,8 @@ import { describeError } from '@/lib/utils/errorMessage'
 import { GradientButton } from '@/components/common/GradientButton'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { MoneyInput } from '@/components/form/MoneyInput'
+import { translateFieldError } from '@/lib/utils/formErrors'
 import {
   Select,
   SelectContent,
@@ -18,7 +20,7 @@ import { translateExpenseCategoryName } from '@/features/i18n/defaultExpenseCate
 import type { Currency, ExpenseKind } from '@/lib/supabase/database.types'
 import { useExpenseCategories } from '../hooks/useExpenseCategories'
 import { useBulkCreateExpenses } from '../hooks/useExpenseMutations'
-import { parseAmount, CURRENCIES, KINDS } from '../schemas/expenseSchema'
+import { amountErrorKey, parseAmount, CURRENCIES, KINDS } from '../schemas/expenseSchema'
 import { statusForDate } from '../utils/status'
 import { NO_CATEGORY, type DraftRow, type ExpenseDraft } from '../utils/draft'
 
@@ -69,7 +71,7 @@ export function ParsedDraftList({ draft, onChange, onDone }: ParsedDraftListProp
 
   const removeRow = (key: string) => onChange(rows.filter((r) => r.key !== key))
 
-  const hasInvalidAmount = rows.some((r) => !(Number(r.amount) > 0))
+  const hasInvalidAmount = rows.some((r) => amountErrorKey(r.amount, r.currency) !== null)
   const canSave = rows.length > 0 && !hasInvalidAmount && !bulkCreate.isPending
 
   const saveAll = () => {
@@ -78,7 +80,7 @@ export function ParsedDraftList({ draft, onChange, onDone }: ParsedDraftListProp
       rows.map((r) => {
         const categoryId = resolveCategoryId(r)
         return {
-          amount: parseAmount(r.amount),
+          amount: parseAmount(r.amount, r.currency),
           currency: r.currency,
           kind: r.kind,
           category_id: categoryId === NO_CATEGORY ? null : categoryId,
@@ -125,6 +127,7 @@ export function ParsedDraftList({ draft, onChange, onDone }: ParsedDraftListProp
         {rows.map((row) => {
           const categoryOptions = optionsForKind(row.kind)
           const categoryValue = resolveCategoryId(row)
+          const amountError = amountErrorKey(row.amount, row.currency)
           return (
             <div
               key={row.key}
@@ -184,25 +187,25 @@ export function ParsedDraftList({ draft, onChange, onDone }: ParsedDraftListProp
                 })}
               </div>
 
-              <div className="flex gap-2">
-                <Input
-                  type="number"
-                  inputMode="decimal"
-                  step="any"
-                  min="0"
-                  aria-label={t.expenseAmount}
-                  value={row.amount}
-                  onChange={(e) => patchRow(row.key, { amount: e.target.value })}
-                  className="h-9 flex-1"
-                  style={inputStyle}
-                />
+              <div className="flex items-start gap-2">
+                <div className="min-w-0 flex-1">
+                  <MoneyInput
+                    aria-label={t.expenseAmount}
+                    value={row.amount}
+                    onChange={(next) => patchRow(row.key, { amount: next })}
+                    currency={row.currency}
+                    size="sm"
+                    invalid={amountError !== null}
+                    style={inputStyle}
+                  />
+                </div>
                 <Select
                   items={CURRENCIES.map((c) => ({ value: c, label: c }))}
                   value={row.currency}
                   onValueChange={(v) => patchRow(row.key, { currency: v as Currency })}
                 >
                   <SelectTrigger
-                    className="h-9 w-[88px]"
+                    className="h-11 w-[88px] sm:h-9"
                     style={inputStyle}
                     aria-label={t.expenseCurrency}
                   >
@@ -220,12 +223,17 @@ export function ParsedDraftList({ draft, onChange, onDone }: ParsedDraftListProp
                   type="button"
                   onClick={() => removeRow(row.key)}
                   aria-label={t.delete}
-                  className="grid h-9 w-9 flex-shrink-0 place-items-center rounded-lg transition-transform duration-150 active:scale-95"
+                  className="grid h-11 w-11 flex-shrink-0 place-items-center rounded-lg transition-transform duration-150 active:scale-95 sm:h-9 sm:w-9"
                   style={{ color: theme.muted }}
                 >
                   <Trash2Icon className="size-4" />
                 </button>
               </div>
+              {amountError && (
+                <p className="text-xs font-bold" style={{ color: theme.danger }}>
+                  {translateFieldError(t, amountError)}
+                </p>
+              )}
 
               <Input
                 aria-label={t.expenseNote}

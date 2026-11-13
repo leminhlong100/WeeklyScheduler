@@ -1,6 +1,7 @@
-import type { UseFormReturn } from 'react-hook-form'
+import { Controller, type UseFormReturn } from 'react-hook-form'
 import { Input } from '@/components/ui/input'
 import { FormField } from '@/components/form/FormField'
+import { MoneyInput } from '@/components/form/MoneyInput'
 import { ColorSwatches } from '@/components/form/ColorSwatches'
 import { useTranslation } from '@/features/i18n/LocaleContext'
 import { useTheme } from '@/features/theme/ThemeContext'
@@ -111,15 +112,22 @@ export function ExpenseCategoryFormFields({
           htmlFor="expenseCategoryBudget"
           error={translateFieldError(t, errors.monthlyBudget?.message)}
         >
-          <Input
-            id="expenseCategoryBudget"
-            type="number"
-            inputMode="decimal"
-            step="any"
-            min="0"
-            placeholder={t.expenseBudgetPh}
-            style={inputStyle}
-            {...register('monthlyBudget')}
+          <Controller
+            control={form.control}
+            name="monthlyBudget"
+            render={({ field }) => (
+              <MoneyInput
+                id="expenseCategoryBudget"
+                name={field.name}
+                value={field.value}
+                onChange={field.onChange}
+                onBlur={field.onBlur}
+                currency={DEFAULT_CURRENCY}
+                invalid={!!errors.monthlyBudget}
+                placeholder={t.expenseBudgetPh}
+                style={inputStyle}
+              />
+            )}
           />
         </FormField>
       )}

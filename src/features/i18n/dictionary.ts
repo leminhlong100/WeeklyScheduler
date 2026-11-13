@@ -383,6 +383,9 @@ export interface Dictionary {
   expenseUpdated: string
   expenseDeleted: string
   expenseAmountPositive: string
+  expenseAmountWhole: string
+  expenseAmountTooLarge: string
+  fieldTooLong: string
   /* Default expense categories seeded at signup (migration 0009). */
   defaultExpenseCategoryFood: string
   defaultExpenseCategoryTransport: string

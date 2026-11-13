@@ -9,7 +9,7 @@ import type { Locale } from '@/features/i18n/types'
 const FRACTION_DIGITS: Record<Currency, number> = { VND: 0, JPY: 0, USD: 2 }
 
 /** Locale của app -> BCP-47 để `Intl` chọn đúng dấu phân cách và vị trí ký hiệu. */
-const INTL_LOCALE: Record<Locale, string> = {
+export const INTL_LOCALE: Record<Locale, string> = {
   vi: 'vi-VN',
   en: 'en-US',
   zh: 'zh-CN',

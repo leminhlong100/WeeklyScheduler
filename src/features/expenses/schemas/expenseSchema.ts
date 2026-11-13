@@ -1,5 +1,6 @@
 import { z } from 'zod'
-import type { ExpenseKind } from '@/lib/supabase/database.types'
+import type { Currency, ExpenseKind } from '@/lib/supabase/database.types'
+import { parseMoneyInput } from '@/lib/utils/parseMoneyInput'
 
 export const CURRENCIES = ['VND', 'JPY', 'USD'] as const
 
@@ -16,14 +17,12 @@ export const DEFAULT_CURRENCY = 'VND' as const
 
 export const expenseSchema = z.object({
   /**
-   * Chuỗi chứ không phải number: `<input type="number">` trả '' khi rỗng, và
-   * `valueAsNumber` biến nó thành NaN — thông báo lỗi khi đó là "Expected number,
-   * received nan" thay vì "chưa nhập". Chuyển sang số ở `parseAmount`.
+   * Chuỗi do `<MoneyInput>` đẩy ra: chuỗi số thô ("30000") khi đọc được, hoặc
+   * nguyên chữ người dùng gõ khi chưa đọc được. Kiểm tra thật nằm ở
+   * `superRefine` bên dưới vì quy tắc phụ thuộc `currency` (VND/JPY không có
+   * số lẻ). Chuyển sang số ở `parseAmount`.
    */
-  amount: z
-    .string()
-    .min(1, 'fieldRequired')
-    .refine((v) => Number.isFinite(Number(v)) && Number(v) > 0, 'expenseAmountPositive'),
+  amount: z.string().min(1, 'fieldRequired'),
   currency: z.enum(CURRENCIES),
   /**
    * Tiền ra hay tiền vào. `amount` vẫn dương ở cả hai — dấu nằm ở đây, nên
@@ -31,20 +30,42 @@ export const expenseSchema = z.object({
    */
   kind: z.enum(KINDS),
   categoryId: z.string(),
-  note: z.string().max(200),
+  note: z.string().max(200, 'fieldTooLong'),
   spentAt: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'fieldRequired'),
   /**
    * Số kỳ khi TẠO MỚI: 1 = khoản lẻ, >1 = chuỗi định kỳ hàng tháng. Không dùng
    * khi sửa — sửa một kỳ đã có không đổi được độ dài chuỗi.
    */
   repeatMonths: z.number().int().min(1).max(24),
+}).superRefine((v, ctx) => {
+  const message = amountErrorKey(v.amount, v.currency)
+  if (message && v.amount !== '') ctx.addIssue({ code: 'custom', path: ['amount'], message })
 })
 
 export type ExpenseFormInput = z.infer<typeof expenseSchema>
 
-/** Làm tròn về 2 số lẻ, khớp `numeric(14,2)` của cột `amount`. */
-export function parseAmount(value: string): number {
-  return Math.round(Number(value) * 100) / 100
+/**
+ * Key lỗi i18n cho một ô tiền, `null` khi hợp lệ. Dùng chung cho form tay,
+ * bảng nháp AI (đánh dấu từng dòng) và ô hạn mức.
+ */
+export function amountErrorKey(
+  value: string,
+  currency: Currency,
+): 'fieldRequired' | 'expenseAmountPositive' | 'expenseAmountWhole' | 'expenseAmountTooLarge' | null {
+  if (value.trim() === '') return 'fieldRequired'
+  const r = parseMoneyInput(value, currency)
+  if (r.ok) return null
+  return r.error === 'whole'
+    ? 'expenseAmountWhole'
+    : r.error === 'tooLarge'
+      ? 'expenseAmountTooLarge'
+      : 'expenseAmountPositive'
+}
+
+/** Số tiền để ghi DB, khớp `numeric(14,2)`. NaN nếu không đọc được (schema đã chặn trước). */
+export function parseAmount(value: string, currency: Currency): number {
+  const r = parseMoneyInput(value, currency)
+  return r.ok ? r.value : Number.NaN
 }
 
 /** Lựa chọn độ dài chuỗi định kỳ. Trần 24 khớp với `max(24)` của schema. */
