@@ -18,7 +18,6 @@ interface ExpenseDayGroupProps {
   title?: string
   /** Bỏ trống khi chỉ được xem. */
   onEdit?: (expense: Expense) => void
-  onDelete?: (expense: Expense) => void
   onMarkPaid?: (expense: Expense) => void
 }
 
@@ -36,7 +35,6 @@ export function ExpenseDayGroup({
   isToday,
   title,
   onEdit,
-  onDelete,
   onMarkPaid,
 }: ExpenseDayGroupProps) {
   const { t, locale } = useTranslation()
@@ -124,7 +122,6 @@ export function ExpenseDayGroup({
             expense={expense}
             category={expense.category_id ? (categoryById.get(expense.category_id) ?? null) : null}
             onEdit={onEdit && (() => onEdit(expense))}
-            onDelete={onDelete && (() => onDelete(expense))}
             onMarkPaid={onMarkPaid && (() => onMarkPaid(expense))}
           />
         ))}

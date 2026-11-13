@@ -113,7 +113,7 @@ function ExpensesPageContent() {
   const expensesQuery = useExpensesForMonth(month)
   const expenses = useMemo(() => expensesQuery.data ?? [], [expensesQuery.data])
   const { data: categories = [] } = useExpenseCategories()
-  const { deleteWithUndo, markPaidWithUndo } = useUndoableActions()
+  const { markPaidWithUndo } = useUndoableActions()
 
   const { monthIndex, year } = monthLabelParts(month)
   const monthLabel = `${t.mon[monthIndex]} ${year}`
@@ -145,8 +145,8 @@ function ExpensesPageContent() {
     downloadCsv(expensesCsvFilename(month, t), buildExpensesCsv(visibleExpenses, categories, t))
   }
 
-  // Xoá và "đã trả" làm ngay, có Hoàn tác 5 giây — không hỏi lại trước.
-  const handleDelete = deleteWithUndo
+  // "Đã trả" làm ngay, có Hoàn tác 5 giây — không hỏi lại trước. (Xoá nằm
+  // trong form sửa, cùng cơ chế Hoàn tác.)
   /** Khoản dự kiến -> đã trả. Từ lúc này nó mới được cộng vào tổng và số dư. */
   const handleMarkPaid = markPaidWithUndo
 
@@ -215,7 +215,6 @@ function ExpensesPageContent() {
               filter={filter}
               onFilterChange={setFilter}
               onEdit={canEdit ? setEditTarget : undefined}
-              onDelete={canEdit ? handleDelete : undefined}
               onMarkPaid={canEdit ? handleMarkPaid : undefined}
             />
           </QueryStatus>

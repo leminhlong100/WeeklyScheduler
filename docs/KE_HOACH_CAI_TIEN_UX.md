@@ -462,7 +462,7 @@ làm mặc định thay cho `DEFAULT_CURRENCY` cố định (`QuickAddSheet.tsx:
 - [x] **C5** Báo cáo gộp biểu đồ tròn, xoá `ExpenseStatsDialog`
 - [x] **C6** tab Thêm, xoá hàng 5 icon
 - [x] **D1** bảng Thêm giao dịch: tự focus, lưới danh mục, chip ngày, nhớ lựa chọn, Lưu & thêm tiếp
-- [ ] **D2** hoàn tác cho xoá / đã trả / thêm; `ConfirmDialog` thay 7 `window.confirm`
+- [x] **D2** hoàn tác cho xoá / đã trả / thêm; `ConfirmDialog` thay 7 `window.confirm`
 - [ ] **D3** bấm cả hàng để sửa, cột tiền thẳng hàng
 - [ ] **D4** bảng nháp AI: tổng, câu gốc, lỗi theo dòng, giữ câu khi bỏ nháp
 - [ ] Sau mỗi bước: `npm test && npm run typecheck && npm run lint && npm run build`
@@ -488,3 +488,4 @@ làm mặc định thay cho `DEFAULT_CURRENCY` cố định (`QuickAddSheet.tsx:
 - 2026-11-13 — Đợt C xong trong MỘT commit (các bước phụ thuộc nhau). Khác kế hoạch: (1) desktop dùng hàng tab ở đầu nội dung (ExpenseTopNav) thay vì đưa nav vào sidebar; (2) LedgerBar (chip sổ) giữ nguyên dưới header thay vì dropdown; (3) bảng Thêm giao dịch (AddTransactionSheet: AI | Nhập tay, nhớ chế độ) làm luôn ở đây vì nút ＋ cần nó. Logic con số chính ở utils/overview.ts (+test).
 - 2026-11-13 — **KIỂM CHỨNG ĐỢT C: ĐẠT** — 129 test, typecheck/lint(0 lỗi)/build sạch. Trang thử harness.html dựng ExpensesPage thật với dữ liệu giả nạp vào cache TanStack Query: Tổng quan ra 5.930.000 (=8.8tr−2.87tr), 329.444/ngày; 4 tab đổi URL đúng; ＋ mở sheet, Nhập tay tự focus ô tiền; chọn tháng 3 → ?m=2026-03, chip Về tháng này quay lại; desktop có tab trên + nút có chữ, không thanh dưới.
 - 2026-11-13 — D1 xong: CategoryGrid (xếp theo lịch sử dùng, utils/addPreferences.ts + test), chip Hôm nay/Hôm qua, 3 nút tiền tệ, nhớ tiền tệ/loại/danh mục theo sổ (localStorage), AI dùng tiền tệ nhớ được, nút 'Lưu & thêm tiếp', tự focus ô tiền. CHƯA làm: chỉnh chiều cao sheet theo visualViewport cho iOS (cần máy thật để kiểm) — để lại cho chủ repo thử trên iPhone.
+- 2026-11-13 — D2 xong: hooks/useUndoableActions.ts (xoá trễ 5s, xả ngay khi trang bị ẩn; đã trả & thêm mới có Hoàn tác), components/common/ConfirmDialog.tsx + ConfirmProvider trong AppProviders. Không còn window.confirm trong module chi tiêu (lịch tuần vẫn dùng, ngoài phạm vi). Kiểm trang thử: xoá không hỏi, dòng biến mất, toast có Hoàn tác; xoá danh mục hiện hộp xác nhận theo theme.

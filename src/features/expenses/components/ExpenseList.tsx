@@ -26,7 +26,6 @@ interface ExpenseListProps {
   onFilterChange: (next: ExpenseFilter) => void
   /** Bỏ trống khi chỉ được xem (sổ người khác chia sẻ). */
   onEdit?: (expense: Expense) => void
-  onDelete?: (expense: Expense) => void
   onMarkPaid?: (expense: Expense) => void
 }
 
@@ -37,7 +36,6 @@ export function ExpenseList({
   filter,
   onFilterChange,
   onEdit,
-  onDelete,
   onMarkPaid,
 }: ExpenseListProps) {
   const { t, locale } = useTranslation()
@@ -129,7 +127,6 @@ export function ExpenseList({
                 categoryById={categoryById}
                 isToday={group.date === today}
                 onEdit={onEdit}
-                onDelete={onDelete}
                 onMarkPaid={onMarkPaid}
               />
             ))}
@@ -153,7 +150,6 @@ export function ExpenseList({
                       categoryById={categoryById}
                       isToday={false}
                       onEdit={onEdit}
-                      onDelete={onDelete}
                       onMarkPaid={onMarkPaid}
                     />
                   ))}

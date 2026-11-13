@@ -69,7 +69,7 @@ export function ExpenseEditForm({ expense, defaultDate, onDone }: ExpenseEditFor
   const updateSeries = useUpdateExpenseSeries()
   const deleteSeries = useDeleteExpenseSeries()
   const isEdit = !!expense
-  const { announceCreated } = useUndoableActions()
+  const { announceCreated, deleteWithUndo } = useUndoableActions()
   const seriesId = expense?.series_id ?? null
 
   const [applyToSeries, setApplyToSeries] = useState(false)
@@ -512,6 +512,26 @@ export function ExpenseEditForm({ expense, defaultDate, onDone }: ExpenseEditFor
         className="sticky bottom-0 -mx-5 flex flex-wrap justify-end gap-2 border-t px-5 pb-1 pt-3 sm:-mx-6 sm:px-6"
         style={{ background: theme.modalBg, borderColor: theme.border }}
       >
+        {isEdit && (
+          <Button
+            type="button"
+            size="touch"
+            variant="outline"
+            disabled={isPending}
+            onClick={() => {
+              deleteWithUndo(expense)
+              onDone()
+            }}
+            className={seriesId ? undefined : 'mr-auto'}
+            style={{
+              background: 'transparent',
+              borderColor: theme.dangerBorder,
+              color: theme.danger,
+            }}
+          >
+            {t.delete}
+          </Button>
+        )}
         {isEdit && seriesId && (
           <Button
             size="touch"
