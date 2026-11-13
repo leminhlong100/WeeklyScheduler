@@ -336,6 +336,8 @@ export const vi: Dictionary = {
   dayYesterday: 'Hôm qua',
   plannedDayTotal: 'Dự kiến {amount}',
   yearSection: 'Năm {year}',
+  sidebarYearEmpty: 'Năm nay chưa có giao dịch',
+  sidebarYearChart: 'Chi theo tháng',
 
   expensesTitle: 'Chi tiêu',
   expensesSub: 'Ghi lại mỗi ngày',

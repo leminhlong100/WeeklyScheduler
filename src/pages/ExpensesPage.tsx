@@ -17,6 +17,8 @@ import { ExpenseEditForm } from '@/features/expenses/components/ExpenseEditForm'
 import { AmountVisibilityDialog } from '@/features/expenses/components/AmountVisibilityDialog'
 import { ExpenseCategoryManagerModal } from '@/features/expenses/components/ExpenseCategoryManagerModal'
 import { LedgerBar } from '@/features/expenses/components/LedgerBar'
+import { SidebarYearCard } from '@/features/expenses/components/SidebarYearCard'
+import { SidebarLedgerList } from '@/features/expenses/components/SidebarLedgerList'
 import {
   LedgerSettingsDialog,
   type LedgerDialogTarget,
@@ -182,7 +184,22 @@ function ExpensesPageContent() {
           locale={locale}
           onLocaleChange={setLocale}
           onClose={() => setSidebarOpen(false)}
-        />
+        >
+          <SidebarYearCard
+            month={month}
+            onPickMonth={(m) => {
+              setMonth(m)
+              if (isMobile) setSidebarOpen(false)
+            }}
+          />
+          <SidebarLedgerList
+            onCreate={() => {
+              if (isMobile) setSidebarOpen(false)
+              setLedgerDialog('new')
+            }}
+            onNavigate={isMobile ? () => setSidebarOpen(false) : undefined}
+          />
+        </Sidebar>
       }
       header={
         <ExpensesHeader

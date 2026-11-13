@@ -337,6 +337,8 @@ export const en: Dictionary = {
   dayYesterday: 'Yesterday',
   plannedDayTotal: 'Planned {amount}',
   yearSection: 'Year {year}',
+  sidebarYearEmpty: 'No transactions this year yet',
+  sidebarYearChart: 'Spending by month',
 
   expensesTitle: 'Expenses',
   expensesSub: 'Track it as you go',

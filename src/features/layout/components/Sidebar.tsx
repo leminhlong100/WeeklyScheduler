@@ -33,6 +33,8 @@ interface SidebarProps {
   categories?: CategorySidebarItem[]
   onToggleCategory?: (id: string) => void
   onManageCategories?: () => void
+  /** Khối riêng của trang chi tiêu (tổng năm, danh sách sổ), xếp dưới ModuleNav. */
+  children?: ReactNode
 }
 
 export function Sidebar({
@@ -46,6 +48,7 @@ export function Sidebar({
   categories,
   onToggleCategory,
   onManageCategories,
+  children,
 }: SidebarProps) {
   const isMobile = useIsMobile()
 
@@ -124,6 +127,8 @@ export function Sidebar({
           <ModuleNav t={t} onNavigate={isMobile ? onClose : undefined} />
 
           {miniCalendar}
+
+          {children}
 
           {categories && (
             <div>

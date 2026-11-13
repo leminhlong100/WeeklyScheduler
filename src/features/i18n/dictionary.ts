@@ -366,6 +366,10 @@ export interface Dictionary {
   dayYesterday: string
   plannedDayTotal: string
   yearSection: string
+  /** Sidebar year card when the open ledger has nothing this year. */
+  sidebarYearEmpty: string
+  /** Accessible name of the sidebar's 12-month spending bars. */
+  sidebarYearChart: string
 
   /* --- Expenses --- */
   expensesTitle: string

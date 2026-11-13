@@ -335,6 +335,8 @@ export const zh: Dictionary = {
   dayYesterday: '昨天',
   plannedDayTotal: '预计 {amount}',
   yearSection: '{year} 年',
+  sidebarYearEmpty: '今年还没有交易',
+  sidebarYearChart: '每月支出',
 
   expensesTitle: '开支',
   expensesSub: '随手记一笔',
