@@ -1,3 +1,4 @@
+import { useConfirm } from '@/components/common/ConfirmDialog'
 import { useState } from 'react'
 import { useForm, useWatch, Controller } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -45,6 +46,7 @@ import { NO_CATEGORY } from '../utils/draft'
 import { orderByUsage, readAddPreferences, rememberAddChoice } from '../utils/addPreferences'
 import { ledgerCacheKey, useCurrentLedger } from '../LedgerContext'
 import { CategoryGrid } from './CategoryGrid'
+import { useUndoableActions } from '../hooks/useUndoableActions'
 import type { Expense } from '../api/expensesApi'
 
 interface ExpenseEditFormProps {
@@ -58,6 +60,7 @@ const CURRENCY_LABEL = { VND: '₫ VND', JPY: '¥ JPY', USD: '$ USD' } as const
 
 export function ExpenseEditForm({ expense, defaultDate, onDone }: ExpenseEditFormProps) {
   const { t } = useTranslation()
+  const confirm = useConfirm()
   const { theme } = useTheme()
   const { data: categories = [] } = useExpenseCategories()
   const createExpense = useCreateExpense()
@@ -66,6 +69,7 @@ export function ExpenseEditForm({ expense, defaultDate, onDone }: ExpenseEditFor
   const updateSeries = useUpdateExpenseSeries()
   const deleteSeries = useDeleteExpenseSeries()
   const isEdit = !!expense
+  const { announceCreated } = useUndoableActions()
   const seriesId = expense?.series_id ?? null
 
   const [applyToSeries, setApplyToSeries] = useState(false)
@@ -182,7 +186,7 @@ export function ExpenseEditForm({ expense, defaultDate, onDone }: ExpenseEditFor
         // Chỉ chuỗi thật mới có `series_id`; khoản lẻ để NULL, tránh dựng chuỗi
         // một phần tử rồi phải xử lý riêng ở mọi chỗ.
         const newSeriesId = crypto.randomUUID()
-        await bulkCreate.mutateAsync(
+        const createdRows = await bulkCreate.mutateAsync(
           dates.map((spent_at) => ({
             ...shared,
             spent_at,
@@ -194,19 +198,19 @@ export function ExpenseEditForm({ expense, defaultDate, onDone }: ExpenseEditFor
             series_id: newSeriesId,
           })),
         )
-        toast.success(t.expenseSeriesCreated.replace('{n}', String(dates.length)))
+        announceCreated(t.expenseSeriesCreated.replace('{n}', String(dates.length)), createdRows)
         rememberAddChoice(ledgerKey, { currency: values.currency, kind: values.kind, categoryId })
         onDone()
         return
       }
 
-      await createExpense.mutateAsync({
+      const created = await createExpense.mutateAsync({
         ...shared,
         spent_at: values.spentAt,
         status: statusForDate(values.spentAt),
         source: 'manual',
       })
-      toast.success(values.kind === 'income' ? t.incomeCreated : t.expenseCreated)
+      announceCreated(values.kind === 'income' ? t.incomeCreated : t.expenseCreated, [created])
       rememberAddChoice(ledgerKey, { currency: values.currency, kind: values.kind, categoryId })
       if (keepOpen) {
         // Giữ ngày, loại, danh mục, tiền tệ; chỉ xoá số tiền và ghi chú.
@@ -220,9 +224,9 @@ export function ExpenseEditForm({ expense, defaultDate, onDone }: ExpenseEditFor
     }
   }
 
-  const handleDeleteSeries = () => {
+  const handleDeleteSeries = async () => {
     if (!expense || !seriesId) return
-    if (!window.confirm(t.deleteExpenseSeriesConfirm)) return
+    if (!(await confirm({ message: t.deleteExpenseSeriesConfirm }))) return
     deleteSeries.mutate(
       { seriesId, fromISO: expense.spent_at },
       {

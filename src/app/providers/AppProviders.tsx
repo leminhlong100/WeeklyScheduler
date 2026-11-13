@@ -9,6 +9,7 @@ import { ThemeProvider } from '@/features/theme/ThemeContext'
 import { AmountVisibilityProvider } from '@/features/expenses/AmountVisibilityContext'
 import { PreferenceSync } from '@/features/profile/components/PreferenceSync'
 import { LocaleProvider } from '@/features/i18n/LocaleContext'
+import { ConfirmProvider } from '@/components/common/ConfirmDialog'
 import { PwaUpdatePrompt } from '@/app/PwaUpdatePrompt'
 import { QUERY_CACHE_BUSTER, queryPersister } from '@/lib/queryPersister'
 
@@ -40,18 +41,24 @@ export function AppProviders({ children }: { children: ReactNode }) {
                 state is a once-per-session step, and a per-page mount turned every
                 module switch into another chance to undo the user's last choice. */}
             <PreferenceSync />
-            <AmountVisibilityProvider>
-              <TooltipProvider>
-                <BrowserRouter>{children}</BrowserRouter>
-                <Toaster
-                  position="top-center"
-                  richColors
-                  offset={{ top: 'calc(16px + env(safe-area-inset-top) * var(--sched-notch-scale))' }}
-                  mobileOffset={{ top: 'calc(16px + env(safe-area-inset-top) * var(--sched-notch-scale))' }}
-                />
-                <PwaUpdatePrompt />
-              </TooltipProvider>
-            </AmountVisibilityProvider>
+            <ConfirmProvider>
+              <AmountVisibilityProvider>
+                <TooltipProvider>
+                  <BrowserRouter>{children}</BrowserRouter>
+                  <Toaster
+                    position="top-center"
+                    richColors
+                    offset={{
+                      top: 'calc(16px + env(safe-area-inset-top) * var(--sched-notch-scale))',
+                    }}
+                    mobileOffset={{
+                      top: 'calc(16px + env(safe-area-inset-top) * var(--sched-notch-scale))',
+                    }}
+                  />
+                  <PwaUpdatePrompt />
+                </TooltipProvider>
+              </AmountVisibilityProvider>
+            </ConfirmProvider>
           </ThemeProvider>
         </AuthProvider>
       </LocaleProvider>

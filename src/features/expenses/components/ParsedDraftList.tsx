@@ -20,6 +20,7 @@ import { translateExpenseCategoryName } from '@/features/i18n/defaultExpenseCate
 import type { Currency, ExpenseKind } from '@/lib/supabase/database.types'
 import { useExpenseCategories } from '../hooks/useExpenseCategories'
 import { useBulkCreateExpenses } from '../hooks/useExpenseMutations'
+import { useUndoableActions } from '../hooks/useUndoableActions'
 import { amountErrorKey, parseAmount, CURRENCIES, KINDS } from '../schemas/expenseSchema'
 import { statusForDate } from '../utils/status'
 import { NO_CATEGORY, type DraftRow, type ExpenseDraft } from '../utils/draft'
@@ -38,6 +39,7 @@ export function ParsedDraftList({ draft, onChange, onDone, onSaved }: ParsedDraf
   const { theme } = useTheme()
   const { data: categories = [] } = useExpenseCategories()
   const bulkCreate = useBulkCreateExpenses()
+  const { announceCreated } = useUndoableActions()
 
   const rows = draft.rows
 
@@ -94,7 +96,7 @@ export function ParsedDraftList({ draft, onChange, onDone, onSaved }: ParsedDraf
       }),
       {
         onSuccess: (created) => {
-          toast.success(t.expensesSavedCount.replace('{n}', String(created.length)))
+          announceCreated(t.expensesSavedCount.replace('{n}', String(created.length)), created)
           ;(onSaved ?? onDone)()
         },
         onError: (error) => toast.error(describeError(t, error)),

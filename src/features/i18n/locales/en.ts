@@ -401,6 +401,12 @@ export const en: Dictionary = {
   aiErrorConfig: 'AI is not configured on the server, please enter it by hand',
   aiErrorGeneric: "Couldn't reach the AI — try again or enter it by hand",
   retry: 'Try again',
+  undo: 'Undo',
+  confirmTitle: 'Are you sure?',
+  confirmLeave: 'Leave',
+  confirmRegenerate: 'Regenerate',
+  confirmRemove: 'Remove',
+  restored: 'Undone',
   enterManually: 'Enter by hand',
 
   tabExpenseList: 'Transactions',

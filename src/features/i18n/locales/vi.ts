@@ -400,6 +400,12 @@ export const vi: Dictionary = {
   aiErrorConfig: 'Máy chủ chưa cấu hình AI, tạm thời nhập tay giúp nhé',
   aiErrorGeneric: 'Không gọi được AI, thử lại hoặc nhập tay',
   retry: 'Thử lại',
+  undo: 'Hoàn tác',
+  confirmTitle: 'Bạn chắc chứ?',
+  confirmLeave: 'Rời sổ',
+  confirmRegenerate: 'Đổi mã',
+  confirmRemove: 'Gỡ',
+  restored: 'Đã hoàn tác',
   enterManually: 'Nhập tay',
 
   tabExpenseList: 'Giao dịch',

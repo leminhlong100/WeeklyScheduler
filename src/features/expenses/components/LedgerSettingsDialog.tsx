@@ -1,3 +1,4 @@
+import { useConfirm } from '@/components/common/ConfirmDialog'
 import { useState, type FormEvent } from 'react'
 import {
   CopyIcon,
@@ -179,6 +180,7 @@ function LedgerForm({ ledger, onDone }: { ledger?: LedgerSummary; onDone?: () =>
 }
 
 function OwnerSettings({ ledger, onDeleted }: { ledger: LedgerSummary; onDeleted: () => void }) {
+  const confirm = useConfirm()
   const { t } = useTranslation()
   const { theme } = useTheme()
   const { selectLedger } = useLedgerSwitcher()
@@ -198,8 +200,14 @@ function OwnerSettings({ ledger, onDeleted }: { ledger: LedgerSummary; onDeleted
     )
   }
 
-  const handleRegenerate = () => {
-    if (!window.confirm(t.ledgerInviteRegenerateConfirm)) return
+  const handleRegenerate = async () => {
+    if (
+      !(await confirm({
+        message: t.ledgerInviteRegenerateConfirm,
+        confirmLabel: t.confirmRegenerate,
+      }))
+    )
+      return
     toggleInvite(true)
   }
 
@@ -224,8 +232,9 @@ function OwnerSettings({ ledger, onDeleted }: { ledger: LedgerSummary; onDeleted
     }
   }
 
-  const handleRemoveMember = (userId: string) => {
-    if (!window.confirm(t.ledgerRemoveMemberConfirm)) return
+  const handleRemoveMember = async (userId: string) => {
+    if (!(await confirm({ message: t.ledgerRemoveMemberConfirm, confirmLabel: t.confirmRemove })))
+      return
     removeMember.mutate(
       { ledgerId: ledger.id, userId },
       {
@@ -235,8 +244,8 @@ function OwnerSettings({ ledger, onDeleted }: { ledger: LedgerSummary; onDeleted
     )
   }
 
-  const handleDelete = () => {
-    if (!window.confirm(t.ledgerDeleteConfirm.replace('{name}', ledger.name))) return
+  const handleDelete = async () => {
+    if (!(await confirm({ message: t.ledgerDeleteConfirm.replace('{name}', ledger.name) }))) return
     deleteLedger.mutate(ledger.id, {
       onSuccess: () => {
         selectLedger(null)
@@ -369,14 +378,15 @@ function OwnerSettings({ ledger, onDeleted }: { ledger: LedgerSummary; onDeleted
 }
 
 function ViewerSettings({ ledger, onLeft }: { ledger: LedgerSummary; onLeft: () => void }) {
+  const confirm = useConfirm()
   const { t } = useTranslation()
   const { theme } = useTheme()
   const { user } = useAuth()
   const { selectLedger } = useLedgerSwitcher()
   const removeMember = useRemoveLedgerMember()
 
-  const handleLeave = () => {
-    if (!window.confirm(t.ledgerLeaveConfirm)) return
+  const handleLeave = async () => {
+    if (!(await confirm({ message: t.ledgerLeaveConfirm, confirmLabel: t.confirmLeave }))) return
     removeMember.mutate(
       { ledgerId: ledger.id, userId: user!.id },
       {

@@ -399,6 +399,12 @@ export const zh: Dictionary = {
   aiErrorConfig: '服务器未配置 AI，请先手动输入',
   aiErrorGeneric: '连接不上 AI，请重试或手动输入',
   retry: '重试',
+  undo: '撤销',
+  confirmTitle: '确定吗？',
+  confirmLeave: '退出',
+  confirmRegenerate: '重新生成',
+  confirmRemove: '移除',
+  restored: '已撤销',
   enterManually: '手动输入',
 
   tabExpenseList: '开支',

@@ -464,6 +464,12 @@ export interface Dictionary {
   aiErrorConfig: string
   aiErrorGeneric: string
   retry: string
+  undo: string
+  confirmTitle: string
+  confirmLeave: string
+  confirmRegenerate: string
+  confirmRemove: string
+  restored: string
   enterManually: string
 
   tabExpenseList: string

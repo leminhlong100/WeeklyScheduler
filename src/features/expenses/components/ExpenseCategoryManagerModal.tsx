@@ -1,3 +1,4 @@
+import { useConfirm } from '@/components/common/ConfirmDialog'
 import { useState } from 'react'
 import { PlusIcon } from 'lucide-react'
 import { toast } from 'sonner'
@@ -25,6 +26,7 @@ export function ExpenseCategoryManagerModal({
   onOpenChange,
 }: ExpenseCategoryManagerModalProps) {
   const { t } = useTranslation()
+  const confirm = useConfirm()
   const { theme } = useTheme()
   const { data: categories = [] } = useExpenseCategories()
   const deleteCategory = useDeleteExpenseCategory()
@@ -35,10 +37,10 @@ export function ExpenseCategoryManagerModal({
     onOpenChange(false)
   }
 
-  const handleDelete = (category: ExpenseCategory) => {
+  const handleDelete = async (category: ExpenseCategory) => {
     // Câu xác nhận nói rõ khoản chi KHÔNG mất: `on delete set null` chỉ gỡ nhãn.
     // Người dùng đang giữ vài trăm dòng tiền sẽ không dám bấm nếu không biết điều đó.
-    if (!window.confirm(t.deleteExpenseCategoryConfirm)) return
+    if (!(await confirm({ message: t.deleteExpenseCategoryConfirm }))) return
     deleteCategory.mutate(category.id, {
       onSuccess: () => toast.success(t.categoryDeleted),
       onError: (error) => toast.error(describeError(t, error)),

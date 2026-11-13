@@ -400,6 +400,12 @@ export const ja: Dictionary = {
   aiErrorConfig: 'サーバーで AI が未設定です。手入力してください',
   aiErrorGeneric: 'AI に接続できません。再試行するか手入力してください',
   retry: '再試行',
+  undo: '元に戻す',
+  confirmTitle: 'よろしいですか？',
+  confirmLeave: '退出する',
+  confirmRegenerate: '再発行',
+  confirmRemove: '削除',
+  restored: '元に戻しました',
   enterManually: '手入力',
 
   tabExpenseList: '支出',

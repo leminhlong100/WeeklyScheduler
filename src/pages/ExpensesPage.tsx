@@ -1,6 +1,5 @@
 import { useMemo, useState } from 'react'
 import { toast } from 'sonner'
-import { describeError } from '@/lib/utils/errorMessage'
 import { useIsMobile, useIsTouchDevice } from '@/hooks/useMediaQuery'
 import { useSessionStorageState } from '@/hooks/useSessionStorageState'
 import { useTranslation } from '@/features/i18n/LocaleContext'
@@ -43,7 +42,7 @@ import {
 import { useExpensesForMonth } from '@/features/expenses/hooks/useExpenses'
 import { useExpenseCategories } from '@/features/expenses/hooks/useExpenseCategories'
 import { useExpensesUrlState } from '@/features/expenses/hooks/useExpensesUrlState'
-import { useDeleteExpense, useUpdateExpense } from '@/features/expenses/hooks/useExpenseMutations'
+import { useUndoableActions } from '@/features/expenses/hooks/useUndoableActions'
 import type { Expense } from '@/features/expenses/api/expensesApi'
 import { todayISO } from '@/lib/utils/date'
 import {
@@ -114,8 +113,7 @@ function ExpensesPageContent() {
   const expensesQuery = useExpensesForMonth(month)
   const expenses = useMemo(() => expensesQuery.data ?? [], [expensesQuery.data])
   const { data: categories = [] } = useExpenseCategories()
-  const deleteExpense = useDeleteExpense()
-  const updateExpense = useUpdateExpense()
+  const { deleteWithUndo, markPaidWithUndo } = useUndoableActions()
 
   const { monthIndex, year } = monthLabelParts(month)
   const monthLabel = `${t.mon[monthIndex]} ${year}`
@@ -147,25 +145,10 @@ function ExpensesPageContent() {
     downloadCsv(expensesCsvFilename(month, t), buildExpensesCsv(visibleExpenses, categories, t))
   }
 
-  const handleDelete = (expense: Expense) => {
-    if (!window.confirm(t.deleteExpenseConfirm)) return
-    deleteExpense.mutate(expense.id, {
-      onSuccess: () => toast.success(t.expenseDeleted),
-      onError: (error) => toast.error(describeError(t, error)),
-    })
-  }
-
-  /** Kỳ dự kiến -> đã trả. Từ lúc này nó mới được cộng vào tổng và số dư. */
-  const handleMarkPaid = (expense: Expense) => {
-    updateExpense.mutate(
-      { id: expense.id, patch: { status: 'paid' } },
-      {
-        onSuccess: () =>
-          toast.success(expense.kind === 'income' ? t.incomeMarkedReceived : t.expenseMarkedPaid),
-        onError: (error) => toast.error(describeError(t, error)),
-      },
-    )
-  }
+  // Xoá và "đã trả" làm ngay, có Hoàn tác 5 giây — không hỏi lại trước.
+  const handleDelete = deleteWithUndo
+  /** Khoản dự kiến -> đã trả. Từ lúc này nó mới được cộng vào tổng và số dư. */
+  const handleMarkPaid = markPaidWithUndo
 
   return (
     <AppShell
