@@ -449,7 +449,7 @@ làm mặc định thay cho `DEFAULT_CURRENCY` cố định (`QuickAddSheet.tsx:
 - [x] **A1** `MoneyInput` + `parseMoneyInput`, thay ở 3 form, placeholder 4 ngôn ngữ
 - [x] **A2** skeleton / lỗi / offline, `keepPreviousData`
 - [x] **A3** chống gửi trùng `isSubmitting`
-- [ ] **A4** ẩn số tiền: mặc định che hết, `cat:none`, che %
+- [x] **A4** ẩn số tiền: mặc định che hết, `cat:none`, che %
 - [ ] **A5** một gốc %, `formatPercent`
 - [ ] **B1** `formatSignedMoney`
 - [ ] **B2** token màu theo theme, ≥ 4.5:1, xoá 7 màu viết cứng
@@ -477,3 +477,4 @@ làm mặc định thay cho `DEFAULT_CURRENCY` cố định (`QuickAddSheet.tsx:
 - 2026-11-13 — Tạo nhánh `feat/ux-overhaul`, bắt đầu Đợt A.
 - 2026-11-13 — A0+A1+A3 xong (commit 48d9388 và trước đó). Vitest 4 (vitest.config.ts riêng), 51 test. MoneyInput ở src/components/form, parser ở src/lib/utils/parseMoneyInput.ts. Đã kiểm trên trang thử: 30000→30.000, '30.000'→30000, '1,5tr'→1.500.000, chèn số giữa giữ con trỏ, chip +50k. CHƯA kiểm được trang thật vì không đăng nhập được (Google OAuth). Trang thử cục bộ: harness.html + harness/ (bị .git/info/exclude, không commit).
 - 2026-11-13 — A2 xong: QueryStatus (skeleton / lỗi + Thử lại / dải ngoại tuyến), placeholder giữ tháng cũ nhưng CHỈ trong cùng sổ (keepWithinLedger). Kiểm trên trang thử.
+- 2026-11-13 — A4 xong, KHÁC kế hoạch một chút: không mặc định che hết (vì cờ ẩn reset mỗi lần mở app → người mới sẽ thấy toàn ••• mỗi lần mở). Thay vào đó: chưa chọn mục nào thì nút con mắt = che tất cả. Thêm khoá cat:none, che % trong báo cáo, tìm kiếm bỏ qua số tiền khi đang che.

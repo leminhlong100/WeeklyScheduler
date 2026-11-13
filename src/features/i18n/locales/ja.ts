@@ -364,6 +364,7 @@ export const ja: Dictionary = {
   reportNoData: '今月はまだ集計できるデータがありません',
   reportVsPrevMonth: '先月比',
   reportNoPrevMonth: '先月の支出はありません',
+  reportSpentOfIncome: '収入の {p} を使用',
   reportFlat: '先月と同じ',
   reportBudget: '予算',
   reportOverBudget: '予算超過',

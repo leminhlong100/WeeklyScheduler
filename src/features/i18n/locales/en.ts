@@ -365,6 +365,7 @@ export const en: Dictionary = {
   reportNoData: 'Nothing to report for this month yet',
   reportVsPrevMonth: 'vs last month',
   reportNoPrevMonth: 'No expenses last month',
+  reportSpentOfIncome: 'Spent {p} of income',
   reportFlat: 'Same as last month',
   reportBudget: 'Budget',
   reportOverBudget: 'Over budget',

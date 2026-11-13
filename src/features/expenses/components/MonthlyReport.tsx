@@ -4,9 +4,10 @@ import { TrendingDownIcon, TrendingUpIcon } from 'lucide-react'
 import { useTranslation } from '@/features/i18n/LocaleContext'
 import { useTheme } from '@/features/theme/ThemeContext'
 import type { Dictionary } from '@/features/i18n/dictionary'
+import type { Locale } from '@/features/i18n/types'
 import type { DerivedTheme } from '@/features/theme/types'
 import { translateExpenseCategoryName } from '@/features/i18n/defaultExpenseCategoryNames'
-import { formatMoney } from '@/lib/utils/formatMoney'
+import { formatMoney, formatPercent } from '@/lib/utils/formatMoney'
 import { MaskedAmount } from './MaskedAmount'
 import type { Currency, ExpenseKind } from '@/lib/supabase/database.types'
 import type { ExpenseCategory } from '../api/expenseCategoriesApi'
@@ -23,20 +24,18 @@ const OVER_BUDGET_COLOR = '#d93a3a'
 const UNDER_BUDGET_COLOR = '#2fc39a'
 const INCOME_COLOR = '#2fc39a'
 
-function percent(ratio: number): string {
-  return `${Math.round(ratio * 100)}%`
-}
-
 function ChangeLine({
   change,
   cutoffDay,
   t,
+  locale,
   theme,
 }: {
   change: number | null
   /** Không null = tháng đang diễn ra, hai bên chỉ so tới ngày này. */
   cutoffDay: number | null
   t: Dictionary
+  locale: Locale
   theme: DerivedTheme
 }) {
   // Nói rõ cửa sổ so sánh. Không có câu này thì "−40%" giữa tháng đọc như đã
@@ -79,7 +78,7 @@ function ChangeLine({
       </span>
       <Icon className="size-3.5" />
       {up ? '+' : '−'}
-      {percent(Math.abs(change))}
+      {formatPercent(Math.abs(change), locale)}
       <span className="font-semibold" style={{ color: theme.muted }}>
         {suffix}
       </span>
@@ -129,7 +128,7 @@ function CategoryLine({ row, kind, currency, category }: CategoryLineProps) {
           style={{ color: theme.muted }}
         >
           {/* % cũng lộ độ lớn: che cùng lúc với số tiền của danh mục. */}
-          <MaskedAmount categoryId={categoryId}>{percent(row.share)}</MaskedAmount>
+          <MaskedAmount categoryId={categoryId}>{formatPercent(row.share, locale)}</MaskedAmount>
         </span>
         <span
           className="flex-shrink-0 text-[13px] font-extrabold tabular-nums"
@@ -284,7 +283,22 @@ export function MonthlyReport({ month }: { month: MonthKey }) {
               </span>
             </div>
 
-            <ChangeLine change={report.change} cutoffDay={cutoffDay} t={t} theme={theme} />
+            <ChangeLine
+              change={report.change}
+              cutoffDay={cutoffDay}
+              t={t}
+              locale={locale}
+              theme={theme}
+            />
+            {report.incomeTotal > 0 && (
+              <span className="text-[11.5px] font-semibold" style={{ color: theme.muted }}>
+                {t.reportSpentOfIncome.split('{p}')[0]}
+                <MaskedAmount scope="month">
+                  {formatPercent(report.expenseTotal / report.incomeTotal, locale)}
+                </MaskedAmount>
+                {t.reportSpentOfIncome.split('{p}')[1] ?? ''}
+              </span>
+            )}
 
             {(report.plannedExpense > 0 || report.plannedIncome > 0) && (
               <div

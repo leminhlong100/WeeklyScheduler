@@ -364,6 +364,7 @@ export const vi: Dictionary = {
   reportNoData: 'Tháng này chưa có gì để báo cáo',
   reportVsPrevMonth: 'so với tháng trước',
   reportNoPrevMonth: 'Tháng trước chưa có khoản chi',
+  reportSpentOfIncome: 'Đã tiêu {p} thu nhập',
   reportFlat: 'Ngang tháng trước',
   reportBudget: 'Hạn mức',
   reportOverBudget: 'Vượt hạn mức',

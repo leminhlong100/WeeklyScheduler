@@ -363,6 +363,7 @@ export const zh: Dictionary = {
   reportNoData: '本月还没有可统计的数据',
   reportVsPrevMonth: '与上月相比',
   reportNoPrevMonth: '上月没有开支记录',
+  reportSpentOfIncome: '已花掉收入的 {p}',
   reportFlat: '与上月持平',
   reportBudget: '预算',
   reportOverBudget: '已超预算',

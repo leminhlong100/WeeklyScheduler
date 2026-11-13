@@ -4,7 +4,7 @@ import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog'
 import { useTranslation } from '@/features/i18n/LocaleContext'
 import { translateExpenseCategoryName } from '@/features/i18n/defaultExpenseCategoryNames'
 import { useTheme } from '@/features/theme/ThemeContext'
-import { formatMoney } from '@/lib/utils/formatMoney'
+import { formatMoney, formatPercent } from '@/lib/utils/formatMoney'
 import { useExpenseCategories } from '../hooks/useExpenseCategories'
 import { useExpensesForMonth } from '../hooks/useExpenses'
 import type { MonthKey } from '../utils/month'
@@ -20,10 +20,6 @@ const RADIUS = (SIZE - STROKE) / 2
 const CIRCUMFERENCE = 2 * Math.PI * RADIUS
 
 /** Một chữ số thập phân: danh mục nhỏ vẫn đọc được là 0,4% chứ không phải 0%. */
-function percent(ratio: number): string {
-  return `${Math.round(ratio * 1000) / 10}%`
-}
-
 interface Slice {
   key: string
   name: string
@@ -138,7 +134,7 @@ function CurrencyStats({ report }: { report: CurrencyReport }) {
     >
       <Donut
         slices={slices}
-        centerTop={spentOfIncome !== null ? percent(spentOfIncome) : report.currency}
+        centerTop={spentOfIncome !== null ? formatPercent(spentOfIncome, locale) : report.currency}
         centerBottom={spentOfIncome !== null ? t.statsSpentOfIncome : t.expenseExpenseTotal}
       />
 
@@ -190,7 +186,7 @@ function CurrencyStats({ report }: { report: CurrencyReport }) {
                   className={`flex-shrink-0 tabular-nums ${s.overBudget ? 'font-black' : 'font-extrabold'}`}
                   style={{ color: s.overBudget ? OVER_BUDGET_COLOR : theme.text }}
                 >
-                  {percent(s.ofIncome ?? s.share)}
+                  {formatPercent(s.share, locale)}
                 </span>
                 <span
                   className={`w-[92px] flex-shrink-0 text-right text-[12px] tabular-nums ${s.overBudget ? 'font-extrabold' : 'font-semibold'}`}

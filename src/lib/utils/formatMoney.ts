@@ -38,3 +38,16 @@ export function formatAmount(amount: number, currency: Currency, locale: Locale)
     maximumFractionDigits: digits,
   }).format(amount)
 }
+
+/**
+ * Tỉ lệ 0..1 → "12,5%" theo locale. Tối đa một số lẻ, nhưng tỉ lệ nhỏ hơn 1%
+ * mà khác 0 vẫn hiện ra (≥ 0,1%) thay vì làm tròn thành "0%" khi thanh biểu
+ * đồ vẫn có một vệt.
+ */
+export function formatPercent(ratio: number, locale: Locale): string {
+  const digits = Math.abs(ratio) < 0.1 ? 1 : 0
+  return new Intl.NumberFormat(INTL_LOCALE[locale], {
+    style: 'percent',
+    maximumFractionDigits: digits,
+  }).format(ratio)
+}

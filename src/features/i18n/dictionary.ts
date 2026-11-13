@@ -433,6 +433,7 @@ export interface Dictionary {
    */
   reportVsPrevMonthPartial: string
   reportNoPrevMonth: string
+  reportSpentOfIncome: string
   reportFlat: string
   reportBudget: string
   reportOverBudget: string
