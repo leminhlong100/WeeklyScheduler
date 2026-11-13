@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { MicIcon, SparklesIcon, SquareIcon } from 'lucide-react'
+import { Loader2Icon, MicIcon, SparklesIcon, SquareIcon } from 'lucide-react'
 import { GradientButton } from '@/components/common/GradientButton'
 import { Button } from '@/components/ui/button'
 import { useTranslation } from '@/features/i18n/LocaleContext'
@@ -55,17 +55,19 @@ function speechErrorMessage(code: SpeechErrorCode, t: Dictionary): string {
 interface QuickAddSheetProps {
   /** Gọi khi AI trả về ít nhất một khoản — trang mở bảng nháp để user xác nhận. */
   onDrafts: (items: ParsedExpenseItem[], rawText: string) => void
-  /** Mở form nhập tay khi AI lỗi hoặc không đọc được câu. */
-  onEnterManually: () => void
+  /** Mở form nhập tay khi AI lỗi hoặc không đọc được câu; nhận câu đang gõ để điền sẵn. */
+  onEnterManually: (text: string) => void
+  /** Câu điền sẵn (vd. vừa bỏ bản nháp: câu gốc quay lại để sửa). */
+  initialText?: string
 }
 
-export function QuickAddSheet({ onDrafts, onEnterManually }: QuickAddSheetProps) {
+export function QuickAddSheet({ onDrafts, onEnterManually, initialText = '' }: QuickAddSheetProps) {
   const { t, locale } = useTranslation()
   const { theme } = useTheme()
   const { data: categories = [] } = useExpenseCategories()
   const { ledgerId } = useCurrentLedger()
 
-  const [text, setText] = useState('')
+  const [text, setText] = useState(initialText)
   const [isPending, setIsPending] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
@@ -176,7 +178,7 @@ export function QuickAddSheet({ onDrafts, onEnterManually }: QuickAddSheetProps)
             type="button"
             variant="outline"
             size="sm"
-            onClick={onEnterManually}
+            onClick={() => onEnterManually(trimmed)}
             style={{ background: 'transparent', borderColor: theme.border, color: theme.text }}
           >
             {t.enterManually}
@@ -220,8 +222,10 @@ export function QuickAddSheet({ onDrafts, onEnterManually }: QuickAddSheetProps)
           type="button"
           onClick={() => void submit()}
           disabled={!canSend || speech.listening}
+          aria-busy={isPending}
           className="h-11 min-w-[140px] flex-1 text-[14px] sm:h-9 sm:flex-none sm:px-4 sm:text-[13px]"
         >
+          {isPending && <Loader2Icon className="size-4 animate-spin" aria-hidden />}
           {isPending ? t.quickAddThinking : t.quickAddSend}
         </GradientButton>
       </div>

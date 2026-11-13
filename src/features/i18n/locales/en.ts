@@ -389,6 +389,7 @@ export const en: Dictionary = {
   quickAddTooLong: 'Too long — {n} characters max',
   draftTitle: 'Check before saving',
   draftHint: 'Edit any row inline. Only the rows left here get saved.',
+  draftCount: '{n} transactions',
   draftLowConfidence: 'The AI was unsure about this row — worth a look',
   draftDiscard: 'Discard draft',
   saveAll: 'Save all',

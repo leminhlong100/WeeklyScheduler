@@ -387,6 +387,7 @@ export const zh: Dictionary = {
   quickAddTooLong: '句子太长，最多 {n} 个字符',
   draftTitle: '保存前请确认',
   draftHint: '可直接修改每一行。只有留下的行会被保存。',
+  draftCount: '{n} 条记录',
   draftLowConfidence: 'AI 对这一行不太确定，请复核',
   draftDiscard: '放弃草稿',
   saveAll: '全部保存',

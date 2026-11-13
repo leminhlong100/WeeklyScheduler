@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { MoneyInput } from '@/components/form/MoneyInput'
 import { translateFieldError } from '@/lib/utils/formErrors'
+import { formatSignedMoney } from '@/lib/utils/formatMoney'
 import {
   Select,
   SelectContent,
@@ -35,7 +36,7 @@ interface ParsedDraftListProps {
 }
 
 export function ParsedDraftList({ draft, onChange, onDone, onSaved }: ParsedDraftListProps) {
-  const { t } = useTranslation()
+  const { t, locale } = useTranslation()
   const { theme } = useTheme()
   const { data: categories = [] } = useExpenseCategories()
   const bulkCreate = useBulkCreateExpenses()
@@ -74,10 +75,27 @@ export function ParsedDraftList({ draft, onChange, onDone, onSaved }: ParsedDraf
   const removeRow = (key: string) => onChange(rows.filter((r) => r.key !== key))
 
   const hasInvalidAmount = rows.some((r) => amountErrorKey(r.amount, r.currency) !== null)
-  const canSave = rows.length > 0 && !hasInvalidAmount && !bulkCreate.isPending
+  // Nút Lưu không bị khoá câm khi có dòng lỗi: bấm thì cuộn tới dòng lỗi đầu
+  // tiên (đã tô đỏ + ghi lý do), thay vì một nút xám không nói vì sao.
+  const canSave = rows.length > 0 && !bulkCreate.isPending
+
+  // Tổng của bản nháp theo từng tiền tệ, chỉ các dòng đọc được số tiền.
+  const totals = new Map<Currency, number>()
+  for (const r of rows) {
+    if (amountErrorKey(r.amount, r.currency) !== null) continue
+    const v = parseAmount(r.amount, r.currency) * (r.kind === 'income' ? 1 : -1)
+    totals.set(r.currency, Math.round(((totals.get(r.currency) ?? 0) + v) * 100) / 100)
+  }
+  const totalText = [...totals].map(([c, v]) => formatSignedMoney(v, c, locale, 'auto')).join(' · ')
 
   const saveAll = () => {
     if (!canSave) return
+    if (hasInvalidAmount) {
+      document
+        .querySelector('[data-draft-invalid="true"]')
+        ?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+      return
+    }
     bulkCreate.mutate(
       rows.map((r) => {
         const categoryId = resolveCategoryId(r)
@@ -125,6 +143,25 @@ export function ParsedDraftList({ draft, onChange, onDone, onSaved }: ParsedDraf
         </p>
       </div>
 
+      {/* Câu gốc để đối chiếu từng dòng AI tách ra. */}
+      <blockquote
+        className="rounded-xl border-l-4 px-3 py-2 text-[13px] font-semibold italic"
+        style={{ borderColor: theme.accent, background: theme.inputBg, color: theme.text }}
+      >
+        “{draft.rawText}”
+      </blockquote>
+
+      {rows.length > 0 && (
+        <div className="flex items-baseline justify-between gap-2 px-1 text-[13px] font-extrabold">
+          <span style={{ color: theme.mutedText }}>
+            {t.draftCount.replace('{n}', String(rows.length))}
+          </span>
+          <span className="tabular-nums" style={{ color: theme.text }}>
+            {totalText}
+          </span>
+        </div>
+      )}
+
       <div className="flex flex-col gap-2.5">
         {rows.map((row) => {
           const categoryOptions = optionsForKind(row.kind)
@@ -133,11 +170,17 @@ export function ParsedDraftList({ draft, onChange, onDone, onSaved }: ParsedDraf
           return (
             <div
               key={row.key}
+              data-draft-invalid={amountError !== null}
               className="flex flex-col gap-2 rounded-xl border-[1.5px] p-2.5"
               style={{
                 // Nền cảnh báo nhẹ cho dòng AI không chắc — đủ để mắt dừng lại,
-                // không đủ để trông như lỗi.
-                borderColor: row.confidence === 'low' ? '#f0b429' : theme.border,
+                // không đủ để trông như lỗi. Dòng có số tiền sai thì viền đỏ.
+                borderColor:
+                  amountError !== null
+                    ? theme.danger
+                    : row.confidence === 'low'
+                      ? theme.warning
+                      : theme.border,
                 background: row.confidence === 'low' ? theme.warningBg : theme.inputBg,
               }}
             >

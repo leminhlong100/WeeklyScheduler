@@ -53,12 +53,21 @@ interface ExpenseEditFormProps {
   expense?: Expense
   /** Ngày điền sẵn cho khoản mới — thường là ngày đang xem. */
   defaultDate?: string
+  /** Điền sẵn khi chuyển từ AI sang nhập tay (số tiền đầu tiên + cả câu làm ghi chú). */
+  defaultAmount?: string
+  defaultNote?: string
   onDone: () => void
 }
 
 const CURRENCY_LABEL = { VND: '₫ VND', JPY: '¥ JPY', USD: '$ USD' } as const
 
-export function ExpenseEditForm({ expense, defaultDate, onDone }: ExpenseEditFormProps) {
+export function ExpenseEditForm({
+  expense,
+  defaultDate,
+  defaultAmount,
+  defaultNote,
+  onDone,
+}: ExpenseEditFormProps) {
   const { t } = useTranslation()
   const confirm = useConfirm()
   const { theme } = useTheme()
@@ -82,13 +91,13 @@ export function ExpenseEditForm({ expense, defaultDate, onDone }: ExpenseEditFor
   const form = useForm<ExpenseFormInput>({
     resolver: zodResolver(expenseSchema),
     defaultValues: {
-      amount: expense ? String(expense.amount) : '',
+      amount: expense ? String(expense.amount) : (defaultAmount ?? ''),
       currency: expense?.currency ?? prefs.currency ?? DEFAULT_CURRENCY,
       kind: initialKind,
       categoryId: expense
         ? (expense.category_id ?? NO_CATEGORY)
         : (prefs.lastCategory?.[initialKind] ?? NO_CATEGORY),
-      note: expense?.note ?? '',
+      note: expense?.note ?? defaultNote ?? '',
       spentAt: expense?.spent_at ?? defaultDate ?? todayISO(),
       repeatMonths: 1,
     },

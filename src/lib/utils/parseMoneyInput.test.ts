@@ -89,3 +89,16 @@ describe('formatTypingAmount', () => {
     expect(formatStoredAmount(12.5, 'USD', 'en-US')).toBe('12.5')
   })
 })
+
+import { firstAmountIn } from './parseMoneyInput'
+describe('firstAmountIn', () => {
+  it.each([
+    ['ăn sáng 30k với bạn', '30000'],
+    ['trưa cà phê 35 nghìn', '35000'],
+    ['tiền nhà 4,5tr', '4500000'],
+    ['đổ xăng 100.000', '100000'],
+    ['không có số', null],
+  ])('%s → %s', (text, expected) => {
+    expect(firstAmountIn(text, 'VND')).toBe(expected)
+  })
+})

@@ -388,6 +388,7 @@ export const ja: Dictionary = {
   quickAddTooLong: '長すぎます。最大 {n} 文字です',
   draftTitle: '保存前に確認',
   draftHint: '各行はその場で編集できます。残した行だけ保存されます。',
+  draftCount: '{n} 件',
   draftLowConfidence: 'AI が判断に迷った行です。確認してください',
   draftDiscard: '下書きを破棄',
   saveAll: 'すべて保存',

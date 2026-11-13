@@ -7,6 +7,8 @@ import { ExpenseEditForm } from './ExpenseEditForm'
 import { ParsedDraftList } from './ParsedDraftList'
 import { QuickAddSheet } from './QuickAddSheet'
 import { SheetDialog } from './SheetDialog'
+import { firstAmountIn } from '@/lib/utils/parseMoneyInput'
+import { DEFAULT_CURRENCY } from '../schemas/expenseSchema'
 
 type AddMode = 'ai' | 'manual'
 const MODE_KEY = 'weeklyScheduler.expenseAddMode'
@@ -43,6 +45,10 @@ export function AddTransactionSheet({
   const { t } = useTranslation()
   const { theme } = useTheme()
   const [mode, setModeState] = useState<AddMode>(readMode)
+  /** Câu gốc trả lại ô nhập khi bỏ bản nháp — để sửa câu, không phải gõ lại. */
+  const [restoreText, setRestoreText] = useState('')
+  /** Điền sẵn cho nhập tay khi chuyển từ AI (AI lỗi / không đọc được câu). */
+  const [prefill, setPrefill] = useState<{ amount?: string; note?: string }>({})
 
   const setMode = (next: AddMode) => {
     setModeState(next)
@@ -95,20 +101,44 @@ export function AddTransactionSheet({
           <ParsedDraftList
             draft={draft}
             onChange={(rows: DraftRow[]) => onDraftChange({ ...draft, rows })}
-            onDone={() => onDraftChange(null)}
+            onDone={() => {
+              setRestoreText(draft.rawText)
+              // Ở lại chế độ AI để sửa câu, kể cả khi lần trước dùng nhập tay.
+              setMode('ai')
+              onDraftChange(null)
+            }}
             onSaved={() => {
+              setRestoreText('')
               onDraftChange(null)
               onOpenChange(false)
             }}
           />
         ) : (
           <QuickAddSheet
+            // Đổi key khi có câu cần trả lại: ô nhập dựng lại với câu đó.
+            key={restoreText}
+            initialText={restoreText}
             onDrafts={(items, rawText) => onDraftChange({ rawText, rows: toDraftRows(items) })}
-            onEnterManually={() => setMode('manual')}
+            onEnterManually={(text) => {
+              setPrefill({
+                amount: firstAmountIn(text, DEFAULT_CURRENCY) ?? undefined,
+                note: text || undefined,
+              })
+              setMode('manual')
+            }}
           />
         )
       ) : (
-        <ExpenseEditForm defaultDate={defaultDate} onDone={() => onOpenChange(false)} />
+        <ExpenseEditForm
+          key={`${prefill.amount ?? ''}|${prefill.note ?? ''}`}
+          defaultDate={defaultDate}
+          defaultAmount={prefill.amount}
+          defaultNote={prefill.note}
+          onDone={() => {
+            setPrefill({})
+            onOpenChange(false)
+          }}
+        />
       )}
     </SheetDialog>
   )

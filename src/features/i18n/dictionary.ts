@@ -451,6 +451,7 @@ export interface Dictionary {
   quickAddTooLong: string
   draftTitle: string
   draftHint: string
+  draftCount: string
   draftLowConfidence: string
   draftDiscard: string
   saveAll: string

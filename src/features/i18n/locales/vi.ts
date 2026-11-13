@@ -388,6 +388,7 @@ export const vi: Dictionary = {
   quickAddTooLong: 'Câu quá dài, tối đa {n} ký tự',
   draftTitle: 'Kiểm tra trước khi lưu',
   draftHint: 'Sửa trực tiếp từng dòng. Chỉ những dòng còn lại mới được lưu.',
+  draftCount: '{n} giao dịch',
   draftLowConfidence: 'AI không chắc dòng này — kiểm tra lại giúp nhé',
   draftDiscard: 'Bỏ bản nháp',
   saveAll: 'Lưu tất cả',

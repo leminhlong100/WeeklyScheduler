@@ -24,8 +24,7 @@ export const MAX_AMOUNT = 999_999_999_999.99
 export type MoneyInputError = 'invalid' | 'whole' | 'tooLarge'
 
 export type MoneyParseResult =
-  | { ok: true; value: number; canonical: string }
-  | { ok: false; error: MoneyInputError }
+  { ok: true; value: number; canonical: string } | { ok: false; error: MoneyInputError }
 
 const WHOLE_ONLY: Record<Currency, boolean> = { VND: true, JPY: true, USD: false }
 
@@ -93,8 +92,8 @@ export function parseMoneyInput(raw: string, currency: Currency): MoneyParseResu
 /** Ký tự thập phân của locale: `,` cho vi-VN, `.` cho en/zh/ja. */
 export function decimalSeparator(intlLocale: string): string {
   return (
-    new Intl.NumberFormat(intlLocale).formatToParts(1.5).find((p) => p.type === 'decimal')
-      ?.value ?? '.'
+    new Intl.NumberFormat(intlLocale).formatToParts(1.5).find((p) => p.type === 'decimal')?.value ??
+    '.'
   )
 }
 
@@ -124,9 +123,16 @@ export function formatTypingAmount(
   const dec = decimalSeparator(intlLocale)
   const idx = raw.lastIndexOf(dec)
   const intRaw = idx >= 0 ? raw.slice(0, idx) : raw
-  const fracRaw = idx >= 0 ? raw.slice(idx + 1).replace(/\D/g, '').slice(0, 2) : null
+  const fracRaw =
+    idx >= 0
+      ? raw
+          .slice(idx + 1)
+          .replace(/\D/g, '')
+          .slice(0, 2)
+      : null
   const intDigits = stripSeparators(intRaw).replace(/^0+(?=\d)/, '')
-  const intShown = intDigits === '' ? (fracRaw !== null ? '0' : '') : group.format(Number(intDigits))
+  const intShown =
+    intDigits === '' ? (fracRaw !== null ? '0' : '') : group.format(Number(intDigits))
   return fracRaw !== null ? `${intShown}${dec}${fracRaw}` : intShown
 }
 
@@ -136,4 +142,17 @@ export function formatStoredAmount(value: number, currency: Currency, intlLocale
     maximumFractionDigits: WHOLE_ONLY[currency] ? 0 : 2,
     useGrouping: true,
   }).format(value)
+}
+
+/**
+ * Số tiền đầu tiên trong một câu tự nhiên ("ăn sáng 30k với bạn" → 30.000).
+ * Dùng khi AI lỗi và người dùng chuyển sang nhập tay: điền sẵn số tiền thay vì
+ * bắt gõ lại từ đầu. Không chắc thì trả `null` — thà để trống còn hơn điền sai.
+ */
+export function firstAmountIn(text: string, currency: Currency): string | null {
+  const match =
+    /\d[\d.,]*(?:\s*(?:tỷ|tỉ|triệu|trieu|tr|nghìn|nghin|ngàn|ngan|k)(?![\p{L}]))?/iu.exec(text)
+  if (!match) return null
+  const r = parseMoneyInput(match[0], currency)
+  return r.ok ? r.canonical : null
 }
