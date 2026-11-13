@@ -464,7 +464,7 @@ làm mặc định thay cho `DEFAULT_CURRENCY` cố định (`QuickAddSheet.tsx:
 - [x] **D1** bảng Thêm giao dịch: tự focus, lưới danh mục, chip ngày, nhớ lựa chọn, Lưu & thêm tiếp
 - [x] **D2** hoàn tác cho xoá / đã trả / thêm; `ConfirmDialog` thay 7 `window.confirm`
 - [x] **D3** bấm cả hàng để sửa, cột tiền thẳng hàng
-- [ ] **D4** bảng nháp AI: tổng, câu gốc, lỗi theo dòng, giữ câu khi bỏ nháp
+- [x] **D4** bảng nháp AI: tổng, câu gốc, lỗi theo dòng, giữ câu khi bỏ nháp
 - [ ] Sau mỗi bước: `npm test && npm run typecheck && npm run lint && npm run build`
 - [ ] Sau mỗi đợt: kiểm trên điện thoại thật (375px), cả theme sáng và tối, cả 4 ngôn ngữ
 
@@ -490,3 +490,5 @@ làm mặc định thay cho `DEFAULT_CURRENCY` cố định (`QuickAddSheet.tsx:
 - 2026-11-13 — D1 xong: CategoryGrid (xếp theo lịch sử dùng, utils/addPreferences.ts + test), chip Hôm nay/Hôm qua, 3 nút tiền tệ, nhớ tiền tệ/loại/danh mục theo sổ (localStorage), AI dùng tiền tệ nhớ được, nút 'Lưu & thêm tiếp', tự focus ô tiền. CHƯA làm: chỉnh chiều cao sheet theo visualViewport cho iOS (cần máy thật để kiểm) — để lại cho chủ repo thử trên iPhone.
 - 2026-11-13 — D2 xong: hooks/useUndoableActions.ts (xoá trễ 5s, xả ngay khi trang bị ẩn; đã trả & thêm mới có Hoàn tác), components/common/ConfirmDialog.tsx + ConfirmProvider trong AppProviders. Không còn window.confirm trong module chi tiêu (lịch tuần vẫn dùng, ngoài phạm vi). Kiểm trang thử: xoá không hỏi, dòng biến mất, toast có Hoàn tác; xoá danh mục hiện hộp xác nhận theo theme.
 - 2026-11-13 — D3 xong: cả hàng là nút sửa (nút phủ absolute), nút 'Đã trả/Đã nhận' 44px nằm dưới số tiền (cột tiền thẳng hàng), Xoá (có Hoàn tác) nằm trong form sửa, ghi chú trống thì tên danh mục làm tiêu đề.
+- 2026-11-13 — D4 xong: bảng nháp có câu gốc, dòng tổng theo tiền tệ, dòng sai viền đỏ + lý do, nút Lưu tất cả không khoá câm (cuộn tới dòng lỗi), bỏ nháp → câu cũ quay lại ô AI, AI lỗi → Nhập tay điền sẵn số tiền đầu tiên (firstAmountIn + test) và cả câu làm ghi chú, spinner + aria-busy.
+- 2026-11-13 — **KIỂM CHỨNG ĐỢT D: ĐẠT** — 137 test, typecheck/lint(0 lỗi)/build sạch. Trang thử: form nhập tay 4 chạm, tự focus ô tiền; xoá có Hoàn tác; xoá danh mục hiện ConfirmDialog; bấm hàng mở form sửa có nút Xoá; bản nháp hiện câu gốc + tổng 14.960.000 ₫, dòng lỗi được đánh dấu, bỏ nháp trả lại câu.
