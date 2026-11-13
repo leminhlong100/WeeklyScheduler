@@ -6,7 +6,11 @@ const SCOPES_KEY = 'weeklyScheduler.amountsHiddenScopes'
 /** Những khối tổng có thể ẩn riêng; danh mục dùng khoá `cat:<id>`. */
 export type AmountScope = 'month' | 'year' | 'day'
 
-export const categoryScopeKey = (categoryId: string) => `cat:${categoryId}`
+/** Khoá cho nhóm "chưa phân loại": khoản không có danh mục cũng phải che được. */
+export const UNCATEGORIZED_SCOPE_KEY = 'cat:none'
+
+export const categoryScopeKey = (categoryId: string | null) =>
+  categoryId === null ? UNCATEGORIZED_SCOPE_KEY : `cat:${categoryId}`
 
 function readStoredScopes(): Set<string> {
   try {
@@ -37,11 +41,12 @@ interface AmountVisibilityContextValue {
 const AmountVisibilityContext = createContext<AmountVisibilityContextValue | null>(null)
 
 export function AmountVisibilityProvider({ children }: { children: ReactNode }) {
-  const [hidden, setHidden] = useState(true)
+  // "Che theo lựa chọn" — mặc định bật, mở lại app là che lại ngay.
+  const [scopedOn, setScopedOn] = useState(true)
   const [hiddenScopes, setHiddenScopes] = useState(readStoredScopes)
 
   const toggleHidden = useCallback(() => {
-    setHidden((prev) => !prev)
+    setScopedOn((prev) => !prev)
   }, [])
 
   const toggleScope = useCallback((key: string) => {
@@ -67,12 +72,23 @@ export function AmountVisibilityProvider({ children }: { children: ReactNode }) 
     setHiddenScopes(next)
   }, [])
 
+  // `categoryId === null` là khoản chưa phân loại — trước đây nó không bao giờ
+  // bị che, kể cả khi đã chọn che mọi danh mục.
+  //
+  // Chưa chọn mục nào thì mặc định KHÔNG che gì (như trước), và nút con mắt đổi
+  // vai thành "che tất cả". Trước đây trường hợp này làm nút con mắt không có tác
+  // dụng gì, trông như hỏng.
+  const noScopes = hiddenScopes.size === 0
+  const hidden = noScopes ? !scopedOn : scopedOn
+
   const isMasked = useCallback(
-    (scope?: AmountScope, categoryId?: string | null) =>
-      hidden &&
-      ((scope !== undefined && hiddenScopes.has(scope)) ||
-        (!!categoryId && hiddenScopes.has(categoryScopeKey(categoryId)))),
-    [hidden, hiddenScopes],
+    (scope?: AmountScope, categoryId?: string | null) => {
+      if (!hidden) return false
+      if (noScopes) return true
+      if (scope !== undefined && hiddenScopes.has(scope)) return true
+      return categoryId !== undefined && hiddenScopes.has(categoryScopeKey(categoryId))
+    },
+    [hidden, noScopes, hiddenScopes],
   )
 
   const value = useMemo(

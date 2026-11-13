@@ -129,7 +129,10 @@ function ExpensesPageContent() {
   const { monthIndex, year } = monthLabelParts(month)
   const monthLabel = `${t.mon[monthIndex]} ${year}`
 
-  const visibleExpenses = useMemo(() => filterExpenses(expenses, filter), [expenses, filter])
+  const visibleExpenses = useMemo(
+    () => filterExpenses(expenses, filter, { matchAmount: !amountsHidden }),
+    [expenses, filter, amountsHidden],
+  )
 
   // Đang xem tháng này thì điền hôm nay; xem tháng khác thì điền ngày 1 của
   // tháng đó — nếu cứ điền hôm nay, khoản vừa thêm sẽ rơi ra ngoài danh sách

@@ -128,7 +128,8 @@ function CategoryLine({ row, kind, currency, category }: CategoryLineProps) {
           className="flex-shrink-0 text-[11.5px] font-bold tabular-nums"
           style={{ color: theme.muted }}
         >
-          {percent(row.share)}
+          {/* % cũng lộ độ lớn: che cùng lúc với số tiền của danh mục. */}
+          <MaskedAmount categoryId={categoryId}>{percent(row.share)}</MaskedAmount>
         </span>
         <span
           className="flex-shrink-0 text-[13px] font-extrabold tabular-nums"

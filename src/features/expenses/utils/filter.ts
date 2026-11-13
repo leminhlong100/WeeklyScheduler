@@ -46,7 +46,15 @@ function normalize(text: string): string {
  * Khớp cả `note`, `raw_text` (câu gốc AI tách ra: gõ "bún" vẫn tìm được dòng đã
  * bị sửa ghi chú) và chính con số tiền.
  */
-export function filterExpenses(expenses: Expense[], filter: ExpenseFilter): Expense[] {
+export function filterExpenses(
+  expenses: Expense[],
+  filter: ExpenseFilter,
+  /**
+   * `false` khi số tiền đang bị che: gõ thử một con số mà danh sách lọc ra đúng
+   * dòng thì vẫn biết được số tiền bị che là bao nhiêu.
+   */
+  { matchAmount = true }: { matchAmount?: boolean } = {},
+): Expense[] {
   const needle = normalize(filter.query.trim())
 
   return expenses.filter((e) => {
@@ -59,7 +67,7 @@ export function filterExpenses(expenses: Expense[], filter: ExpenseFilter): Expe
     }
 
     if (needle === '') return true
-    const haystack = normalize(`${e.note} ${e.raw_text ?? ''} ${e.amount}`)
+    const haystack = normalize(`${e.note} ${e.raw_text ?? ''} ${matchAmount ? e.amount : ''}`)
     return haystack.includes(needle)
   })
 }

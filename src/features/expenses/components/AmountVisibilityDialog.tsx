@@ -53,7 +53,11 @@ export function AmountVisibilityDialog({
     { key: 'year', label: t.hideScopeYear },
     { key: 'day', label: t.hideScopeDay },
   ] as const
-  const allKeys = [...scopes.map((s) => s.key), ...categories.map((c) => categoryScopeKey(c.id))]
+  const allKeys = [
+    ...scopes.map((s) => s.key),
+    ...categories.map((c) => categoryScopeKey(c.id)),
+    categoryScopeKey(null),
+  ]
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -113,6 +117,13 @@ export function AmountVisibilityDialog({
                 <span className="truncate">{translateExpenseCategoryName(c.name, t)}</span>
               </Option>
             ))}
+            <Option
+              checked={hiddenScopes.has(categoryScopeKey(null))}
+              onChange={() => toggleScope(categoryScopeKey(null))}
+            >
+              <span>❔</span>
+              <span className="truncate">{t.expenseUncategorized}</span>
+            </Option>
           </div>
         )}
       </DialogContent>
