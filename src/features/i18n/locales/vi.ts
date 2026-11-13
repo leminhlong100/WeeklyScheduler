@@ -343,6 +343,7 @@ export const vi: Dictionary = {
   addTransaction: 'Thêm giao dịch',
   addIncome: 'Thêm khoản thu',
   editIncome: 'Sửa khoản thu',
+  saveAndAddAnother: 'Lưu & thêm tiếp',
   incomeCreated: 'Đã thêm khoản thu',
   incomeUpdated: 'Đã cập nhật khoản thu',
   incomeMarkReceived: 'Đã nhận',

@@ -343,6 +343,7 @@ export const ja: Dictionary = {
   addTransaction: '取引を追加',
   addIncome: '収入を追加',
   editIncome: '収入を編集',
+  saveAndAddAnother: '保存して続ける',
   incomeCreated: '収入を追加しました',
   incomeUpdated: '収入を更新しました',
   incomeMarkReceived: '受け取り済みにする',

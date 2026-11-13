@@ -342,6 +342,7 @@ export const zh: Dictionary = {
   addTransaction: '添加记录',
   addIncome: '添加收入',
   editIncome: '编辑收入',
+  saveAndAddAnother: '保存并继续',
   incomeCreated: '已添加收入',
   incomeUpdated: '已更新收入',
   incomeMarkReceived: '标记已收到',

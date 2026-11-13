@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { useForm, useWatch, Controller } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { RepeatIcon } from 'lucide-react'
@@ -18,9 +18,9 @@ import { FormField } from '@/components/form/FormField'
 import { MoneyInput } from '@/components/form/MoneyInput'
 import { useTranslation } from '@/features/i18n/LocaleContext'
 import { useTheme } from '@/features/theme/ThemeContext'
-import { translateExpenseCategoryName } from '@/features/i18n/defaultExpenseCategoryNames'
 import { translateFieldError } from '@/lib/utils/formErrors'
 import { todayISO } from '@/lib/utils/date'
+import dayjs from 'dayjs'
 import type { ExpenseKind } from '@/lib/supabase/database.types'
 import {
   expenseSchema,
@@ -42,6 +42,9 @@ import { useExpenseCategories } from '../hooks/useExpenseCategories'
 import { buildMonthlyRepeatDates } from '../utils/month'
 import { statusForDate } from '../utils/status'
 import { NO_CATEGORY } from '../utils/draft'
+import { orderByUsage, readAddPreferences, rememberAddChoice } from '../utils/addPreferences'
+import { ledgerCacheKey, useCurrentLedger } from '../LedgerContext'
+import { CategoryGrid } from './CategoryGrid'
 import type { Expense } from '../api/expensesApi'
 
 interface ExpenseEditFormProps {
@@ -50,6 +53,8 @@ interface ExpenseEditFormProps {
   defaultDate?: string
   onDone: () => void
 }
+
+const CURRENCY_LABEL = { VND: '₫ VND', JPY: '¥ JPY', USD: '$ USD' } as const
 
 export function ExpenseEditForm({ expense, defaultDate, onDone }: ExpenseEditFormProps) {
   const { t } = useTranslation()
@@ -64,14 +69,23 @@ export function ExpenseEditForm({ expense, defaultDate, onDone }: ExpenseEditFor
   const seriesId = expense?.series_id ?? null
 
   const [applyToSeries, setApplyToSeries] = useState(false)
+  const { ledgerId } = useCurrentLedger()
+  const ledgerKey = ledgerCacheKey(ledgerId)
+  // Đọc một lần khi mở form: lựa chọn lần trước làm mặc định cho lần này.
+  const [prefs] = useState(() => readAddPreferences(ledgerKey))
+  const initialKind = expense?.kind ?? prefs.kind ?? 'expense'
+  /** Bấm "Lưu & thêm tiếp" thì giữ form mở cho khoản kế tiếp. */
+  const keepOpen = useRef(false)
 
   const form = useForm<ExpenseFormInput>({
     resolver: zodResolver(expenseSchema),
     defaultValues: {
       amount: expense ? String(expense.amount) : '',
-      currency: expense?.currency ?? DEFAULT_CURRENCY,
-      kind: expense?.kind ?? 'expense',
-      categoryId: expense?.category_id ?? NO_CATEGORY,
+      currency: expense?.currency ?? prefs.currency ?? DEFAULT_CURRENCY,
+      kind: initialKind,
+      categoryId: expense
+        ? (expense.category_id ?? NO_CATEGORY)
+        : (prefs.lastCategory?.[initialKind] ?? NO_CATEGORY),
       note: expense?.note ?? '',
       spentAt: expense?.spent_at ?? defaultDate ?? todayISO(),
       repeatMonths: 1,
@@ -89,17 +103,15 @@ export function ExpenseEditForm({ expense, defaultDate, onDone }: ExpenseEditFor
   const repeatMonths = useWatch({ control, name: 'repeatMonths' })
   const currency = useWatch({ control, name: 'currency' })
 
-  // Danh mục thu và danh mục chi tách hẳn, nên bộ chọn chỉ hiện nhóm khớp kind
-  // đang chọn — tránh gán "Lương" cho một khoản chi.
-  const categoryOptions = [
-    { value: NO_CATEGORY, label: t.expenseUncategorized },
-    ...categories
-      .filter((c) => c.kind === kind)
-      .map((c) => ({
-        value: c.id,
-        label: `${c.emoji} ${translateExpenseCategoryName(c.name, t)}`,
-      })),
-  ]
+  // Danh mục thu và danh mục chi tách hẳn, nên lưới chỉ hiện nhóm khớp kind
+  // đang chọn — tránh gán "Lương" cho một khoản chi. Hay dùng thì lên đầu.
+  const gridCategories = orderByUsage(
+    categories.filter((c) => c.kind === kind),
+    prefs.history,
+  )
+  const spentAt = useWatch({ control, name: 'spentAt' })
+  const today = todayISO()
+  const yesterday = dayjs(today).subtract(1, 'day').format('YYYY-MM-DD')
 
   const kindLabel: Record<ExpenseKind, string> = {
     expense: t.expenseKindExpense,
@@ -114,11 +126,18 @@ export function ExpenseEditForm({ expense, defaultDate, onDone }: ExpenseEditFor
   const onSubmit = async (values: ExpenseFormInput) => {
     // Không đưa `status` vào đây: mỗi kỳ giữ trạng thái đã trả / chưa trả của
     // riêng nó, một bản vá chung cho cả chuỗi sẽ ghi đè hết.
+    // Danh mục nhớ từ lần trước có thể đã bị xoá ở thiết bị khác: không gửi một
+    // id không còn tồn tại (DB sẽ báo lỗi khoá ngoại).
+    const categoryExists = categories.some((c) => c.id === values.categoryId)
+    const categoryId =
+      values.categoryId === NO_CATEGORY || (categories.length > 0 && !categoryExists)
+        ? null
+        : values.categoryId
     const shared = {
       amount: parseAmount(values.amount, values.currency),
       currency: values.currency,
       kind: values.kind,
-      category_id: values.categoryId === NO_CATEGORY ? null : values.categoryId,
+      category_id: categoryId,
       note: values.note.trim(),
     }
 
@@ -177,6 +196,7 @@ export function ExpenseEditForm({ expense, defaultDate, onDone }: ExpenseEditFor
           })),
         )
         toast.success(t.expenseSeriesCreated.replace('{n}', String(dates.length)))
+        rememberAddChoice(ledgerKey, { currency: values.currency, kind: values.kind, categoryId })
         onDone()
         return
       }
@@ -188,8 +208,17 @@ export function ExpenseEditForm({ expense, defaultDate, onDone }: ExpenseEditFor
         source: 'manual',
       })
       toast.success(values.kind === 'income' ? t.incomeCreated : t.expenseCreated)
+      rememberAddChoice(ledgerKey, { currency: values.currency, kind: values.kind, categoryId })
+      if (keepOpen.current) {
+        // Giữ ngày, loại, danh mục, tiền tệ; chỉ xoá số tiền và ghi chú.
+        keepOpen.current = false
+        form.reset({ ...values, amount: '', note: '', repeatMonths: 1 })
+        form.setFocus('amount')
+        return
+      }
       onDone()
     } catch (error) {
+      keepOpen.current = false
       toast.error(describeError(t, error))
     }
   }
@@ -248,7 +277,7 @@ export function ExpenseEditForm({ expense, defaultDate, onDone }: ExpenseEditFor
                     field.onChange(option)
                     // Danh mục của kind cũ không còn nằm trong danh sách mới, để
                     // lại sẽ là một id vô hình mà bộ chọn không hiển thị được.
-                    form.setValue('categoryId', NO_CATEGORY)
+                    form.setValue('categoryId', prefs.lastCategory?.[option] ?? NO_CATEGORY)
                   }}
                   className="min-h-11 flex-1 rounded-[10px] py-1.5 text-[14px] font-extrabold sm:min-h-9 transition-transform duration-150 active:scale-[0.98]"
                   style={{
@@ -268,7 +297,7 @@ export function ExpenseEditForm({ expense, defaultDate, onDone }: ExpenseEditFor
         )}
       />
 
-      <div className="flex gap-3">
+      <div className="flex">
         <div className="min-w-0 flex-1">
           <FormField
             label={t.expenseAmount}
@@ -303,58 +332,51 @@ export function ExpenseEditForm({ expense, defaultDate, onDone }: ExpenseEditFor
             />
           </FormField>
         </div>
-        <div className="w-[104px] flex-shrink-0">
-          <FormField label={t.expenseCurrency} htmlFor="currency">
-            <Controller
-              control={control}
-              name="currency"
-              render={({ field }) => (
-                <Select
-                  items={CURRENCIES.map((c) => ({ value: c, label: c }))}
-                  value={field.value}
-                  onValueChange={(v) => field.onChange(v)}
-                >
-                  <SelectTrigger className="w-full" style={inputStyle}>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent style={contentStyle}>
-                    {CURRENCIES.map((c) => (
-                      <SelectItem key={c} value={c} label={c}>
-                        {c}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              )}
-            />
-          </FormField>
-        </div>
       </div>
 
-      <FormField label={t.expenseCategory} htmlFor="categoryId">
+      <Controller
+        control={control}
+        name="currency"
+        render={({ field }) => (
+          <div role="radiogroup" aria-label={t.expenseCurrency} className="-mt-1 flex gap-1.5">
+            {CURRENCIES.map((c) => {
+              const selected = field.value === c
+              return (
+                <button
+                  key={c}
+                  type="button"
+                  role="radio"
+                  aria-checked={selected}
+                  onClick={() => field.onChange(c)}
+                  className="min-h-11 flex-1 rounded-[12px] border-[1.5px] text-[13px] font-extrabold sm:min-h-9"
+                  style={{
+                    borderColor: selected ? theme.accent : theme.border,
+                    background: selected ? `${theme.accent}22` : 'transparent',
+                    color: selected ? theme.text : theme.mutedText,
+                  }}
+                >
+                  {CURRENCY_LABEL[c]}
+                </button>
+              )
+            })}
+          </div>
+        )}
+      />
+
+      <div className="flex flex-col gap-1.5">
+        <div className="text-sm font-medium">{t.expenseCategory}</div>
         <Controller
           control={control}
           name="categoryId"
           render={({ field }) => (
-            <Select
-              items={categoryOptions}
+            <CategoryGrid
+              categories={gridCategories}
               value={field.value}
-              onValueChange={(v) => field.onChange(v)}
-            >
-              <SelectTrigger className="w-full" style={inputStyle}>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent style={contentStyle}>
-                {categoryOptions.map((o) => (
-                  <SelectItem key={o.value} value={o.value} label={o.label}>
-                    {o.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+              onChange={field.onChange}
+            />
           )}
         />
-      </FormField>
+      </div>
 
       <FormField
         label={t.expenseNote}
@@ -375,7 +397,34 @@ export function ExpenseEditForm({ expense, defaultDate, onDone }: ExpenseEditFor
         htmlFor="spentAt"
         error={translateFieldError(t, errors.spentAt?.message)}
       >
-        <Input id="spentAt" type="date" style={inputStyle} {...register('spentAt')} />
+        <div className="flex gap-1.5">
+          {[
+            [today, t.today],
+            [yesterday, t.dayYesterday],
+          ].map(([iso, label]) => (
+            <button
+              key={iso}
+              type="button"
+              aria-pressed={spentAt === iso}
+              onClick={() => form.setValue('spentAt', iso, { shouldValidate: true })}
+              className="min-h-11 flex-shrink-0 rounded-[12px] border-[1.5px] px-3 text-[13px] font-extrabold sm:min-h-8"
+              style={{
+                borderColor: spentAt === iso ? theme.accent : theme.border,
+                background: spentAt === iso ? `${theme.accent}22` : 'transparent',
+                color: spentAt === iso ? theme.text : theme.mutedText,
+              }}
+            >
+              {label}
+            </button>
+          ))}
+          <Input
+            id="spentAt"
+            type="date"
+            className="min-w-0 flex-1"
+            style={inputStyle}
+            {...register('spentAt')}
+          />
+        </div>
       </FormField>
 
       {/* Chỉ hỏi lúc TẠO: mỗi kỳ là một dòng thật, nên đổi độ dài chuỗi lúc sửa
@@ -486,6 +535,21 @@ export function ExpenseEditForm({ expense, defaultDate, onDone }: ExpenseEditFor
         >
           {t.cancel}
         </Button>
+        {!isEdit && (
+          <Button
+            type="button"
+            size="touch"
+            variant="outline"
+            disabled={isPending}
+            onClick={() => {
+              keepOpen.current = true
+              void form.handleSubmit(onSubmit)()
+            }}
+            style={{ background: 'transparent', borderColor: theme.accent, color: theme.accent }}
+          >
+            {t.saveAndAddAnother}
+          </Button>
+        )}
         <GradientButton type="submit" size="touch" disabled={isPending} className="min-w-[96px]">
           {t.save}
         </GradientButton>

@@ -16,6 +16,8 @@ import {
 import { useExpenseCategories } from '../hooks/useExpenseCategories'
 import { useSpeechRecognition, type SpeechErrorCode } from '../hooks/useSpeechRecognition'
 import { DEFAULT_CURRENCY } from '../schemas/expenseSchema'
+import { readAddPreferences } from '../utils/addPreferences'
+import { ledgerCacheKey, useCurrentLedger } from '../LedgerContext'
 
 /** Lỗi thô của Groq không bao giờ đến tay người dùng — mỗi mã một câu dễ hiểu. */
 function errorMessage(code: ParseExpenseErrorCode, t: Dictionary): string {
@@ -61,6 +63,7 @@ export function QuickAddSheet({ onDrafts, onEnterManually }: QuickAddSheetProps)
   const { t, locale } = useTranslation()
   const { theme } = useTheme()
   const { data: categories = [] } = useExpenseCategories()
+  const { ledgerId } = useCurrentLedger()
 
   const [text, setText] = useState('')
   const [isPending, setIsPending] = useState(false)
@@ -96,7 +99,8 @@ export function QuickAddSheet({ onDrafts, onEnterManually }: QuickAddSheetProps)
         // kind, nên "nhận lương 20tr" không thể rơi vào một danh mục chi.
         categories: categories.filter((c) => c.kind === 'expense').map((c) => c.name),
         incomeCategories: categories.filter((c) => c.kind === 'income').map((c) => c.name),
-        defaultCurrency: DEFAULT_CURRENCY,
+        // Tiền tệ dùng lần trước ở sổ này (người hay ghi yên không phải nói "yên" mỗi lần).
+        defaultCurrency: readAddPreferences(ledgerCacheKey(ledgerId)).currency ?? DEFAULT_CURRENCY,
       })
       if (items.length === 0) {
         setError(t.aiNoItems)

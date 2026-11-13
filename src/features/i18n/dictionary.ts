@@ -373,6 +373,7 @@ export interface Dictionary {
   addTransaction: string
   addIncome: string
   editIncome: string
+  saveAndAddAnother: string
   incomeCreated: string
   incomeUpdated: string
   incomeMarkReceived: string

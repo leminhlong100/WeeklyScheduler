@@ -344,6 +344,7 @@ export const en: Dictionary = {
   addTransaction: 'Add transaction',
   addIncome: 'Add income',
   editIncome: 'Edit income',
+  saveAndAddAnother: 'Save & add another',
   incomeCreated: 'Income added',
   incomeUpdated: 'Income updated',
   incomeMarkReceived: 'Mark received',
