@@ -1,4 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
+import type { QueryKey } from '@tanstack/react-query'
 import { useAuth } from '@/features/auth/AuthContext'
 import { listExpensesInRange } from '../api/expensesApi'
 import { ledgerCacheKey, useCurrentLedger } from '../LedgerContext'
@@ -29,6 +30,7 @@ export function useExpensesForYear(year: number) {
     queryKey: ['expenses', user?.id, ledgerCacheKey(ledgerId), 'year', year] as const,
     queryFn: () =>
       listExpensesInRange({ ownerId: ownerId!, ledgerId }, `${year}-01-01`, `${year + 1}-01-01`),
+    placeholderData: keepWithinLedger(ledgerCacheKey(ledgerId)),
     enabled: !!user && !!ownerId,
   })
 }
@@ -41,6 +43,17 @@ export function useExpensesForMonth(month: MonthKey) {
   return useQuery({
     queryKey: expensesQueryKey(user?.id, ledgerId, month),
     queryFn: () => listExpensesInRange({ ownerId: ownerId!, ledgerId }, startISO, endExclusiveISO),
+    placeholderData: keepWithinLedger(ledgerCacheKey(ledgerId)),
     enabled: !!user && !!ownerId,
   })
+}
+
+/**
+ * Chuyển tháng thì giữ dữ liệu tháng cũ (mờ đi) cho tới khi tháng mới về, thay
+ * vì nháy trạng thái trống. CHỈ khi cùng một sổ: đổi sổ mà giữ dữ liệu sổ kia
+ * làm placeholder là hiện tiền của người khác dưới tên sổ này.
+ */
+function keepWithinLedger(ledgerKey: string) {
+  return <T>(previous: T | undefined, previousQuery: { queryKey: QueryKey } | undefined) =>
+    previousQuery?.queryKey[2] === ledgerKey ? previous : undefined
 }

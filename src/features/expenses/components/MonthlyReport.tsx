@@ -1,3 +1,4 @@
+import { QueryStatus } from './QueryStatus'
 import { useMemo } from 'react'
 import { TrendingDownIcon, TrendingUpIcon } from 'lucide-react'
 import { useTranslation } from '@/features/i18n/LocaleContext'
@@ -133,7 +134,9 @@ function CategoryLine({ row, kind, currency, category }: CategoryLineProps) {
           className="flex-shrink-0 text-[13px] font-extrabold tabular-nums"
           style={{ color: kind === 'income' ? INCOME_COLOR : theme.text }}
         >
-          <MaskedAmount categoryId={categoryId}>{formatMoney(row.total, currency, locale)}</MaskedAmount>
+          <MaskedAmount categoryId={categoryId}>
+            {formatMoney(row.total, currency, locale)}
+          </MaskedAmount>
         </span>
       </div>
 
@@ -207,10 +210,12 @@ export function MonthlyReport({ month }: { month: MonthKey }) {
   const { t, locale } = useTranslation()
   const { theme } = useTheme()
 
-  const { data: expenses = [] } = useExpensesForMonth(month)
+  const expensesQuery = useExpensesForMonth(month)
+  const expenses = useMemo(() => expensesQuery.data ?? [], [expensesQuery.data])
   // Tháng trước là một query key khác nên có cache riêng: lùi một tháng rồi quay
   // lại không phải fetch thêm lần nào.
-  const { data: previousExpenses = [] } = useExpensesForMonth(shiftMonth(month, -1))
+  const previousQuery = useExpensesForMonth(shiftMonth(month, -1))
+  const previousExpenses = useMemo(() => previousQuery.data ?? [], [previousQuery.data])
   const { data: categories = [] } = useExpenseCategories()
 
   // Tháng đang diễn ra thì chỉ so với cùng số ngày của tháng trước.
@@ -224,6 +229,10 @@ export function MonthlyReport({ month }: { month: MonthKey }) {
     () => new Map(categories.map((c) => [c.id, c] as const)),
     [categories],
   )
+
+  if (expensesQuery.isPending || (expensesQuery.isError && !expensesQuery.data)) {
+    return <QueryStatus query={expensesQuery}>{null}</QueryStatus>
+  }
 
   if (expenses.length === 0) {
     return (
@@ -249,7 +258,9 @@ export function MonthlyReport({ month }: { month: MonthKey }) {
                   className="font-heading text-[20px] font-extrabold tabular-nums"
                   style={{ color: report.balance < 0 ? OVER_BUDGET_COLOR : INCOME_COLOR }}
                 >
-                  <MaskedAmount scope="month">{formatMoney(report.balance, report.currency, locale)}</MaskedAmount>
+                  <MaskedAmount scope="month">
+                    {formatMoney(report.balance, report.currency, locale)}
+                  </MaskedAmount>
                 </div>
               </div>
               <span className="text-[11px] font-extrabold" style={{ color: theme.muted }}>

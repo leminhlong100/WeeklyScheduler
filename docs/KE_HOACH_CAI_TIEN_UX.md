@@ -445,10 +445,10 @@ làm mặc định thay cho `DEFAULT_CURRENCY` cố định (`QuickAddSheet.tsx:
 
 ## Checklist tổng
 
-- [ ] **A0** Vitest + 25 case cũ thành test
-- [ ] **A1** `MoneyInput` + `parseMoneyInput`, thay ở 3 form, placeholder 4 ngôn ngữ
+- [x] **A0** Vitest + 25 case cũ thành test
+- [x] **A1** `MoneyInput` + `parseMoneyInput`, thay ở 3 form, placeholder 4 ngôn ngữ
 - [ ] **A2** skeleton / lỗi / offline, `keepPreviousData`
-- [ ] **A3** chống gửi trùng `isSubmitting`
+- [x] **A3** chống gửi trùng `isSubmitting`
 - [ ] **A4** ẩn số tiền: mặc định che hết, `cat:none`, che %
 - [ ] **A5** một gốc %, `formatPercent`
 - [ ] **B1** `formatSignedMoney`
@@ -475,3 +475,4 @@ làm mặc định thay cho `DEFAULT_CURRENCY` cố định (`QuickAddSheet.tsx:
 > Ghi mới nhất ở dưới cùng. Mỗi dòng: ngày — bước — kết quả / ghi chú cho phiên sau.
 
 - 2026-11-13 — Tạo nhánh `feat/ux-overhaul`, bắt đầu Đợt A.
+- 2026-11-13 — A0+A1+A3 xong (commit 48d9388 và trước đó). Vitest 4 (vitest.config.ts riêng), 51 test. MoneyInput ở src/components/form, parser ở src/lib/utils/parseMoneyInput.ts. Đã kiểm trên trang thử: 30000→30.000, '30.000'→30000, '1,5tr'→1.500.000, chèn số giữa giữ con trỏ, chip +50k. CHƯA kiểm được trang thật vì không đăng nhập được (Google OAuth). Trang thử cục bộ: harness.html + harness/ (bị .git/info/exclude, không commit).

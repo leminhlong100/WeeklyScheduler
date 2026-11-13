@@ -349,6 +349,10 @@ export interface Dictionary {
   /** Badge on rows the AI extracted (as opposed to typed by hand). */
   expenseSourceAi: string
   noExpenses: string
+  loadErrorTitle: string
+  loadErrorHint: string
+  offlineNotice: string
+  loadingLabel: string
   expenseMonthTotal: string
   expenseYearTotal: string
 

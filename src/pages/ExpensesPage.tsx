@@ -20,6 +20,7 @@ import { AppShell } from '@/features/layout/components/AppShell'
 import { Sidebar } from '@/features/layout/components/Sidebar'
 import { ExpensesHeader } from '@/features/expenses/components/ExpensesHeader'
 import { ExpenseList } from '@/features/expenses/components/ExpenseList'
+import { QueryStatus } from '@/features/expenses/components/QueryStatus'
 import { ExpenseEditForm } from '@/features/expenses/components/ExpenseEditForm'
 import { QuickAddSheet } from '@/features/expenses/components/QuickAddSheet'
 import { ParsedDraftList } from '@/features/expenses/components/ParsedDraftList'
@@ -119,7 +120,8 @@ function ExpensesPageContent() {
     isExpenseDraft,
   )
 
-  const { data: expenses = [] } = useExpensesForMonth(month)
+  const expensesQuery = useExpensesForMonth(month)
+  const expenses = useMemo(() => expensesQuery.data ?? [], [expensesQuery.data])
   const { data: categories = [] } = useExpenseCategories()
   const deleteExpense = useDeleteExpense()
   const updateExpense = useUpdateExpense()
@@ -275,17 +277,19 @@ function ExpensesPageContent() {
         </div>
 
         {tab === 'list' ? (
-          <ExpenseList
-            expenses={visibleExpenses}
-            year={year}
-            monthCount={expenses.length}
-            categories={categories}
-            filter={filter}
-            onFilterChange={setFilter}
-            onEdit={canEdit ? setEditTarget : undefined}
-            onDelete={canEdit ? handleDelete : undefined}
-            onMarkPaid={canEdit ? handleMarkPaid : undefined}
-          />
+          <QueryStatus query={expensesQuery}>
+            <ExpenseList
+              expenses={visibleExpenses}
+              year={year}
+              monthCount={expenses.length}
+              categories={categories}
+              filter={filter}
+              onFilterChange={setFilter}
+              onEdit={canEdit ? setEditTarget : undefined}
+              onDelete={canEdit ? handleDelete : undefined}
+              onMarkPaid={canEdit ? handleMarkPaid : undefined}
+            />
+          </QueryStatus>
         ) : (
           // Báo cáo cố ý KHÔNG chịu ảnh hưởng của bộ lọc: nó là bức tranh cả
           // tháng, một báo cáo đã lọc mà không nói rõ sẽ bị đọc thành toàn cảnh.
