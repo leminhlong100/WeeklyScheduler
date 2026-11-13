@@ -454,7 +454,7 @@ làm mặc định thay cho `DEFAULT_CURRENCY` cố định (`QuickAddSheet.tsx:
 - [x] **B1** `formatSignedMoney`
 - [x] **B2** token màu theo theme, ≥ 4.5:1, xoá 7 màu viết cứng
 - [x] **B3** thuật ngữ, nhãn theo kind, lỗi zod i18n
-- [ ] **B4** vùng chạm 44px, ô AI 16px, ARIA
+- [x] **B4** vùng chạm 44px, ô AI 16px, ARIA
 - [ ] **C1** tháng + tab vào URL
 - [ ] **C2** `ExpenseBottomNav` + sidebar desktop
 - [ ] **C3** Tổng quan: `SpendableCard`, `BudgetProgressList`, Sắp tới, Gần đây, trạng thái trống
@@ -483,3 +483,5 @@ làm mặc định thay cho `DEFAULT_CURRENCY` cố định (`QuickAddSheet.tsx:
 - 2026-11-13 — B1 xong: formatSignedMoney (chi luôn −, thu +, số dư âm U+2212). Lưu ý: commit này cũng chạy prettier trên src/features/expenses/components (chỉ đổi định dạng).
 - 2026-11-13 — B2 xong: DerivedTheme có thêm mutedText/income/warning/warningBg, danger cũng được chỉnh đạt 4.5:1 (deriveTheme.readable). Test src/features/theme/contrast.test.ts chạy qua mọi preset. Trong module chi tiêu mọi 'color: theme.muted' (chữ) đổi thành mutedText; FormField nối lỗi bằng aria-invalid/aria-describedby.
 - 2026-11-13 — B3 xong: thuật ngữ (giao dịch, Tiền tệ, Ngày, Đã trả/Đã nhận, lần lặp thay cho kỳ/chuỗi, Xoá thống nhất). Toast/tiêu đề theo kind. CSV thêm cột nhãn đã dịch, tên file theo locale. GIỮ 'Sức khỏe' của danh mục lịch tuần vì phải khớp tên seed trong DB.
+- 2026-11-13 — B4 xong: Button size='touch', Input/SelectTrigger/SelectItem cao 44px dưới sm (ảnh hưởng cả app, chỉ trên mobile), Chi/Thu là radiogroup, chip tiền 44px, ô AI 16px, lưới emoji 6 cột. Đo trên trang thử 375px: không còn ô/nút nào < 44px trong form và bảng nháp.
+- 2026-11-13 — **KIỂM CHỨNG ĐỢT B: ĐẠT** — 118 test (thêm test tương phản cho mọi theme), typecheck/lint(0 lỗi)/build sạch, kiểm trang thử 375px.
