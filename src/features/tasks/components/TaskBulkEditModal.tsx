@@ -49,7 +49,7 @@ function FieldToggle({
             style={{ transform: enabled ? 'translateX(16px)' : 'translateX(0)' }}
           />
         </span>
-        <span className="text-xs font-extrabold" style={{ color: enabled ? theme.text : theme.muted }}>
+        <span className="text-xs font-extrabold" style={{ color: enabled ? theme.text : theme.mutedText }}>
           {label}
         </span>
       </button>
@@ -119,7 +119,7 @@ export function TaskBulkEditModal({ count, onClose, onApply, isPending }: TaskBu
             <DialogTitle className="font-heading text-xl font-extrabold" style={{ color: theme.text }}>
               {t.bulkEditTitle.replace('{n}', String(count))}
             </DialogTitle>
-            <p className="mt-1 text-[12.5px] font-medium" style={{ color: theme.muted }}>
+            <p className="mt-1 text-[12.5px] font-medium" style={{ color: theme.mutedText }}>
               {t.bulkEditHint}
             </p>
           </div>

@@ -90,8 +90,12 @@ function ConfirmDialogView({
             size="touch"
             autoFocus
             onClick={() => onClose(true)}
-            className="font-extrabold text-white"
-            style={{ background: danger ? theme.danger : theme.accent, border: 'none' }}
+            className="font-extrabold"
+            style={{
+              background: danger ? theme.danger : theme.accentFill,
+              color: danger ? theme.onDanger : theme.onAccent,
+              border: 'none',
+            }}
           >
             {pending?.confirmLabel ?? t.delete}
           </Button>

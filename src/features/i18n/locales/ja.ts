@@ -194,7 +194,7 @@ export const ja: Dictionary = {
 
   themeIssueTextSurface: 'この面では文字が薄すぎます',
   themeIssueMuted: '補助テキストがかなり薄いです',
-  themeIssueSidebar: 'サイドバーが明るすぎて白文字が読めません',
+  themeIssueSidebar: 'サイドバーの色は白文字でも黒文字でも読みにくいです',
   themeIssueScene: '背景画で文字が読みにくくなっています',
   studioUseOpacity: '{n}% にする',
   studioDarkenSidebar: 'サイドバーを暗くする',

@@ -103,8 +103,8 @@ export function ExpenseFilters({ value, onChange, categories, resultCount }: Exp
                 onClick={() => onChange({ ...value, kind, categoryId: 'all' })}
                 className="min-h-9 rounded-[9px] px-3 py-1 text-[12.5px] font-extrabold transition-transform duration-150 active:scale-95"
                 style={{
-                  background: selected ? theme.accent : 'transparent',
-                  color: selected ? '#fff' : theme.muted,
+                  background: selected ? theme.accentFill : 'transparent',
+                  color: selected ? theme.onAccent : theme.mutedText,
                 }}
               >
                 {kindLabel[kind]}

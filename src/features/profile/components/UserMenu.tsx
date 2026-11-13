@@ -38,14 +38,14 @@ export function UserMenu() {
         className="relative h-[42px] w-[42px] flex-shrink-0 rounded-full outline-none"
       >
         <Avatar
-          className="h-full w-full border-2 font-heading text-[15px] font-extrabold text-white"
+          className="h-full w-full border-2 font-heading text-[15px] font-extrabold"
           style={{
             borderColor: theme.panel,
             boxShadow: `0 5px 14px ${theme.brandShadow}, 0 0 0 1.5px ${theme.borderStrong}`,
           }}
         >
           {profile?.avatar_url && <AvatarImage src={profile.avatar_url} alt={name} />}
-          <AvatarFallback style={{ background: theme.brandGrad }} className="text-white">
+          <AvatarFallback style={{ background: theme.brandGrad, color: theme.onBrand }}>
             {getInitials(name)}
           </AvatarFallback>
         </Avatar>

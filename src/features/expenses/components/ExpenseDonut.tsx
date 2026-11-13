@@ -34,7 +34,7 @@ export function ExpenseDonut({
     const category = row.categoryId === UNCATEGORIZED ? undefined : categoryById.get(row.categoryId)
     return {
       key: row.categoryId,
-      color: category?.color ?? theme.muted,
+      color: category?.color ?? theme.mutedText,
       length: row.share * CIRCUMFERENCE,
       // Điểm bắt đầu = tổng độ dài các lát trước nó.
       offset: rows.slice(0, i).reduce((sum, r) => sum + r.share * CIRCUMFERENCE, 0),

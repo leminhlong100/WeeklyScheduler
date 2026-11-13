@@ -26,7 +26,7 @@ export function TaskCategoryChips({ categories, selectedId, onSelect, theme }: T
             style={{
               borderColor: selected ? category.color : theme.border,
               background: selected ? rgba(category.color, 0.14) : 'transparent',
-              color: selected ? mixColors(category.color, '#000000', 0.12) : theme.muted,
+              color: selected ? mixColors(category.color, '#000000', 0.12) : theme.mutedText,
             }}
           >
             <span className="text-sm">{category.emoji}</span>

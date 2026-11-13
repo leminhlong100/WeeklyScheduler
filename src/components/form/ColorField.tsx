@@ -60,7 +60,7 @@ export function ColorField({
   return (
     <div className={cn('flex flex-col gap-1.5', className)}>
       <div className="flex items-center justify-between gap-2">
-        <span className="text-[11px] font-extrabold" style={{ color: colors.muted }}>
+        <span className="text-[11px] font-extrabold" style={{ color: colors.mutedText }}>
           {label}
         </span>
         <div className="flex items-center gap-1.5">
@@ -72,7 +72,7 @@ export function ColorField({
               aria-label={resetLabel}
               title={resetLabel}
               className="grid size-5 place-items-center rounded-md"
-              style={{ color: colors.muted }}
+              style={{ color: colors.mutedText }}
             >
               <RotateCcw className="size-3" />
             </button>

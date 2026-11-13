@@ -14,7 +14,7 @@ export function GoogleButton() {
     <div className="flex flex-col gap-4">
       <div className="flex items-center gap-3">
         <div className="h-px flex-1" style={{ background: theme.border }} />
-        <span className="text-xs font-semibold uppercase" style={{ color: theme.muted }}>
+        <span className="text-xs font-semibold uppercase" style={{ color: theme.mutedText }}>
           {t.orDivider}
         </span>
         <div className="h-px flex-1" style={{ background: theme.border }} />

@@ -260,12 +260,12 @@ export function ArtTab({ draft, chrome, t, userId, onBusyChange }: ArtTabProps) 
         <>
           <div className="flex flex-col gap-1">
             <div className="flex items-baseline justify-between gap-2">
-              <span className="text-[11px] font-extrabold" style={{ color: chrome.muted }}>
+              <span className="text-[11px] font-extrabold" style={{ color: chrome.mutedText }}>
                 {t.studioSceneOpacity}
               </span>
               <span
                 className="font-mono text-[10px] font-bold tabular-nums"
-                style={{ color: chrome.muted }}
+                style={{ color: chrome.mutedText }}
               >
                 {Math.round(sceneOpacity * 100)}%
               </span>
@@ -315,7 +315,7 @@ export function ArtTab({ draft, chrome, t, userId, onBusyChange }: ArtTabProps) 
           </div>
 
           <div className="flex flex-col gap-1.5">
-            <span className="text-[11px] font-extrabold" style={{ color: chrome.muted }}>
+            <span className="text-[11px] font-extrabold" style={{ color: chrome.mutedText }}>
               {t.studioScenePosition}
             </span>
             <div className="grid grid-cols-3 gap-1.5">
@@ -364,14 +364,14 @@ export function ArtTab({ draft, chrome, t, userId, onBusyChange }: ArtTabProps) 
 
       <div className="flex flex-col gap-2">
         <div className="flex items-center justify-between gap-2">
-          <span className="text-[11px] font-extrabold" style={{ color: chrome.muted }}>
+          <span className="text-[11px] font-extrabold" style={{ color: chrome.mutedText }}>
             {t.studioFigures}
           </span>
-          <span className="font-mono text-[10px] font-bold" style={{ color: chrome.muted }}>
+          <span className="font-mono text-[10px] font-bold" style={{ color: chrome.mutedText }}>
             {figures.length}/{MAX_FIGURES}
           </span>
         </div>
-        <p className="text-[10px] font-semibold leading-snug" style={{ color: chrome.muted }}>
+        <p className="text-[10px] font-semibold leading-snug" style={{ color: chrome.mutedText }}>
           {t.studioFiguresHint}
         </p>
 
@@ -401,7 +401,7 @@ export function ArtTab({ draft, chrome, t, userId, onBusyChange }: ArtTabProps) 
                 aria-label={t.studioCropEdit}
                 title={t.studioCropEdit}
                 className="grid size-6 place-items-center rounded-md disabled:opacity-40"
-                style={{ color: chrome.muted }}
+                style={{ color: chrome.mutedText }}
               >
                 <Crop className="size-3.5" />
               </button>
@@ -411,7 +411,7 @@ export function ArtTab({ draft, chrome, t, userId, onBusyChange }: ArtTabProps) 
                 aria-label={t.studioRemove}
                 title={t.studioRemove}
                 className="grid size-6 place-items-center rounded-md"
-                style={{ color: chrome.muted }}
+                style={{ color: chrome.mutedText }}
               >
                 <X className="size-3.5" />
               </button>
@@ -453,7 +453,7 @@ export function ArtTab({ draft, chrome, t, userId, onBusyChange }: ArtTabProps) 
               }
             />
             <div className="flex items-center justify-between gap-2">
-              <span className="text-[11px] font-extrabold" style={{ color: chrome.muted }}>
+              <span className="text-[11px] font-extrabold" style={{ color: chrome.mutedText }}>
                 {t.studioFigureFlip}
               </span>
               <Switch
@@ -532,10 +532,10 @@ function FigureSlider({
   return (
     <div className="flex flex-col gap-0.5">
       <div className="flex items-baseline justify-between">
-        <span className="text-[10px] font-extrabold" style={{ color: chrome.muted }}>
+        <span className="text-[10px] font-extrabold" style={{ color: chrome.mutedText }}>
           {label}
         </span>
-        <span className="font-mono text-[10px] font-bold tabular-nums" style={{ color: chrome.muted }}>
+        <span className="font-mono text-[10px] font-bold tabular-nums" style={{ color: chrome.mutedText }}>
           {Math.round(value)}
           {suffix}
         </span>

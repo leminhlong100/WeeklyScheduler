@@ -46,7 +46,7 @@ export function AdvancedTab({ draft, chrome, t, focusToken }: AdvancedTabProps) 
 
   return (
     <div className="flex flex-col gap-4">
-      <p className="text-[10px] font-semibold leading-snug" style={{ color: chrome.muted }}>
+      <p className="text-[10px] font-semibold leading-snug" style={{ color: chrome.mutedText }}>
         {t.studioAdvancedNote}
       </p>
 
@@ -102,7 +102,7 @@ export function AdvancedTab({ draft, chrome, t, focusToken }: AdvancedTabProps) 
                       <div className="flex items-center gap-1.5">
                         <span
                           className="font-mono text-[10px] font-bold tabular-nums"
-                          style={{ color: chrome.muted }}
+                          style={{ color: chrome.mutedText }}
                         >
                           {alpha.toFixed(3)}
                         </span>
@@ -113,7 +113,7 @@ export function AdvancedTab({ draft, chrome, t, focusToken }: AdvancedTabProps) 
                             aria-label={t.studioResetToken}
                             title={t.studioResetToken}
                             className="grid size-5 place-items-center rounded-md"
-                            style={{ color: chrome.muted }}
+                            style={{ color: chrome.mutedText }}
                           >
                             <RotateCcw className="size-3" />
                           </button>
@@ -159,7 +159,7 @@ export function AdvancedTab({ draft, chrome, t, focusToken }: AdvancedTabProps) 
                           aria-label={t.studioResetToken}
                           title={t.studioResetToken}
                           className="grid size-5 place-items-center rounded-md"
-                          style={{ color: chrome.muted }}
+                          style={{ color: chrome.mutedText }}
                         >
                           <RotateCcw className="size-3" />
                         </button>
@@ -216,7 +216,7 @@ export function AdvancedTab({ draft, chrome, t, focusToken }: AdvancedTabProps) 
                   {overridden && (
                     <span
                       className="mt-0.5 block font-mono text-[9px] font-bold"
-                      style={{ color: chrome.muted }}
+                      style={{ color: chrome.mutedText }}
                     >
                       {fallback}
                     </span>

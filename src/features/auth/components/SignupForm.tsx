@@ -73,7 +73,7 @@ export function SignupForm() {
 
       <p className="text-center text-sm font-medium text-muted-foreground">
         {t.alreadyHaveAccount}{' '}
-        <Link to="/login" className="font-bold hover:underline" style={{ color: theme.accent }}>
+        <Link to="/login" className="font-bold hover:underline" style={{ color: theme.accentText }}>
           {t.login}
         </Link>
       </p>

@@ -84,7 +84,7 @@ export function StickerDock({
             type="button"
             onClick={onClearAll}
             className="rounded-[10px] border-[1.5px] px-[10px] py-1 text-[11px] font-bold"
-            style={{ borderColor: theme.border, color: theme.muted }}
+            style={{ borderColor: theme.border, color: theme.mutedText }}
           >
             {t.clearAll}
           </button>
@@ -93,13 +93,16 @@ export function StickerDock({
             onClick={onClose}
             aria-label="Close"
             className="grid h-7 w-7 shrink-0 place-items-center rounded-full"
-            style={{ background: theme.chip, color: theme.muted }}
+            style={{ background: theme.chip, color: theme.mutedText }}
           >
             <XIcon className="size-3.5" />
           </button>
         </div>
       </div>
-      <div className="mb-[11px] shrink-0 text-[11px] font-semibold" style={{ color: theme.muted }}>
+      <div
+        className="mb-[11px] shrink-0 text-[11px] font-semibold"
+        style={{ color: theme.mutedText }}
+      >
         {isMobile ? t.tapHint : t.dragHint}
       </div>
       <div className="flex min-h-0 flex-1 gap-[10px]">
@@ -114,8 +117,8 @@ export function StickerDock({
                 className="flex shrink-0 flex-col items-center gap-0.5 rounded-[12px] border-[1.5px] py-[7px] text-center"
                 style={{
                   borderColor: active ? theme.accent : 'transparent',
-                  background: active ? theme.accent : theme.chip,
-                  color: active ? '#fff' : theme.muted,
+                  background: active ? theme.accentFill : theme.chip,
+                  color: active ? theme.onAccent : theme.mutedText,
                 }}
               >
                 <span className="text-[16px] leading-none">{cat.emoji}</span>
@@ -132,7 +135,11 @@ export function StickerDock({
                 onClick={() => fileInputRef.current?.click()}
                 title={t.addCustomSticker}
                 className="grid aspect-square place-items-center rounded-[13px] border-[1.5px] border-dashed text-[20px]"
-                style={{ borderColor: theme.border, background: theme.chip, color: theme.muted }}
+                style={{
+                  borderColor: theme.border,
+                  background: theme.chip,
+                  color: theme.mutedText,
+                }}
               >
                 +
               </button>
@@ -161,7 +168,7 @@ export function StickerDock({
                     type="button"
                     onClick={() => onRemoveCustom((item as TrayImageItem).id)}
                     title={t.delete}
-                    className="absolute -top-[6px] -right-[6px] grid h-[17px] w-[17px] place-items-center rounded-full bg-[#ff5d7a] text-[10px] leading-none text-white shadow-md"
+                    className="absolute -top-[6px] -right-[6px] grid h-[17px] w-[17px] place-items-center rounded-full bg-[#d61f4b] text-[10px] leading-none text-white shadow-md"
                   >
                     ×
                   </button>
@@ -170,12 +177,12 @@ export function StickerDock({
             ))}
           </div>
           {category === 'custom' && customItems.length === 0 && !isSyncingCustom && (
-            <div className="mt-2 text-xs font-semibold" style={{ color: theme.muted }}>
+            <div className="mt-2 text-xs font-semibold" style={{ color: theme.mutedText }}>
               {t.addCustomSticker}
             </div>
           )}
           {category === 'custom' && isSyncingCustom && (
-            <div className="mt-2 text-xs font-semibold" style={{ color: theme.muted }}>
+            <div className="mt-2 text-xs font-semibold" style={{ color: theme.mutedText }}>
               {t.stickerSyncing}
             </div>
           )}

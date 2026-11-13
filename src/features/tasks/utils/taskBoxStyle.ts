@@ -1,4 +1,10 @@
-import { mixColors, rgba } from '@/lib/utils/color'
+import {
+  contrastRatio,
+  mixSrgbHex,
+  normalizeHex,
+  rgba,
+  solveLightnessForContrast,
+} from '@/lib/utils/color'
 import type { DerivedTheme } from '@/features/theme/types'
 
 export interface TaskBoxStyle {
@@ -8,28 +14,41 @@ export interface TaskBoxStyle {
   shadow: string
 }
 
+/**
+ * Chữ của ô công việc phải đọc được với MỌI màu danh mục người dùng chọn —
+ * kể cả vàng chanh hay hồng phấn. Giữ tông màu danh mục, chỉ kéo độ sáng tới
+ * 4.5:1 trên nền của chính ô đó.
+ */
+const readableOn = (fg: string, bg: string) => solveLightnessForContrast(fg, bg, 4.6)
+
 /** Tints a category's accent color into a soft task-block background/text pair. */
 export function taskBoxStyle(color: string, theme: DerivedTheme, isCurrent = false): TaskBoxStyle {
+  const base = normalizeHex(color)
   if (isCurrent) {
     return {
-      bg: color,
-      fg: '#ffffff',
-      border: `1.5px solid ${mixColors(color, '#ffffff', 0.35)}`,
-      shadow: `0 0 0 2px ${rgba(color, 0.35)}, 0 10px 24px ${rgba(color, 0.45)}`,
+      bg: base,
+      fg:
+        contrastRatio('#ffffff', base) >= 4.5
+          ? '#ffffff'
+          : solveLightnessForContrast(base, base, 4.6, 'darker'),
+      border: `1.5px solid ${mixSrgbHex(base, '#ffffff', 0.35)}`,
+      shadow: `0 0 0 2px ${rgba(base, 0.35)}, 0 10px 24px ${rgba(base, 0.45)}`,
     }
   }
   if (theme.dark) {
+    const bg = mixSrgbHex(base, '#1c1f3d', 0.62)
     return {
-      bg: mixColors(color, '#1c1f3d', 0.62),
-      fg: mixColors(color, '#ffffff', 0.72),
-      border: `1px solid ${rgba(color, 0.5)}`,
+      bg,
+      fg: readableOn(mixSrgbHex(base, '#ffffff', 0.72), bg),
+      border: `1px solid ${rgba(base, 0.5)}`,
       shadow: '0 5px 14px rgba(0,0,0,.4)',
     }
   }
+  const bg = mixSrgbHex(base, '#ffffff', 0.85)
   return {
-    bg: mixColors(color, '#ffffff', 0.85),
-    fg: mixColors(color, '#3a2f52', 0.22),
-    border: `1px solid ${rgba(color, 0.3)}`,
-    shadow: `0 4px 12px ${rgba(color, 0.2)}`,
+    bg,
+    fg: readableOn(mixSrgbHex(base, '#3a2f52', 0.22), bg),
+    border: `1px solid ${rgba(base, 0.3)}`,
+    shadow: `0 4px 12px ${rgba(base, 0.2)}`,
   }
 }

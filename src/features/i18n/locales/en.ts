@@ -195,7 +195,7 @@ export const en: Dictionary = {
 
   themeIssueTextSurface: 'Text is too faint on this surface',
   themeIssueMuted: 'Secondary text is very faint',
-  themeIssueSidebar: 'Sidebar is too light for white text',
+  themeIssueSidebar: 'Sidebar colour is hard to read with either white or dark text',
   themeIssueScene: 'The backdrop makes text hard to read',
   studioUseOpacity: 'Use {n}%',
   studioDarkenSidebar: 'Darken sidebar',

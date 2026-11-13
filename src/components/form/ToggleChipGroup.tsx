@@ -75,7 +75,7 @@ export function ToggleChipGroup<T extends string>({
             {option.label}
             {showOrder && active && (
               <span
-                className="absolute -top-1.5 -right-1.5 grid size-[17px] place-items-center rounded-full text-[10px] font-extrabold text-white"
+                className="absolute -top-1.5 -right-1.5 grid size-[17px] place-items-center rounded-full text-[10px] font-extrabold"
                 style={{ background: colors.accent }}
               >
                 {order + 1}

@@ -55,7 +55,7 @@ export function JoinLedgerPage() {
           <Button
             render={<Link to="/login" />}
             nativeButton={false}
-            style={{ background: theme.accent, color: '#fff' }}
+            style={{ background: theme.accentFill, color: theme.onAccent }}
           >
             {t.login}
           </Button>
@@ -77,7 +77,7 @@ export function JoinLedgerPage() {
       <AuthLayout title={t.joinLedgerTitle} subtitle={t.joinLedgerInvalid}>
         <Button
           onClick={() => navigate('/expenses', { replace: true })}
-          style={{ background: theme.accent, color: '#fff' }}
+          style={{ background: theme.accentFill, color: theme.onAccent }}
           className="w-full"
         >
           {t.joinLedgerGoToExpenses}

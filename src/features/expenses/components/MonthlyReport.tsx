@@ -106,7 +106,7 @@ function CategoryLine({ row, kind, currency, category }: CategoryLineProps) {
       ? category.monthly_budget
       : null
   const overBudget = budget !== null && row.total > budget
-  const budgetColor = overBudget ? theme.danger : theme.muted
+  const budgetColor = overBudget ? theme.danger : theme.mutedText
 
   return (
     <div className="flex flex-col gap-1.5">

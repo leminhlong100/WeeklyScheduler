@@ -104,7 +104,7 @@ export function ExpensesHeader({
             className="flex min-h-9 flex-shrink-0 items-center rounded-full px-2.5 text-[12px] font-extrabold"
             style={{
               background: theme.chip,
-              color: theme.accent,
+              color: theme.accentText,
               border: `1.5px solid ${theme.border}`,
             }}
           >

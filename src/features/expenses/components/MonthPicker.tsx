@@ -74,8 +74,8 @@ export function MonthPicker({
               className="min-h-12 rounded-[14px] border-[1.5px] text-[14px] font-extrabold transition-transform active:scale-95"
               style={{
                 borderColor: isCurrent ? theme.accent : theme.border,
-                background: selected ? theme.accent : theme.chip,
-                color: selected ? '#fff' : theme.text,
+                background: selected ? theme.accentFill : theme.chip,
+                color: selected ? theme.onAccent : theme.text,
               }}
             >
               {name}
@@ -91,7 +91,7 @@ export function MonthPicker({
             onOpenChange(false)
           }}
           className="min-h-11 rounded-[14px] text-[14px] font-extrabold"
-          style={{ background: theme.inputBg, color: theme.accent }}
+          style={{ background: theme.inputBg, color: theme.accentText }}
         >
           {t.backToThisMonth}
         </button>

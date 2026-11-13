@@ -286,7 +286,7 @@ export function ImageCropDialog({
       >
         <div className="flex flex-col gap-0.5">
           <h2 className="text-[15px] font-extrabold">{labels.title}</h2>
-          <p className="text-[11px] font-semibold" style={{ color: colors.muted }}>
+          <p className="text-[11px] font-semibold" style={{ color: colors.mutedText }}>
             {labels.hint}
           </p>
         </div>
@@ -340,7 +340,7 @@ export function ImageCropDialog({
               {loadError ? (
                 <span className="text-[12px] font-bold text-[#ff5d7a]">{labels.failed}</span>
               ) : (
-                <Loader2 className="size-6 animate-spin" style={{ color: colors.accent }} />
+                <Loader2 className="size-6 animate-spin" style={{ color: colors.accentText }} />
               )}
             </div>
           )}
@@ -348,7 +348,7 @@ export function ImageCropDialog({
 
         {aspects.length > 1 && (
           <div className="flex flex-col gap-1.5">
-            <span className="text-[11px] font-extrabold" style={{ color: colors.muted }}>
+            <span className="text-[11px] font-extrabold" style={{ color: colors.mutedText }}>
               {labels.aspect}
             </span>
             <div className="flex flex-wrap gap-1.5">
@@ -376,10 +376,10 @@ export function ImageCropDialog({
 
         <div className="flex flex-col gap-1">
           <div className="flex items-baseline justify-between">
-            <span className="text-[11px] font-extrabold" style={{ color: colors.muted }}>
+            <span className="text-[11px] font-extrabold" style={{ color: colors.mutedText }}>
               {labels.zoom}
             </span>
-            <span className="font-mono text-[10px] font-bold tabular-nums" style={{ color: colors.muted }}>
+            <span className="font-mono text-[10px] font-bold tabular-nums" style={{ color: colors.mutedText }}>
               {sliderValue}%
             </span>
           </div>
@@ -389,7 +389,7 @@ export function ImageCropDialog({
               onClick={() => zoomAt(view.zoom / 1.25)}
               aria-label={`${labels.zoom} -`}
               className="grid size-7 shrink-0 place-items-center rounded-md"
-              style={{ color: colors.muted }}
+              style={{ color: colors.mutedText }}
             >
               <ZoomOut className="size-4" />
             </button>
@@ -410,7 +410,7 @@ export function ImageCropDialog({
               onClick={() => zoomAt(view.zoom * 1.25)}
               aria-label={`${labels.zoom} +`}
               className="grid size-7 shrink-0 place-items-center rounded-md"
-              style={{ color: colors.muted }}
+              style={{ color: colors.mutedText }}
             >
               <ZoomIn className="size-4" />
             </button>
@@ -422,7 +422,7 @@ export function ImageCropDialog({
             type="button"
             onClick={() => setView(INITIAL_VIEW)}
             className="flex h-9 items-center gap-1.5 rounded-full px-3 text-[12px] font-extrabold"
-            style={{ color: colors.muted }}
+            style={{ color: colors.mutedText }}
           >
             <RotateCcw className="size-3.5" />
             {labels.reset}
@@ -440,8 +440,8 @@ export function ImageCropDialog({
             type="button"
             disabled={!image || exporting}
             onClick={() => void apply()}
-            className="flex h-9 items-center gap-1.5 rounded-full px-4 text-[12px] font-extrabold text-white disabled:opacity-50"
-            style={{ background: colors.accent }}
+            className="flex h-9 items-center gap-1.5 rounded-full px-4 text-[12px] font-extrabold disabled:opacity-50"
+            style={{ background: colors.accentFill, color: colors.onAccent }}
           >
             {exporting && <Loader2 className="size-3.5 animate-spin" />}
             {labels.apply}

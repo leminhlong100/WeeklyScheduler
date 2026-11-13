@@ -29,7 +29,7 @@ export function SidebarLedgerList({
 
   return (
     <section>
-      <div className="mb-2.5 text-[13px] font-extrabold text-white/85">{t.moreLedgers}</div>
+      <div className="mb-2.5 text-[13px] font-extrabold text-(--side-fg)">{t.moreLedgers}</div>
       <div className="flex flex-col gap-1.5">
         {items.map((item) => {
           const active = item.id === ledgerId
@@ -45,7 +45,7 @@ export function SidebarLedgerList({
               className="flex items-center gap-2.5 rounded-2xl border-none px-[11px] py-2.5 text-left transition-colors"
               style={{
                 background: active ? 'rgba(255,255,255,.92)' : 'rgba(255,255,255,.13)',
-                color: active ? '#1f2937' : '#fff',
+                color: active ? '#1f2937' : 'var(--side-fg)',
               }}
             >
               <span className="flex-shrink-0 text-base">{item.emoji}</span>
@@ -65,7 +65,7 @@ export function SidebarLedgerList({
       <button
         type="button"
         onClick={onCreate}
-        className="mt-2.5 flex items-center gap-1 text-xs font-bold text-white/90 underline-offset-2 hover:underline"
+        className="mt-2.5 flex items-center gap-1 text-xs font-bold text-(--side-fg) underline-offset-2 hover:underline"
       >
         <PlusIcon className="size-3.5" />
         {t.ledgerNew}

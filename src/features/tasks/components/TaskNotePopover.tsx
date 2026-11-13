@@ -112,8 +112,8 @@ export function TaskNotePopover({ task, theme, side, onClose, onSave }: TaskNote
             onClick={() => setIsEditing((v) => !v)}
             className="flex size-6 items-center justify-center rounded-full transition-colors"
             style={{
-              background: isEditing ? theme.accent : theme.chip,
-              color: isEditing ? '#ffffff' : theme.text,
+              background: isEditing ? theme.accentFill : theme.chip,
+              color: isEditing ? theme.onAccent : theme.text,
             }}
           >
             <Pencil className="size-3.5" />
@@ -166,10 +166,15 @@ export function TaskNotePopover({ task, theme, side, onClose, onSave }: TaskNote
                 className="mt-0.5 flex size-4 flex-shrink-0 items-center justify-center rounded-full border-2"
                 style={{
                   borderColor: item.done ? theme.accent : theme.border,
-                  background: item.done ? theme.accent : 'transparent',
+                  background: item.done ? theme.accentFill : 'transparent',
                 }}
               >
-                {item.done && <span className="block size-1.5 rounded-full bg-white" />}
+                {item.done && (
+                  <span
+                    className="block size-1.5 rounded-full"
+                    style={{ background: theme.onAccent }}
+                  />
+                )}
               </button>
               <span style={{ color: theme.text, opacity: item.done ? 0.5 : 1 }} className={item.done ? 'line-through' : ''}>
                 {item.text}

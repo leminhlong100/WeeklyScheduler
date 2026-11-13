@@ -92,7 +92,7 @@ export function DailyNotesModal({ open, onOpenChange, defaultDate }: DailyNotesM
               style={{ background: theme.inputBg, borderColor: theme.border, color: theme.text }}
             />
             <div className="flex flex-wrap items-center justify-between gap-2">
-              <label className="flex items-center gap-2 text-xs font-extrabold" style={{ color: theme.muted }}>
+              <label className="flex items-center gap-2 text-xs font-extrabold" style={{ color: theme.mutedText }}>
                 {t.dailyNoteDate}
                 <Input
                   type="date"
@@ -110,7 +110,7 @@ export function DailyNotesModal({ open, onOpenChange, defaultDate }: DailyNotesM
                 style={{
                   borderColor: special ? SPECIAL_DAY_COLOR : theme.border,
                   background: special ? `${SPECIAL_DAY_COLOR}22` : 'transparent',
-                  color: special ? SPECIAL_DAY_COLOR : theme.muted,
+                  color: special ? SPECIAL_DAY_COLOR : theme.mutedText,
                 }}
               >
                 🎉 {t.dailyNoteSpecial}
@@ -128,13 +128,13 @@ export function DailyNotesModal({ open, onOpenChange, defaultDate }: DailyNotesM
 
           <div className="flex min-h-0 min-w-0 flex-col gap-3 overflow-x-hidden overflow-y-auto">
             {groups.length === 0 && (
-              <p className="py-6 text-center text-sm font-semibold" style={{ color: theme.muted }}>
+              <p className="py-6 text-center text-sm font-semibold" style={{ color: theme.mutedText }}>
                 {t.dailyNotesEmpty}
               </p>
             )}
             {groups.map((group) => (
               <section key={group.date}>
-                <div className="mb-1.5 text-xs font-extrabold" style={{ color: theme.muted }}>
+                <div className="mb-1.5 text-xs font-extrabold" style={{ color: theme.mutedText }}>
                   {parseISODate(group.date).format('DD/MM/YYYY')}
                 </div>
                 <ul className="flex flex-col gap-1.5">
@@ -155,10 +155,10 @@ export function DailyNotesModal({ open, onOpenChange, defaultDate }: DailyNotesM
                         className="mt-0.5 flex size-5 flex-shrink-0 items-center justify-center rounded-md border-2"
                         style={{
                           borderColor: note.done ? theme.accent : theme.border,
-                          background: note.done ? theme.accent : 'transparent',
+                          background: note.done ? theme.accentFill : 'transparent',
                         }}
                       >
-                        {note.done && <CheckIcon className="size-3.5 text-white" strokeWidth={4} />}
+                        {note.done && <CheckIcon className="size-3.5" style={{ color: theme.onAccent }} strokeWidth={4} />}
                       </button>
                       <span
                         className={`min-w-0 flex-1 whitespace-pre-wrap text-[13.5px] [overflow-wrap:anywhere] font-semibold ${note.done ? 'line-through' : ''}`}

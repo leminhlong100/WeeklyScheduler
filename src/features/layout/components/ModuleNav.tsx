@@ -32,7 +32,7 @@ export function ModuleNav({ t, onNavigate }: ModuleNavProps) {
           className={({ isActive }) =>
             cn(
               'flex flex-1 items-center justify-center gap-1.5 rounded-xl px-2 py-2 text-[12.5px] font-bold transition-colors',
-              isActive ? 'bg-white/90 text-slate-800' : 'text-white/85 hover:bg-white/10',
+              isActive ? 'bg-white/90 text-slate-800' : 'text-(--side-fg) hover:bg-white/10',
             )
           }
         >

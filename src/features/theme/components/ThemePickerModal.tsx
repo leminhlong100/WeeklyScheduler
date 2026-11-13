@@ -82,14 +82,14 @@ export function ThemePickerModal({ open, onOpenChange, onEditTheme }: ThemePicke
         <DialogTitle className="font-heading text-xl font-extrabold" style={{ color: theme.text }}>
           {t.themeTitle}
         </DialogTitle>
-        <p className="mb-1 text-[13px] font-semibold" style={{ color: theme.muted }}>
+        <p className="mb-1 text-[13px] font-semibold" style={{ color: theme.mutedText }}>
           {t.themeSub}
         </p>
 
         {/* "Mine" first: a theme the user built is a stronger candidate than any
             preset, and burying it under sixteen built-ins would say otherwise. */}
         <section className="flex flex-col gap-2">
-          <h3 className="text-[11px] font-extrabold" style={{ color: theme.muted }}>
+          <h3 className="text-[11px] font-extrabold" style={{ color: theme.mutedText }}>
             {t.themeMine}
           </h3>
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
@@ -107,7 +107,7 @@ export function ThemePickerModal({ open, onOpenChange, onEditTheme }: ThemePicke
             >
               <span
                 className="grid size-9 place-items-center rounded-full"
-                style={{ background: theme.brandGrad, color: '#ffffff' }}
+                style={{ background: theme.brandGrad, color: theme.onBrand }}
               >
                 <Plus className="size-4" />
               </span>
@@ -152,7 +152,7 @@ export function ThemePickerModal({ open, onOpenChange, onEditTheme }: ThemePicke
         </section>
 
         <section className="mt-4 flex flex-col gap-2">
-          <h3 className="text-[11px] font-extrabold" style={{ color: theme.muted }}>
+          <h3 className="text-[11px] font-extrabold" style={{ color: theme.mutedText }}>
             {t.themePresets}
           </h3>
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">

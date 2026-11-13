@@ -47,8 +47,8 @@ export function LedgerBar({
                 className="flex max-w-[220px] flex-shrink-0 items-center gap-1.5 rounded-full border-[1.5px] px-3 py-1.5 text-[12.5px] font-extrabold transition-transform duration-150 active:scale-95"
                 style={{
                   borderColor: active ? theme.accent : theme.border,
-                  background: active ? theme.accent : theme.chip,
-                  color: active ? '#fff' : theme.text,
+                  background: active ? theme.accentFill : theme.chip,
+                  color: active ? theme.onAccent : theme.text,
                 }}
               >
                 <span className="text-sm leading-none">{chip.emoji}</span>

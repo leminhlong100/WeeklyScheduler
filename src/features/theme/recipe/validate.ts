@@ -24,8 +24,8 @@ export const CONTRAST_LIMITS = {
   textFloor: 4.5,
   /** `mint` ships 1.98:1, so warning starts just under it. */
   mutedWarn: 2,
-  /** White sidebar text; `lemon` ships 1.38:1 and is the reason this exists. */
-  sidebarWarn: 1.8,
+  /** Best of white or dark sidebar text (the sidebar picks whichever reads). */
+  sidebarWarn: 4.5,
   /** Text over the composited scene. */
   sceneWarn: 4.5,
 } as const
@@ -140,12 +140,12 @@ export function validateTheme(tokens: ThemeTokens, art?: ThemeArt | null): Theme
     issues.push({ code: 'themeIssueMuted', severity: 'warn', ratio: mutedRatio, token: 'muted' })
   }
 
-  // --- white sidebar text ---------------------------------------------------
-  // `Sidebar.tsx` hard-codes `text-white` and literal `rgba(255,255,255,…)`, so
-  // this pair cannot be fixed by any token; only the gradient can move.
+  // --- sidebar text ----------------------------------------------------------
+  // `deriveTheme` picks white or a dark tint for the sidebar text, whichever
+  // reads, so only a mid-tone gradient that neither can reach is a problem.
   const mid = sidebarMid(tokens.sideGrad)
   if (mid) {
-    const ratio = contrastRatio('#ffffff', mid)
+    const ratio = Math.max(contrastRatio('#ffffff', mid), contrastRatio('#000000', mid))
     if (ratio < CONTRAST_LIMITS.sidebarWarn) {
       issues.push({ code: 'themeIssueSidebar', severity: 'warn', ratio, token: 'sideGrad' })
     }

@@ -9,8 +9,13 @@ export function GradientButton({ className, style, ...props }: ComponentProps<ty
 
   return (
     <Button
-      className={cn('rounded-2xl border-none font-extrabold text-white hover:opacity-95', className)}
-      style={{ background: theme.brandGrad, boxShadow: `0 7px 18px ${theme.brandShadow}`, ...style }}
+      className={cn('rounded-2xl border-none font-extrabold hover:opacity-95', className)}
+      style={{
+        background: theme.brandGrad,
+        color: theme.onBrand,
+        boxShadow: `0 7px 18px ${theme.brandShadow}`,
+        ...style,
+      }}
       {...props}
     />
   )

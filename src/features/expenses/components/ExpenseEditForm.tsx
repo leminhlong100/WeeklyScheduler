@@ -298,9 +298,13 @@ export function ExpenseEditForm({
                     background: selected
                       ? option === 'income'
                         ? theme.income
-                        : theme.accent
+                        : theme.accentFill
                       : 'transparent',
-                    color: selected ? '#fff' : theme.muted,
+                    color: selected
+                      ? option === 'income'
+                        ? theme.onIncome
+                        : theme.onAccent
+                      : theme.mutedText,
                   }}
                 >
                   {kindLabel[option]}
@@ -507,7 +511,7 @@ export function ExpenseEditForm({
             </span>
             <span
               className="text-xs font-extrabold"
-              style={{ color: applyToSeries ? theme.text : theme.muted }}
+              style={{ color: applyToSeries ? theme.text : theme.mutedText }}
             >
               {t.applyToExpenseSeries}
             </span>

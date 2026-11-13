@@ -284,7 +284,7 @@ export function TaskFormModal({ draft, weekStartISO, onClose }: TaskFormModalPro
           </FormField>
 
           <div>
-            <div className="mb-2 text-xs font-extrabold" style={{ color: theme.muted }}>
+            <div className="mb-2 text-xs font-extrabold" style={{ color: theme.mutedText }}>
               {t.category}
             </div>
             <Controller
@@ -302,7 +302,7 @@ export function TaskFormModal({ draft, weekStartISO, onClose }: TaskFormModalPro
           </div>
 
           <div>
-            <div className="mb-2 text-xs font-extrabold" style={{ color: theme.muted }}>
+            <div className="mb-2 text-xs font-extrabold" style={{ color: theme.mutedText }}>
               {t.taskColor}
             </div>
             <TaskColorRow control={form.control} categories={categories} theme={theme} />
@@ -319,7 +319,7 @@ export function TaskFormModal({ draft, weekStartISO, onClose }: TaskFormModalPro
             </FormField>
           ) : (
             <div>
-              <div className="mb-2 text-xs font-extrabold" style={{ color: theme.muted }}>
+              <div className="mb-2 text-xs font-extrabold" style={{ color: theme.mutedText }}>
                 {t.repeatOnDays}
               </div>
               <DayOfWeekPicker labels={t.dow} selected={selectedDows} onToggle={toggleDow} theme={theme} />
@@ -328,7 +328,7 @@ export function TaskFormModal({ draft, weekStartISO, onClose }: TaskFormModalPro
 
           {!isEdit && (
             <div>
-              <div className="mb-2 text-xs font-extrabold" style={{ color: theme.muted }}>
+              <div className="mb-2 text-xs font-extrabold" style={{ color: theme.mutedText }}>
                 {t.repeatWeekly}
               </div>
               <Controller
@@ -362,8 +362,11 @@ export function TaskFormModal({ draft, weekStartISO, onClose }: TaskFormModalPro
           {isEdit && seriesId && (
             <div className="rounded-2xl px-3.5 py-3" style={{ background: theme.chip }}>
               <div className="flex items-start gap-2">
-                <RepeatIcon className="mt-px size-4 flex-shrink-0" style={{ color: theme.muted }} />
-                <p className="text-[12.5px] font-semibold" style={{ color: theme.muted }}>
+                <RepeatIcon
+                  className="mt-px size-4 flex-shrink-0"
+                  style={{ color: theme.mutedText }}
+                />
+                <p className="text-[12.5px] font-semibold" style={{ color: theme.mutedText }}>
                   {t.seriesNotice}
                 </p>
               </div>
@@ -383,7 +386,7 @@ export function TaskFormModal({ draft, weekStartISO, onClose }: TaskFormModalPro
                 </span>
                 <span
                   className="text-xs font-extrabold"
-                  style={{ color: applyToSeries ? theme.text : theme.muted }}
+                  style={{ color: applyToSeries ? theme.text : theme.mutedText }}
                 >
                   {t.applyToSeries}
                 </span>
@@ -393,7 +396,7 @@ export function TaskFormModal({ draft, weekStartISO, onClose }: TaskFormModalPro
 
           <div className="flex gap-3">
             <div className="flex-1">
-              <div className="mb-2 text-xs font-extrabold" style={{ color: theme.muted }}>
+              <div className="mb-2 text-xs font-extrabold" style={{ color: theme.mutedText }}>
                 {t.start}
               </div>
               <Controller
@@ -423,7 +426,7 @@ export function TaskFormModal({ draft, weekStartISO, onClose }: TaskFormModalPro
               />
             </div>
             <div className="flex-1">
-              <div className="mb-2 text-xs font-extrabold" style={{ color: theme.muted }}>
+              <div className="mb-2 text-xs font-extrabold" style={{ color: theme.mutedText }}>
                 {t.duration}
               </div>
               <Controller

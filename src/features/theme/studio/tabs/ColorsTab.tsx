@@ -102,7 +102,7 @@ export function ColorsTab({ draft, chrome, t, onEditToken }: ColorsTabProps) {
             })
           }
           className="self-start text-[11px] font-extrabold underline"
-          style={{ color: chrome.accent }}
+          style={{ color: chrome.accentText }}
         >
           {t.studioSecondaryAuto}
         </button>
@@ -117,7 +117,7 @@ export function ColorsTab({ draft, chrome, t, onEditToken }: ColorsTabProps) {
 
       {!dark && (
         <div className="flex flex-col gap-1.5">
-          <span className="text-[11px] font-extrabold" style={{ color: chrome.muted }}>
+          <span className="text-[11px] font-extrabold" style={{ color: chrome.mutedText }}>
             {t.studioPaper}
           </span>
           <SegmentedControl
@@ -131,7 +131,7 @@ export function ColorsTab({ draft, chrome, t, onEditToken }: ColorsTabProps) {
             trackColor={chrome.chip}
             activeColor={chrome.accent}
             activeTextColor="#ffffff"
-            textColor={chrome.muted}
+            textColor={chrome.mutedText}
             aria-label={t.studioPaper}
           />
         </div>
@@ -153,7 +153,7 @@ export function ColorsTab({ draft, chrome, t, onEditToken }: ColorsTabProps) {
 
       {dark && (
         <div className="flex flex-col gap-1.5">
-          <span className="text-[11px] font-extrabold" style={{ color: chrome.muted }}>
+          <span className="text-[11px] font-extrabold" style={{ color: chrome.mutedText }}>
             {t.studioLineTint}
           </span>
           {/* Dark-only: light presets paint lines as opaque surfaces where the
@@ -168,7 +168,7 @@ export function ColorsTab({ draft, chrome, t, onEditToken }: ColorsTabProps) {
             trackColor={chrome.chip}
             activeColor={chrome.accent}
             activeTextColor="#ffffff"
-            textColor={chrome.muted}
+            textColor={chrome.mutedText}
             aria-label={t.studioLineTint}
           />
         </div>
@@ -176,11 +176,11 @@ export function ColorsTab({ draft, chrome, t, onEditToken }: ColorsTabProps) {
 
       <div className="flex flex-col gap-1.5">
         <div className="flex items-baseline justify-between gap-2">
-          <span className="text-[11px] font-extrabold" style={{ color: chrome.muted }}>
+          <span className="text-[11px] font-extrabold" style={{ color: chrome.mutedText }}>
             {t.studioTokens}
           </span>
           <div className="flex items-center gap-1.5">
-            <span className="text-[10px] font-bold" style={{ color: chrome.muted }}>
+            <span className="text-[10px] font-bold" style={{ color: chrome.mutedText }}>
               {t.studioAccent}
             </span>
             <ContrastBadge
@@ -189,7 +189,7 @@ export function ColorsTab({ draft, chrome, t, onEditToken }: ColorsTabProps) {
             />
           </div>
         </div>
-        <p className="text-[10px] font-semibold leading-snug" style={{ color: chrome.muted }}>
+        <p className="text-[10px] font-semibold leading-snug" style={{ color: chrome.mutedText }}>
           {t.studioTokensHint}
         </p>
         {/* Answers "what do my seven inputs actually do?" honestly, and doubles as
@@ -213,7 +213,7 @@ export function ColorsTab({ draft, chrome, t, onEditToken }: ColorsTabProps) {
               />
               <span
                 className="w-full truncate text-center text-[8px] font-bold"
-                style={{ color: chrome.muted }}
+                style={{ color: chrome.mutedText }}
               >
                 {token}
               </span>
@@ -239,10 +239,10 @@ function SliderRow({
   return (
     <div className="flex flex-col gap-1">
       <div className="flex items-baseline justify-between">
-        <span className="text-[11px] font-extrabold" style={{ color: chrome.muted }}>
+        <span className="text-[11px] font-extrabold" style={{ color: chrome.mutedText }}>
           {label}
         </span>
-        <span className="font-mono text-[10px] font-bold tabular-nums" style={{ color: chrome.muted }}>
+        <span className="font-mono text-[10px] font-bold tabular-nums" style={{ color: chrome.mutedText }}>
           {Math.round(value * 100)}%
         </span>
       </div>

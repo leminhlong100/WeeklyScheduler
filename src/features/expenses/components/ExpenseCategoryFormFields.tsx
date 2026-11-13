@@ -78,8 +78,8 @@ export function ExpenseCategoryFormFields({
                 onClick={() => setValue('kind', option, { shouldValidate: true })}
                 className="flex-1 rounded-[10px] py-1.5 text-[13px] font-extrabold"
                 style={{
-                  background: selected ? theme.accent : 'transparent',
-                  color: selected ? '#fff' : theme.muted,
+                  background: selected ? theme.accentFill : 'transparent',
+                  color: selected ? theme.onAccent : theme.mutedText,
                 }}
               >
                 {kindLabel[option]}

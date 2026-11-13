@@ -107,13 +107,26 @@ export type ThemeTokens = Omit<ThemeDefinition, 'key' | 'name' | 'icon' | 'art'>
 
 /** Theme tokens plus derived values computed at runtime (gradients, shadows). */
 export interface DerivedTheme extends ThemeDefinition {
+  /**
+   * Nền nút tô màu nhấn. Có thể đậm hơn `grad`/`accent` gốc một chút để chữ
+   * `onAccent` đạt 4.5:1. Dùng cho nền đặc có chữ; viền và tô nhạt vẫn dùng `accent`.
+   */
   brandGrad: string
+  /** Màu chữ/biểu tượng trên `brandGrad`: trắng, hoặc chữ tối với màu nhấn nhạt/neon. */
+  onBrand: string
+  accentFill: string
+  /** Như `onBrand`, cho nền đặc `accentFill`. */
+  onAccent: string
+  /** Màu nhấn dùng làm CHỮ (link, nhãn) trên nền thẻ, ≥ 4.5:1. */
+  accentText: string
   brandShadow: string
   pageBg: string
   windowShadow: string
   todayTint: string
   gridLinesImage: string
   danger: string
+  /** Chữ trên nút tô `danger` (Xoá). */
+  onDanger: string
   dangerBorder: string
   /**
    * Màu chữ đọc được (≥ 4.5:1 trên `chip` và `mainBg`) cho các vai trò tiền tệ.
@@ -122,6 +135,8 @@ export interface DerivedTheme extends ThemeDefinition {
   mutedText: string
   /** Tiền vào / số dư dương. */
   income: string
+  /** Chữ trên nền tô `income` (nút chọn "Thu"). */
+  onIncome: string
   /** Kỳ dự kiến, sắp vượt hạn mức. */
   warning: string
   warningBg: string

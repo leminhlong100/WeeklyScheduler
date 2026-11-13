@@ -8,9 +8,16 @@
 export interface FieldColors {
   text: string
   muted: string
+  /** `muted` lifted to 4.5:1 — use this, not `muted`, for text. */
+  mutedText: string
   border: string
   borderStrong: string
   accent: string
+  /** Accent as a text colour, 4.5:1 on the surfaces. */
+  accentText: string
+  /** Solid accent fill for controls that carry text, with its text colour. */
+  accentFill: string
+  onAccent: string
   inputBg: string
   chip: string
   panel: string

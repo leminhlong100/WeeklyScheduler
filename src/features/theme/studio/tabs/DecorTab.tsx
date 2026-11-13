@@ -49,10 +49,10 @@ export function DecorTab({ draft, chrome, t }: StudioTabProps) {
   return (
     <div className="flex flex-col gap-4">
       <div className="flex flex-col gap-1.5">
-        <span className="text-[11px] font-extrabold" style={{ color: chrome.muted }}>
+        <span className="text-[11px] font-extrabold" style={{ color: chrome.mutedText }}>
           {t.studioShapes}
         </span>
-        <p className="text-[10px] font-semibold leading-snug" style={{ color: chrome.muted }}>
+        <p className="text-[10px] font-semibold leading-snug" style={{ color: chrome.mutedText }}>
           {t.studioShapesHint}
         </p>
         {/* Order is shown because it is real: DecorBackground cycles the shape list
@@ -80,7 +80,7 @@ export function DecorTab({ draft, chrome, t }: StudioTabProps) {
 
       <div className="flex flex-col gap-2">
         <div className="flex items-center justify-between gap-2">
-          <span className="text-[11px] font-extrabold" style={{ color: chrome.muted }}>
+          <span className="text-[11px] font-extrabold" style={{ color: chrome.mutedText }}>
             {t.studioDecorColors}
           </span>
           {recipe.decorColors.length < MAX_DECOR_COLORS && (
@@ -88,7 +88,7 @@ export function DecorTab({ draft, chrome, t }: StudioTabProps) {
               type="button"
               onClick={addColor}
               className="grid size-5 place-items-center rounded-md"
-              style={{ color: chrome.accent }}
+              style={{ color: chrome.accentText }}
               aria-label={t.studioDecorColors}
             >
               <Plus className="size-3.5" />
@@ -112,7 +112,7 @@ export function DecorTab({ draft, chrome, t }: StudioTabProps) {
                 aria-label={t.studioRemove}
                 title={t.studioRemove}
                 className="mb-1 grid size-6 place-items-center rounded-md"
-                style={{ color: chrome.muted }}
+                style={{ color: chrome.mutedText }}
               >
                 <X className="size-3.5" />
               </button>
@@ -123,7 +123,7 @@ export function DecorTab({ draft, chrome, t }: StudioTabProps) {
 
       {/* A control for this would be dead: DecorBackground hard-codes white for the
           sidebar variant. Saying so beats shipping a switch that does nothing. */}
-      <p className="text-[10px] font-semibold leading-snug" style={{ color: chrome.muted }}>
+      <p className="text-[10px] font-semibold leading-snug" style={{ color: chrome.mutedText }}>
         {t.studioSidebarShapeNote}
       </p>
     </div>

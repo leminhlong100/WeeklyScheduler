@@ -71,7 +71,7 @@ export function QueryStatus({ query, skeletonRows = 3, children }: QueryStatusPr
         <button
           type="button"
           onClick={() => void query.refetch()}
-          className="mt-1 flex min-h-11 items-center gap-1.5 rounded-[12px] px-4 text-[13px] font-extrabold text-white transition-transform active:scale-95"
+          className="mt-1 flex min-h-11 items-center gap-1.5 rounded-[12px] px-4 text-[13px] font-extrabold transition-transform active:scale-95"
           style={{ background: theme.accent }}
         >
           <RotateCwIcon className="size-4" />
@@ -134,7 +134,7 @@ export function DataFreshness({ query }: { query: QueryLike }) {
         disabled={busy}
         aria-busy={busy}
         className="flex min-h-11 items-center gap-1 rounded-[10px] px-2 font-extrabold disabled:opacity-60"
-        style={{ color: theme.accent }}
+        style={{ color: theme.accentText }}
       >
         <RotateCwIcon className={busy ? 'size-3.5 animate-spin' : 'size-3.5'} />
         {t.refreshData}

@@ -61,7 +61,7 @@ export function TaskSearchModal({ open, onOpenChange, onPickDate }: TaskSearchMo
           <div className="relative">
             <SearchIcon
               className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2"
-              style={{ color: theme.muted }}
+              style={{ color: theme.mutedText }}
             />
             <Input
               autoFocus
@@ -74,16 +74,16 @@ export function TaskSearchModal({ open, onOpenChange, onPickDate }: TaskSearchMo
           </div>
 
           {tooShort ? (
-            <p className="py-6 text-center text-[12.5px] font-semibold" style={{ color: theme.muted }}>
+            <p className="py-6 text-center text-[12.5px] font-semibold" style={{ color: theme.mutedText }}>
               {t.searchMinChars.replace('{n}', String(MIN_SEARCH_LENGTH))}
             </p>
           ) : results.length === 0 ? (
-            <p className="py-6 text-center text-[12.5px] font-semibold" style={{ color: theme.muted }}>
+            <p className="py-6 text-center text-[12.5px] font-semibold" style={{ color: theme.mutedText }}>
               {isFetching ? '…' : t.searchNoResults}
             </p>
           ) : (
             <>
-              <div className="text-[11px] font-extrabold tracking-wider uppercase" style={{ color: theme.muted }}>
+              <div className="text-[11px] font-extrabold tracking-wider uppercase" style={{ color: theme.mutedText }}>
                 {t.searchResultsCount.replace('{n}', String(results.length))}
               </div>
               <div className="-mx-1 flex flex-col gap-1.5 overflow-y-auto px-1">
@@ -111,7 +111,7 @@ export function TaskSearchModal({ open, onOpenChange, onPickDate }: TaskSearchMo
                         >
                           {task.title}
                         </div>
-                        <div className="truncate text-[11.5px] font-semibold" style={{ color: theme.muted }}>
+                        <div className="truncate text-[11.5px] font-semibold" style={{ color: theme.mutedText }}>
                           {t.dow[weekdayMondayIndex(date)]} {date.format('DD/MM/YYYY')} ·{' '}
                           {formatMinutesAsTime(task.start_minute)}–
                           {formatMinutesAsTime(task.start_minute + task.duration_minute)}

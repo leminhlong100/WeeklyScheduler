@@ -26,7 +26,7 @@ export function BasicsTab({ draft, chrome, t }: StudioTabProps) {
   return (
     <div className="flex flex-col gap-4">
       <div className="flex flex-col gap-1.5">
-        <span className="text-[11px] font-extrabold" style={{ color: chrome.muted }}>
+        <span className="text-[11px] font-extrabold" style={{ color: chrome.mutedText }}>
           {t.studioName}
         </span>
         <input
@@ -40,7 +40,7 @@ export function BasicsTab({ draft, chrome, t }: StudioTabProps) {
       </div>
 
       <div className="flex flex-col gap-1.5">
-        <span className="text-[11px] font-extrabold" style={{ color: chrome.muted }}>
+        <span className="text-[11px] font-extrabold" style={{ color: chrome.mutedText }}>
           {t.studioIcon}
         </span>
         <EmojiField
@@ -55,7 +55,7 @@ export function BasicsTab({ draft, chrome, t }: StudioTabProps) {
       </div>
 
       <div className="flex flex-col gap-1.5">
-        <span className="text-[11px] font-extrabold" style={{ color: chrome.muted }}>
+        <span className="text-[11px] font-extrabold" style={{ color: chrome.mutedText }}>
           {t.studioMode}
         </span>
         <SegmentedControl
@@ -68,13 +68,13 @@ export function BasicsTab({ draft, chrome, t }: StudioTabProps) {
           trackColor={chrome.chip}
           activeColor={chrome.accent}
           activeTextColor="#ffffff"
-          textColor={chrome.muted}
+          textColor={chrome.mutedText}
           aria-label={t.studioMode}
         />
       </div>
 
       <div className="flex flex-col gap-2">
-        <span className="text-[11px] font-extrabold" style={{ color: chrome.muted }}>
+        <span className="text-[11px] font-extrabold" style={{ color: chrome.mutedText }}>
           {t.studioBasedOn}
         </span>
         <div className="grid grid-cols-2 gap-2">

@@ -194,7 +194,7 @@ export const vi: Dictionary = {
 
   themeIssueTextSurface: 'Chữ quá mờ trên bề mặt này',
   themeIssueMuted: 'Chữ phụ rất mờ',
-  themeIssueSidebar: 'Thanh bên quá sáng cho chữ trắng',
+  themeIssueSidebar: 'Thanh bên khó đọc với cả chữ trắng lẫn chữ tối',
   themeIssueScene: 'Tranh nền làm chữ khó đọc',
   studioUseOpacity: 'Dùng {n}%',
   studioDarkenSidebar: 'Làm đậm thanh bên',

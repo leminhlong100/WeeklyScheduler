@@ -48,21 +48,21 @@ export function MiniCalendar({
       style={{ background: theme.sidebarCard, borderColor: theme.sidebarBorder }}
     >
       <div className="mb-[11px] flex items-center justify-between">
-        <div className="font-heading text-[15px] font-bold text-white">
+        <div className="font-heading text-[15px] font-bold text-(--side-fg)">
           {formatMonthLabel(locale, t, year, month)}
         </div>
         <div className="flex gap-[5px]">
           <button
             type="button"
             onClick={onPrevMonth}
-            className="grid h-7 w-7 place-items-center rounded-[10px] bg-white/22 text-[15px] leading-none text-white"
+            className="grid h-7 w-7 place-items-center rounded-[10px] bg-white/22 text-[15px] leading-none text-(--side-fg)"
           >
             ‹
           </button>
           <button
             type="button"
             onClick={onNextMonth}
-            className="grid h-7 w-7 place-items-center rounded-[10px] bg-white/22 text-[15px] leading-none text-white"
+            className="grid h-7 w-7 place-items-center rounded-[10px] bg-white/22 text-[15px] leading-none text-(--side-fg)"
           >
             ›
           </button>
@@ -71,7 +71,10 @@ export function MiniCalendar({
 
       <div className="mb-[5px] grid grid-cols-7 gap-0.5">
         {t.miniDow.map((label, i) => (
-          <div key={i} className="py-0.5 text-center text-[10.5px] font-extrabold text-white/78">
+          <div
+            key={i}
+            className="py-0.5 text-center text-[10.5px] font-extrabold text-(--side-muted)"
+          >
             {label}
           </div>
         ))}
@@ -93,10 +96,12 @@ export function MiniCalendar({
                 color: cell.isSelected
                   ? special
                     ? SPECIAL_DAY_COLOR
-                    : theme.accent
-                  : cell.inMonth || special
+                    : theme.accentText
+                  : special
                     ? '#ffffff'
-                    : 'rgba(255,255,255,.42)',
+                    : cell.inMonth
+                      ? 'var(--side-fg)'
+                      : 'var(--side-muted)',
                 background: cell.isSelected
                   ? '#ffffff'
                   : special

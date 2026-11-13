@@ -49,7 +49,7 @@ export function LoginForm() {
           <Link
             to="/forgot-password"
             className="text-xs font-semibold hover:underline"
-            style={{ color: theme.accent }}
+            style={{ color: theme.accentText }}
           >
             {t.forgotPassword}
           </Link>
@@ -64,7 +64,11 @@ export function LoginForm() {
 
       <p className="text-center text-sm font-medium text-muted-foreground">
         {t.dontHaveAccount}{' '}
-        <Link to="/signup" className="font-bold hover:underline" style={{ color: theme.accent }}>
+        <Link
+          to="/signup"
+          className="font-bold hover:underline"
+          style={{ color: theme.accentText }}
+        >
           {t.signup}
         </Link>
       </p>

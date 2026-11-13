@@ -194,7 +194,7 @@ export const zh: Dictionary = {
 
   themeIssueTextSurface: '文字在此面上过淡',
   themeIssueMuted: '次要文字非常淡',
-  themeIssueSidebar: '侧栏太亮，白字看不清',
+  themeIssueSidebar: '侧栏颜色用白字或深色字都看不清',
   themeIssueScene: '背景图让文字难以阅读',
   studioUseOpacity: '用 {n}%',
   studioDarkenSidebar: '加深侧栏',

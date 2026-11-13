@@ -32,7 +32,7 @@ export function CategoryRow({ category, onEdit, onDelete }: CategoryRowProps) {
         type="button"
         onClick={onEdit}
         className="grid h-8 w-8 place-items-center rounded-lg"
-        style={{ color: theme.muted }}
+        style={{ color: theme.mutedText }}
       >
         <PencilIcon className="size-4" />
       </button>

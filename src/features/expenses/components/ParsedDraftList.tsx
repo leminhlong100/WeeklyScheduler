@@ -221,9 +221,13 @@ export function ParsedDraftList({ draft, onChange, onDone, onSaved }: ParsedDraf
                         background: selected
                           ? option === 'income'
                             ? theme.income
-                            : theme.accent
+                            : theme.accentFill
                           : 'transparent',
-                        color: selected ? '#fff' : theme.muted,
+                        color: selected
+                          ? option === 'income'
+                            ? theme.onIncome
+                            : theme.onAccent
+                          : theme.mutedText,
                       }}
                     >
                       {kindLabel[option]}

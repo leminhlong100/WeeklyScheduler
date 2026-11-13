@@ -67,13 +67,19 @@ export function Sidebar({
         inert={isMobile && !open}
         aria-hidden={isMobile && !open}
         className={cn(
-          'overflow-hidden text-white',
+          'overflow-hidden text-(--side-fg)',
           isMobile
             ? 'fixed inset-y-0 left-0 z-[70] w-[85vw] max-w-[300px] shadow-2xl transition-transform duration-300'
             : 'relative flex-shrink-0 transition-[width] duration-300',
           isMobile && (open ? 'translate-x-0' : '-translate-x-full'),
         )}
-        style={{ width: isMobile ? undefined : open ? '328px' : '0px', background: theme.sideGrad }}
+        style={{
+          width: isMobile ? undefined : open ? '328px' : '0px',
+          background: theme.sideGrad,
+          // Chữ thanh bên: trắng, hoặc tối cùng tông với gradient pastel (xem deriveTheme).
+          ['--side-fg' as string]: theme.sidebarText,
+          ['--side-muted' as string]: theme.sidebarMuted,
+        }}
       >
         {/* Cả hai lớp con đều `absolute inset-0`, nên khung này quyết định vùng
             chúng phủ. Trên mobile nó bắt đầu dưới safe-area: mây và sao của
@@ -106,7 +112,7 @@ export function Sidebar({
               <div className="font-heading text-[19px] font-extrabold leading-tight">
                 {t.appName}
               </div>
-              <div className="text-xs font-semibold" style={{ color: 'rgba(255,255,255,0.78)' }}>
+              <div className="text-xs font-semibold" style={{ color: 'var(--side-muted)' }}>
                 {t.appSub}
               </div>
             </div>
@@ -132,7 +138,7 @@ export function Sidebar({
 
           {categories && (
             <div>
-              <div className="mb-2.5 text-[11px] font-extrabold uppercase tracking-wider text-white/78">
+              <div className="mb-2.5 text-[11px] font-extrabold uppercase tracking-wider text-(--side-muted)">
                 {t.categories}
               </div>
               <div className="flex flex-col gap-1.5">
@@ -152,14 +158,14 @@ export function Sidebar({
                   </button>
                 ))}
                 {categories.length === 0 && (
-                  <p className="text-xs font-semibold text-white/78">{t.noCategories}</p>
+                  <p className="text-xs font-semibold text-(--side-muted)">{t.noCategories}</p>
                 )}
               </div>
               {onManageCategories && (
                 <button
                   type="button"
                   onClick={onManageCategories}
-                  className="mt-2.5 text-xs font-bold text-white/90 underline-offset-2 hover:underline"
+                  className="mt-2.5 text-xs font-bold text-(--side-fg) underline-offset-2 hover:underline"
                 >
                   {t.manageCategories}
                 </button>

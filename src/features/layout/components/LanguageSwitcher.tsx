@@ -22,7 +22,7 @@ export function LanguageSwitcher({ locale, onChange, theme }: LanguageSwitcherPr
             className="flex-1 rounded-xl border-none py-2 text-[12.5px] font-extrabold transition-all"
             style={{
               background: active ? '#ffffff' : 'rgba(255,255,255,.16)',
-              color: active ? theme.accent : '#ffffff',
+              color: active ? theme.accentText : 'var(--side-fg)',
             }}
           >
             {LABELS[code]}

@@ -84,8 +84,8 @@ export function MoreTab({
                 aria-pressed={active}
                 className="min-h-11 rounded-[12px] text-[14px] font-extrabold"
                 style={{
-                  background: active ? theme.accent : theme.inputBg,
-                  color: active ? '#fff' : theme.text,
+                  background: active ? theme.accentFill : theme.inputBg,
+                  color: active ? theme.onAccent : theme.text,
                 }}
               >
                 {label}
@@ -135,7 +135,7 @@ function Row({
       className="flex min-h-[52px] items-center gap-3 border-b px-4 text-left text-[14.5px] font-bold last:border-b-0 active:opacity-70"
       style={{ borderColor: theme.border, color: theme.text }}
     >
-      <Icon className="size-5 flex-shrink-0" style={{ color: theme.accent }} />
+      <Icon className="size-5 flex-shrink-0" style={{ color: theme.accentText }} />
       <span className="flex-1">{label}</span>
       <ChevronRightIcon className="size-4 flex-shrink-0" style={{ color: theme.mutedText }} />
     </button>

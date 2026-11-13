@@ -44,13 +44,13 @@ export function IosInstallBanner() {
       className="mx-3 mt-3 flex items-center gap-2.5 rounded-2xl border-[1.5px] px-3.5 py-2.5 sm:mx-4"
       style={{ borderColor: theme.border, background: theme.chip, color: theme.text }}
     >
-      <Share2Icon className="size-5 flex-shrink-0" style={{ color: theme.accent }} />
+      <Share2Icon className="size-5 flex-shrink-0" style={{ color: theme.accentText }} />
       <p className="min-w-0 flex-1 text-[12.5px] leading-snug font-semibold">{t.iosInstallHint}</p>
       <button
         type="button"
         onClick={dismiss}
         className="flex-shrink-0 rounded-full px-2.5 py-1.5 text-[11px] font-extrabold"
-        style={{ background: theme.accent, color: '#fff' }}
+        style={{ background: theme.accentFill, color: theme.onAccent }}
       >
         {t.gotIt}
       </button>

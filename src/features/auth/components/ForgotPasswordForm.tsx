@@ -42,7 +42,7 @@ export function ForgotPasswordForm() {
       </form>
 
       <p className="text-center text-sm font-medium">
-        <Link to="/login" className="font-bold hover:underline" style={{ color: theme.accent }}>
+        <Link to="/login" className="font-bold hover:underline" style={{ color: theme.accentText }}>
           {t.backToLogin}
         </Link>
       </p>

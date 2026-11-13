@@ -100,7 +100,7 @@ export function StickerLayer({
                     onDuplicate(sticker.id)
                   }}
                   className="absolute z-[3] grid place-items-center rounded-full bg-white text-[12px] leading-none shadow-md"
-                  style={{ top: btnOffset, left: btnOffset, height: btnSize, width: btnSize, color: theme.accent, border: `1.5px solid ${theme.accent}`, touchAction: 'none' }}
+                  style={{ top: btnOffset, left: btnOffset, height: btnSize, width: btnSize, color: theme.accentText, border: `1.5px solid ${theme.accent}`, touchAction: 'none' }}
                 >
                   ⧉
                 </button>
@@ -110,7 +110,7 @@ export function StickerLayer({
                     e.stopPropagation()
                     onDelete(sticker.id)
                   }}
-                  className="absolute z-[3] grid place-items-center rounded-full bg-[#ff5d7a] text-[15px] leading-none text-white shadow-md"
+                  className="absolute z-[3] grid place-items-center rounded-full bg-[#d61f4b] text-[15px] leading-none text-white shadow-md"
                   style={{ top: btnOffset, right: btnOffset, height: btnSize, width: btnSize, touchAction: 'none' }}
                 >
                   ×

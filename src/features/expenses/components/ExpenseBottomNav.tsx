@@ -42,7 +42,7 @@ export function ExpenseBottomNav({ view, onChange, onAdd }: Props) {
         onClick={() => onChange(key)}
         aria-current={active ? 'page' : undefined}
         className="flex min-h-14 flex-1 flex-col items-center justify-center gap-0.5 text-[11px] font-extrabold transition-transform active:scale-95"
-        style={{ color: active ? theme.accent : theme.mutedText }}
+        style={{ color: active ? theme.accentText : theme.mutedText }}
       >
         <Icon className="size-[22px]" strokeWidth={active ? 2.6 : 2} />
         {label}
@@ -67,8 +67,12 @@ export function ExpenseBottomNav({ view, onChange, onAdd }: Props) {
             type="button"
             onClick={onAdd}
             aria-label={t.addTransaction}
-            className="-mt-5 grid size-14 place-items-center rounded-full text-white shadow-lg transition-transform active:scale-95"
-            style={{ background: theme.brandGrad, boxShadow: `0 8px 20px ${theme.brandShadow}` }}
+            className="-mt-5 grid size-14 place-items-center rounded-full shadow-lg transition-transform active:scale-95"
+            style={{
+              background: theme.brandGrad,
+              color: theme.onBrand,
+              boxShadow: `0 8px 20px ${theme.brandShadow}`,
+            }}
           >
             <PlusIcon className="size-7" strokeWidth={2.6} />
           </button>
@@ -106,8 +110,8 @@ export function ExpenseTopNav({ view, onChange }: Omit<Props, 'onAdd'>) {
             aria-current={active ? 'page' : undefined}
             className="flex flex-1 items-center justify-center gap-1.5 rounded-[10px] px-3 py-2 text-[13px] font-extrabold transition-transform active:scale-[0.98]"
             style={{
-              background: active ? theme.accent : 'transparent',
-              color: active ? '#fff' : theme.mutedText,
+              background: active ? theme.accentFill : 'transparent',
+              color: active ? theme.onAccent : theme.mutedText,
             }}
           >
             <Icon className="size-4" />

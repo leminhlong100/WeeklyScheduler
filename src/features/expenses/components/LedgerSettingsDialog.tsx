@@ -173,7 +173,7 @@ function LedgerForm({ ledger, onDone }: { ledger?: LedgerSummary; onDone?: () =>
       <Button
         type="submit"
         disabled={pending || !dirty}
-        style={{ background: theme.accent, color: '#fff' }}
+        style={{ background: theme.accentFill, color: theme.onAccent }}
       >
         {ledger ? t.save : t.ledgerCreate}
       </Button>
@@ -281,7 +281,7 @@ function OwnerSettings({ ledger, onDeleted }: { ledger: LedgerSummary; onDeleted
                 type="button"
                 onClick={handleCopy}
                 className="gap-1.5"
-                style={{ background: theme.accent, color: '#fff' }}
+                style={{ background: theme.accentFill, color: theme.onAccent }}
               >
                 <CopyIcon className="size-4" />
                 {t.ledgerInviteCopy}
@@ -326,7 +326,7 @@ function OwnerSettings({ ledger, onDeleted }: { ledger: LedgerSummary; onDeleted
             onClick={() => toggleInvite(true)}
             disabled={setInvite.isPending}
             className="gap-1.5"
-            style={{ background: theme.accent, color: '#fff' }}
+            style={{ background: theme.accentFill, color: theme.onAccent }}
           >
             <LinkIcon className="size-4" />
             {t.ledgerInviteEnable}

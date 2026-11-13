@@ -111,7 +111,7 @@ export function ExpenseList({
                 type="button"
                 onClick={() => onFilterChange(EMPTY_EXPENSE_FILTER)}
                 className="min-h-9 rounded-[10px] px-3 text-[12.5px] font-extrabold"
-                style={{ background: theme.inputBg, color: theme.accent }}
+                style={{ background: theme.inputBg, color: theme.accentText }}
               >
                 {t.filterClear}
               </button>

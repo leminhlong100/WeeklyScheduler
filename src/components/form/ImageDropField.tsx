@@ -53,7 +53,7 @@ export function ImageDropField({
   return (
     <div className={cn('flex flex-col gap-1.5', className)}>
       <div className="flex items-center justify-between gap-2">
-        <label htmlFor={inputId} className="text-[11px] font-extrabold" style={{ color: colors.muted }}>
+        <label htmlFor={inputId} className="text-[11px] font-extrabold" style={{ color: colors.mutedText }}>
           {label}
         </label>
         {value && !busy && onEdit && (
@@ -63,7 +63,7 @@ export function ImageDropField({
             aria-label={editLabel}
             title={editLabel}
             className="ml-auto grid size-5 place-items-center rounded-md"
-            style={{ color: colors.muted }}
+            style={{ color: colors.mutedText }}
           >
             <Crop className="size-3.5" />
           </button>
@@ -75,7 +75,7 @@ export function ImageDropField({
             aria-label={clearLabel}
             title={clearLabel}
             className="grid size-5 place-items-center rounded-md"
-            style={{ color: colors.muted }}
+            style={{ color: colors.mutedText }}
           >
             <X className="size-3.5" />
           </button>
@@ -116,14 +116,14 @@ export function ImageDropField({
         />
 
         {busy ? (
-          <Loader2 className="size-6 animate-spin" style={{ color: colors.accent }} />
+          <Loader2 className="size-6 animate-spin" style={{ color: colors.accentText }} />
         ) : (
           !value && (
             <button
               type="button"
               onClick={() => inputRef.current?.click()}
               className="flex flex-col items-center gap-1 px-3 py-4 text-center"
-              style={{ color: colors.muted }}
+              style={{ color: colors.mutedText }}
             >
               <ImagePlus className="size-5" />
               {hint && <span className="text-[11px] font-bold leading-snug">{hint}</span>}

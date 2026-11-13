@@ -155,7 +155,7 @@ function Section({
             type="button"
             onClick={onAction}
             className="flex min-h-11 items-center gap-0.5 px-1 text-[13px] font-bold"
-            style={{ color: theme.accent }}
+            style={{ color: theme.accentText }}
           >
             {action}
             <ChevronRightIcon className="size-4" />
@@ -303,7 +303,7 @@ function SpendableCard({
           type="button"
           onClick={onSetBudget}
           className="mt-1 flex min-h-11 items-center gap-1.5 self-start rounded-[12px] px-3 text-[13px] font-bold"
-          style={{ background: theme.inputBg, color: theme.accent }}
+          style={{ background: theme.inputBg, color: theme.accentText }}
         >
           <SparklesIcon className="size-4" />
           {t.setBudgetCta}
@@ -442,7 +442,7 @@ function EmptyState({
               style={{ background: theme.inputBg, color: theme.text }}
             >
               <span
-                className="grid size-7 flex-shrink-0 place-items-center rounded-full text-[13px] font-extrabold text-white"
+                className="grid size-7 flex-shrink-0 place-items-center rounded-full text-[13px] font-extrabold"
                 style={{ background: theme.accent }}
               >
                 {i + 1}

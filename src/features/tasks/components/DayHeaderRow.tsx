@@ -30,14 +30,14 @@ export function DayHeaderRow({ days, theme }: DayHeaderRowProps) {
           >
             <div
               className="text-[11.5px] font-extrabold tracking-wide uppercase"
-              style={{ color: d.isToday ? theme.accent : theme.muted }}
+              style={{ color: d.isToday ? theme.accentText : theme.mutedText }}
             >
               {d.dow}
             </div>
             <div
               className="font-heading mx-auto mt-[5px] grid h-9 w-9 place-items-center rounded-[13px] text-lg font-extrabold"
               style={{
-                color: d.isToday ? '#fff' : theme.text,
+                color: d.isToday ? theme.onBrand : theme.text,
                 background: d.isToday ? theme.brandGrad : 'transparent',
                 boxShadow: d.isToday ? `0 5px 13px ${theme.brandShadow}` : 'none',
               }}

@@ -44,7 +44,7 @@ export function AuthLayout({ title, subtitle, children, footer }: AuthLayoutProp
           {title}
         </h1>
         {subtitle && (
-          <p className="mb-5 text-sm font-medium" style={{ color: theme.muted }}>
+          <p className="mb-5 text-sm font-medium" style={{ color: theme.mutedText }}>
             {subtitle}
           </p>
         )}

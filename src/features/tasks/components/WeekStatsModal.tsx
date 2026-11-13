@@ -28,7 +28,7 @@ function formatMinutes(minutes: number, minuteShort: string): string {
 function StatTile({ theme, label, value }: { theme: DerivedTheme; label: string; value: string }) {
   return (
     <div className="min-w-0 flex-1 rounded-2xl px-3 py-2.5" style={{ background: theme.chip }}>
-      <div className="truncate text-[10.5px] font-extrabold tracking-wider uppercase" style={{ color: theme.muted }}>
+      <div className="truncate text-[10.5px] font-extrabold tracking-wider uppercase" style={{ color: theme.mutedText }}>
         {label}
       </div>
       <div className="font-heading truncate text-[17px] font-extrabold" style={{ color: theme.text }}>
@@ -67,7 +67,7 @@ export function WeekStatsModal({ open, onOpenChange, tasks, categories, weekStar
           </DialogTitle>
 
           {stats.taskCount === 0 ? (
-            <p className="py-6 text-center text-[12.5px] font-semibold" style={{ color: theme.muted }}>
+            <p className="py-6 text-center text-[12.5px] font-semibold" style={{ color: theme.mutedText }}>
               {t.statsEmpty}
             </p>
           ) : (
@@ -107,7 +107,7 @@ export function WeekStatsModal({ open, onOpenChange, tasks, categories, weekStar
                         }}
                       />
                     </div>
-                    <span className="text-[10px] font-extrabold" style={{ color: theme.muted }}>
+                    <span className="text-[10px] font-extrabold" style={{ color: theme.mutedText }}>
                       {t.dow[dayIndex]}
                     </span>
                   </div>
@@ -115,7 +115,7 @@ export function WeekStatsModal({ open, onOpenChange, tasks, categories, weekStar
               </div>
 
               <div>
-                <div className="mb-2 text-[11px] font-extrabold tracking-wider uppercase" style={{ color: theme.muted }}>
+                <div className="mb-2 text-[11px] font-extrabold tracking-wider uppercase" style={{ color: theme.mutedText }}>
                   {t.statsByCategory}
                 </div>
                 <div className="flex flex-col gap-2.5">
@@ -128,7 +128,7 @@ export function WeekStatsModal({ open, onOpenChange, tasks, categories, weekStar
                             ? t.statsUncategorized
                             : translateCategoryName(bucket.name, t)}
                         </span>
-                        <span className="flex-shrink-0 text-[12px] font-extrabold" style={{ color: theme.muted }}>
+                        <span className="flex-shrink-0 text-[12px] font-extrabold" style={{ color: theme.mutedText }}>
                           {formatMinutes(bucket.minutes, t.minuteShort)} · {Math.round(bucket.share * 100)}%
                         </span>
                       </div>

@@ -23,7 +23,7 @@ export function DayOfWeekPicker({ labels, selected, onToggle, theme }: DayOfWeek
             style={{
               borderColor: active ? theme.accent : theme.border,
               background: active ? rgba(theme.accent, 0.16) : 'transparent',
-              color: active ? theme.accent : theme.muted,
+              color: active ? theme.accentText : theme.mutedText,
             }}
           >
             {label}

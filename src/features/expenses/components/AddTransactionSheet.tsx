@@ -85,8 +85,8 @@ export function AddTransactionSheet({
               onClick={() => setMode(key)}
               className="flex min-h-11 flex-1 items-center justify-center gap-1.5 rounded-[10px] text-[13.5px] font-extrabold sm:min-h-9"
               style={{
-                background: selected ? theme.accent : 'transparent',
-                color: selected ? '#fff' : theme.mutedText,
+                background: selected ? theme.accentFill : 'transparent',
+                color: selected ? theme.onAccent : theme.mutedText,
               }}
             >
               <Icon className="size-4" />

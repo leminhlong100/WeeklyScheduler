@@ -19,7 +19,7 @@ export function HourRuler({ theme }: HourRulerProps) {
         <div
           key={h.label}
           className={`absolute right-[9px] whitespace-nowrap text-[11px] font-bold ${h.top === 0 ? '' : '-translate-y-1/2'}`}
-          style={{ top: h.top, color: theme.muted }}
+          style={{ top: h.top, color: theme.mutedText }}
         >
           {h.label}
         </div>

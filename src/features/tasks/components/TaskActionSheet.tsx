@@ -59,7 +59,7 @@ export function TaskActionSheet({
                   >
                     {task.title}
                   </DialogTitle>
-                  <div className="text-xs font-semibold" style={{ color: theme.muted }}>
+                  <div className="text-xs font-semibold" style={{ color: theme.mutedText }}>
                     {formatMinutesAsTime(task.startMinute)} –{' '}
                     {formatMinutesAsTime(task.startMinute + task.durationMinute)}
                   </div>

@@ -60,7 +60,7 @@ export const ExpenseDayGroup = memo(function ExpenseDayGroup({
       <div className="flex flex-wrap items-baseline gap-x-2.5 gap-y-0.5 px-1">
         <span
           className="text-[13px] font-extrabold"
-          style={{ color: isToday ? theme.accent : theme.mutedText }}
+          style={{ color: isToday ? theme.accentText : theme.mutedText }}
         >
           {label}
         </span>

@@ -479,13 +479,13 @@ export function WeekGrid({
                 >
                   <span
                     className="text-[10px] font-extrabold uppercase tracking-wide transition-colors duration-200"
-                    style={{ color: active ? 'rgba(255,255,255,0.85)' : theme.muted }}
+                    style={{ color: active ? theme.onBrand : theme.mutedText }}
                   >
                     {day.dow}
                   </span>
                   <span
                     className="font-heading text-[15px] font-extrabold transition-colors duration-200"
-                    style={{ color: active ? '#fff' : day.isToday ? theme.accent : theme.text }}
+                    style={{ color: active ? theme.onBrand : day.isToday ? theme.accentText : theme.text }}
                   >
                     {day.dayNum}
                   </span>

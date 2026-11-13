@@ -319,7 +319,7 @@ function IssueStrip({
         </span>
         <ChevronUp
           className={cn('size-3.5 transition-transform', open && 'rotate-180')}
-          style={{ color: chrome.muted }}
+          style={{ color: chrome.mutedText }}
         />
       </button>
 

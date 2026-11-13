@@ -67,7 +67,7 @@ export function CategoryManagerModal({ open, onOpenChange }: CategoryManagerModa
                 />
               ))}
               {categories.length === 0 && (
-                <p className="text-sm font-medium" style={{ color: theme.muted }}>
+                <p className="text-sm font-medium" style={{ color: theme.mutedText }}>
                   {t.noCategories}
                 </p>
               )}

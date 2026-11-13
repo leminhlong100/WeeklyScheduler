@@ -25,7 +25,7 @@ function Line({
     <div className="flex items-baseline justify-between gap-3">
       <span
         className={strong ? 'text-[12px] font-extrabold' : 'text-[11.5px] font-bold'}
-        style={{ color: strong ? theme.text : theme.muted }}
+        style={{ color: strong ? theme.text : theme.mutedText }}
       >
         {label}
       </span>
