@@ -2,6 +2,7 @@ import type { ReactNode } from 'react'
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog'
 import { useTheme } from '@/features/theme/ThemeContext'
 import { cn } from '@/lib/utils'
+import { useBackToClose } from '@/hooks/useBackToClose'
 
 /**
  * Hộp thoại dạng "bottom sheet" trên điện thoại, hộp giữa màn hình trên desktop
@@ -21,6 +22,7 @@ export function SheetDialog({
   className?: string
 }) {
   const { theme } = useTheme()
+  useBackToClose(open, () => onOpenChange(false))
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent

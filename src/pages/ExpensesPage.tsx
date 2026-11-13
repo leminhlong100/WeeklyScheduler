@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react'
 import { toast } from 'sonner'
 import { useIsMobile, useIsTouchDevice } from '@/hooks/useMediaQuery'
 import { useSessionStorageState } from '@/hooks/useSessionStorageState'
+import { useBackToClose } from '@/hooks/useBackToClose'
 import { useTranslation } from '@/features/i18n/LocaleContext'
 import { translateExpenseCategoryName } from '@/features/i18n/defaultExpenseCategoryNames'
 import { useTheme } from '@/features/theme/ThemeContext'
@@ -89,6 +90,8 @@ function ExpensesPageContent() {
   const { month, view, setMonth, setView } = useExpensesUrlState()
 
   const [sidebarOpen, setSidebarOpen] = useState(!isMobile && !isTouch)
+  // Chỉ drawer trên mobile là một "lớp"; sidebar desktop là một cột cố định.
+  useBackToClose(isMobile && sidebarOpen, () => setSidebarOpen(false))
   const [ledgerDialog, setLedgerDialog] = useState<LedgerDialogTarget>(null)
   const [categoryManagerOpen, setCategoryManagerOpen] = useState(false)
   const [hideOptionsOpen, setHideOptionsOpen] = useState(false)

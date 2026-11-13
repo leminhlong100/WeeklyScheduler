@@ -3,6 +3,7 @@ import { Dialog, DialogContent, DialogDescription, DialogTitle } from '@/compone
 import { Button } from '@/components/ui/button'
 import { useTranslation } from '@/features/i18n/LocaleContext'
 import { useTheme } from '@/features/theme/ThemeContext'
+import { useBackToClose } from '@/hooks/useBackToClose'
 
 export interface ConfirmOptions {
   message: string
@@ -59,6 +60,8 @@ function ConfirmDialogView({
   const { t } = useTranslation()
   const { theme } = useTheme()
   const danger = pending?.danger ?? true
+  // Hộp này hay mở chồng lên một sheet: Back chỉ đóng hộp (= Huỷ), sheet còn nguyên.
+  useBackToClose(pending !== null, () => onClose(false))
   return (
     <Dialog open={pending !== null} onOpenChange={(open) => !open && onClose(false)}>
       <DialogContent

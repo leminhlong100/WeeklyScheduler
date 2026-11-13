@@ -1,5 +1,6 @@
 import { useCallback } from 'react'
 import { useSearchParams } from 'react-router-dom'
+import { whenHistorySettles } from '@/hooks/useBackToClose'
 import { currentMonthKey, type MonthKey } from '../utils/month'
 
 export const EXPENSE_VIEWS = ['overview', 'transactions', 'report', 'more'] as const
@@ -27,16 +28,18 @@ export function useExpensesUrlState() {
 
   const setMonth = useCallback(
     (next: MonthKey | ((prev: MonthKey) => MonthKey)) => {
-      setParams(
-        (prev) => {
-          const p = new URLSearchParams(prev)
-          const prevMonth = isMonthKey(p.get('m')) ? (p.get('m') as MonthKey) : currentMonthKey()
-          const value = typeof next === 'function' ? next(prevMonth) : next
-          if (value === currentMonthKey()) p.delete('m')
-          else p.set('m', value)
-          return p
-        },
-        { replace: true },
+      whenHistorySettles(() =>
+        setParams(
+          (prev) => {
+            const p = new URLSearchParams(prev)
+            const prevMonth = isMonthKey(p.get('m')) ? (p.get('m') as MonthKey) : currentMonthKey()
+            const value = typeof next === 'function' ? next(prevMonth) : next
+            if (value === currentMonthKey()) p.delete('m')
+            else p.set('m', value)
+            return p
+          },
+          { replace: true },
+        ),
       )
     },
     [setParams],
@@ -44,12 +47,14 @@ export function useExpensesUrlState() {
 
   const setView = useCallback(
     (next: ExpenseView) => {
-      setParams((prev) => {
-        const p = new URLSearchParams(prev)
-        if (next === 'overview') p.delete('tab')
-        else p.set('tab', next)
-        return p
-      })
+      whenHistorySettles(() =>
+        setParams((prev) => {
+          const p = new URLSearchParams(prev)
+          if (next === 'overview') p.delete('tab')
+          else p.set('tab', next)
+          return p
+        }),
+      )
     },
     [setParams],
   )

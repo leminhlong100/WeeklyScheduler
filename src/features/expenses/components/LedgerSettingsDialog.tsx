@@ -16,6 +16,7 @@ import { Input } from '@/components/ui/input'
 import { useAuth } from '@/features/auth/AuthContext'
 import { useTranslation } from '@/features/i18n/LocaleContext'
 import { useTheme } from '@/features/theme/ThemeContext'
+import { useBackToClose } from '@/hooks/useBackToClose'
 import { buildInviteLink, type LedgerSummary } from '../api/ledgersApi'
 import { useLedgerSwitcher } from '../LedgerContext'
 import {
@@ -43,6 +44,7 @@ export function LedgerSettingsDialog({
   const { t } = useTranslation()
   const { ledgers } = useLedgerSwitcher()
   const ledger = target && target !== 'new' ? ledgers.find((l) => l.id === target) : undefined
+  useBackToClose(target !== null, onClose)
 
   return (
     <Dialog open={target !== null} onOpenChange={(next) => !next && onClose()}>

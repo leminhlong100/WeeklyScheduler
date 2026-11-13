@@ -7,6 +7,7 @@ import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { useTranslation } from '@/features/i18n/LocaleContext'
 import { useTheme } from '@/features/theme/ThemeContext'
+import { useBackToClose } from '@/hooks/useBackToClose'
 import { useExpenseCategories } from '../hooks/useExpenseCategories'
 import { useDeleteExpenseCategory } from '../hooks/useExpenseCategoryMutations'
 import { KINDS } from '../schemas/expenseSchema'
@@ -36,6 +37,7 @@ export function ExpenseCategoryManagerModal({
     setEditTarget(null)
     onOpenChange(false)
   }
+  useBackToClose(open, close)
 
   const handleDelete = async (category: ExpenseCategory) => {
     // Câu xác nhận nói rõ khoản chi KHÔNG mất: `on delete set null` chỉ gỡ nhãn.

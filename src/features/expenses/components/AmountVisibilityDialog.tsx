@@ -2,6 +2,7 @@ import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog'
 import { useTranslation } from '@/features/i18n/LocaleContext'
 import { translateExpenseCategoryName } from '@/features/i18n/defaultExpenseCategoryNames'
 import { useTheme } from '@/features/theme/ThemeContext'
+import { useBackToClose } from '@/hooks/useBackToClose'
 import { categoryScopeKey, useAmountVisibility } from '../AmountVisibilityContext'
 import { useExpenseCategories } from '../hooks/useExpenseCategories'
 
@@ -47,6 +48,7 @@ export function AmountVisibilityDialog({
   const { theme } = useTheme()
   const { hiddenScopes, toggleScope, setScopes } = useAmountVisibility()
   const { data: categories = [] } = useExpenseCategories()
+  useBackToClose(open, () => onOpenChange(false))
 
   const scopes = [
     { key: 'month', label: t.hideScopeMonth },
