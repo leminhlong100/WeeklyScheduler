@@ -136,7 +136,7 @@ export function ExpenseCategoryFormFields({
         <div className="mb-2 text-xs font-extrabold" style={{ color: theme.mutedText }}>
           {t.categoryEmoji}
         </div>
-        <div className="grid grid-cols-8 gap-1.5">
+        <div className="grid grid-cols-6 gap-1.5 sm:grid-cols-8">
           {EXPENSE_EMOJI_PRESETS.map((e) => (
             <button
               key={e}

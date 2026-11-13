@@ -150,7 +150,7 @@ export function ParsedDraftList({ draft, onChange, onDone }: ParsedDraftListProp
               {/* Chi/Thu sửa được ngay trên dòng: AI đoán sai chiều tiền là lỗi
                   đắt nhất ở đây — nó lật dấu của khoản này trong số dư. */}
               <div
-                role="tablist"
+                role="radiogroup"
                 aria-label={t.expenseKind}
                 className="flex gap-1 self-start rounded-[11px] border-[1.5px] p-0.5"
                 style={{ borderColor: theme.border, background: theme.chip }}
@@ -161,15 +161,15 @@ export function ParsedDraftList({ draft, onChange, onDone }: ParsedDraftListProp
                     <button
                       key={option}
                       type="button"
-                      role="tab"
-                      aria-selected={selected}
+                      role="radio"
+                      aria-checked={selected}
                       onClick={() => {
                         if (selected) return
                         // Danh mục cũ thuộc kind khác nên không còn dùng được;
                         // ép về "chưa phân loại" để không giữ một id vô hình.
                         patchRow(row.key, { kind: option, categoryId: NO_CATEGORY })
                       }}
-                      className="rounded-[8px] px-2.5 py-1 text-[11.5px] font-extrabold"
+                      className="min-h-11 rounded-[8px] px-3 sm:min-h-9 py-1 text-[12px] font-extrabold"
                       style={{
                         background: selected
                           ? option === 'income'
@@ -238,7 +238,7 @@ export function ParsedDraftList({ draft, onChange, onDone }: ParsedDraftListProp
                 value={row.note}
                 placeholder={t.expenseNotePh}
                 onChange={(e) => patchRow(row.key, { note: e.target.value })}
-                className="h-9"
+                className="h-11 sm:h-9"
                 style={inputStyle}
               />
 
@@ -249,7 +249,7 @@ export function ParsedDraftList({ draft, onChange, onDone }: ParsedDraftListProp
                   onValueChange={(v) => patchRow(row.key, { categoryId: v ?? NO_CATEGORY })}
                 >
                   <SelectTrigger
-                    className="h-9 min-w-0 flex-1"
+                    className="h-11 min-w-0 flex-1 sm:h-9"
                     style={inputStyle}
                     aria-label={t.expenseCategory}
                   >
@@ -268,7 +268,7 @@ export function ParsedDraftList({ draft, onChange, onDone }: ParsedDraftListProp
                   aria-label={t.expenseDate}
                   value={row.spentAt}
                   onChange={(e) => patchRow(row.key, { spentAt: e.target.value })}
-                  className="h-9 w-[150px]"
+                  className="h-11 w-[150px] sm:h-9"
                   style={inputStyle}
                 />
               </div>

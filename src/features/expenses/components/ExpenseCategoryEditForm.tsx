@@ -81,13 +81,15 @@ export function ExpenseCategoryEditForm({ category, onDone }: ExpenseCategoryEdi
     }
   }
 
-  const isPending = createCategory.isPending || updateCategory.isPending
+  const isPending =
+    createCategory.isPending || updateCategory.isPending || form.formState.isSubmitting
 
   return (
     <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-4">
       <ExpenseCategoryFormFields form={form} allowKindChange={!isEdit} />
       <div className="flex justify-end gap-2">
         <Button
+          size="touch"
           type="button"
           variant="outline"
           onClick={onDone}
@@ -95,7 +97,7 @@ export function ExpenseCategoryEditForm({ category, onDone }: ExpenseCategoryEdi
         >
           {t.cancel}
         </Button>
-        <GradientButton type="submit" disabled={isPending}>
+        <GradientButton type="submit" size="touch" disabled={isPending} className="min-w-[96px]">
           {t.save}
         </GradientButton>
       </div>

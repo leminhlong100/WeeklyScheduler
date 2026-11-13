@@ -67,7 +67,7 @@ export function ExpenseFilters({ value, onChange, categories, resultCount }: Exp
           onChange={(e) => onChange({ ...value, query: e.target.value })}
           placeholder={t.filterSearchPh}
           aria-label={t.filterSearchPh}
-          className="h-10 w-full rounded-xl border-[1.5px] pl-9 pr-9 text-[13.5px] font-semibold outline-none"
+          className="h-11 w-full rounded-xl border-[1.5px] pl-9 pr-11 text-base sm:h-10 sm:text-[13.5px] font-semibold outline-none"
           style={inputStyle}
         />
         {value.query !== '' && (
@@ -75,7 +75,7 @@ export function ExpenseFilters({ value, onChange, categories, resultCount }: Exp
             type="button"
             onClick={() => onChange({ ...value, query: '' })}
             aria-label={t.filterClear}
-            className="absolute right-2 top-1/2 grid size-7 -translate-y-1/2 place-items-center rounded-lg"
+            className="absolute right-1 top-1/2 grid size-9 -translate-y-1/2 place-items-center rounded-lg"
             style={{ color: theme.mutedText }}
           >
             <XIcon className="size-4" />
@@ -86,7 +86,7 @@ export function ExpenseFilters({ value, onChange, categories, resultCount }: Exp
       <div className="flex flex-wrap items-center gap-2">
         <div
           role="tablist"
-          aria-label={t.filterKindAll}
+          aria-label={t.expenseKind}
           className="flex gap-1 rounded-[13px] border-[1.5px] p-1"
           style={{ borderColor: theme.border, background: theme.chip }}
         >
@@ -101,7 +101,7 @@ export function ExpenseFilters({ value, onChange, categories, resultCount }: Exp
                 // Đổi tab thì bỏ luôn danh mục đang chọn: danh mục cũ có thể
                 // thuộc kind khác, giữ lại sẽ ra danh sách rỗng mà không rõ vì sao.
                 onClick={() => onChange({ ...value, kind, categoryId: 'all' })}
-                className="rounded-[9px] px-2.5 py-1 text-[12px] font-extrabold transition-transform duration-150 active:scale-95"
+                className="min-h-9 rounded-[9px] px-3 py-1 text-[12.5px] font-extrabold transition-transform duration-150 active:scale-95"
                 style={{
                   background: selected ? theme.accent : 'transparent',
                   color: selected ? '#fff' : theme.muted,
@@ -119,7 +119,11 @@ export function ExpenseFilters({ value, onChange, categories, resultCount }: Exp
             value={value.categoryId}
             onValueChange={(v) => onChange({ ...value, categoryId: v ?? 'all' })}
           >
-            <SelectTrigger className="h-9 w-full" style={inputStyle} aria-label={t.expenseCategory}>
+            <SelectTrigger
+              className="h-11 w-full sm:h-9"
+              style={inputStyle}
+              aria-label={t.expenseCategory}
+            >
               <SelectValue />
             </SelectTrigger>
             <SelectContent
@@ -138,7 +142,7 @@ export function ExpenseFilters({ value, onChange, categories, resultCount }: Exp
           <button
             type="button"
             onClick={() => onChange({ query: '', kind: 'all', categoryId: 'all' })}
-            className="flex h-9 items-center gap-1.5 rounded-[11px] border-[1.5px] px-2.5 text-[12px] font-bold transition-transform duration-150 active:scale-95"
+            className="flex h-11 items-center gap-1.5 rounded-[11px] sm:h-9 border-[1.5px] px-2.5 text-[12px] font-bold transition-transform duration-150 active:scale-95"
             style={{ borderColor: theme.border, background: theme.chip, color: theme.mutedText }}
           >
             <XIcon className="size-3.5" />

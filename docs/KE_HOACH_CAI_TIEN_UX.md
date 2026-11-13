@@ -453,7 +453,7 @@ làm mặc định thay cho `DEFAULT_CURRENCY` cố định (`QuickAddSheet.tsx:
 - [x] **A5** một gốc %, `formatPercent`
 - [x] **B1** `formatSignedMoney`
 - [x] **B2** token màu theo theme, ≥ 4.5:1, xoá 7 màu viết cứng
-- [ ] **B3** thuật ngữ, nhãn theo kind, lỗi zod i18n
+- [x] **B3** thuật ngữ, nhãn theo kind, lỗi zod i18n
 - [ ] **B4** vùng chạm 44px, ô AI 16px, ARIA
 - [ ] **C1** tháng + tab vào URL
 - [ ] **C2** `ExpenseBottomNav` + sidebar desktop
@@ -482,3 +482,4 @@ làm mặc định thay cho `DEFAULT_CURRENCY` cố định (`QuickAddSheet.tsx:
 - 2026-11-13 — **KIỂM CHỨNG ĐỢT A: ĐẠT** — 53 test, typecheck/lint (0 lỗi)/build sạch; MoneyInput và QueryStatus kiểm trên trang thử. Chưa kiểm trang thật (cần chủ repo đăng nhập). Việc cho chủ repo: sau khi deploy, tìm khoản VND amount < 1000 trong DB để xem có khoản nào bị lưu sai từ lỗi cũ.
 - 2026-11-13 — B1 xong: formatSignedMoney (chi luôn −, thu +, số dư âm U+2212). Lưu ý: commit này cũng chạy prettier trên src/features/expenses/components (chỉ đổi định dạng).
 - 2026-11-13 — B2 xong: DerivedTheme có thêm mutedText/income/warning/warningBg, danger cũng được chỉnh đạt 4.5:1 (deriveTheme.readable). Test src/features/theme/contrast.test.ts chạy qua mọi preset. Trong module chi tiêu mọi 'color: theme.muted' (chữ) đổi thành mutedText; FormField nối lỗi bằng aria-invalid/aria-describedby.
+- 2026-11-13 — B3 xong: thuật ngữ (giao dịch, Tiền tệ, Ngày, Đã trả/Đã nhận, lần lặp thay cho kỳ/chuỗi, Xoá thống nhất). Toast/tiêu đề theo kind. CSV thêm cột nhãn đã dịch, tên file theo locale. GIỮ 'Sức khỏe' của danh mục lịch tuần vì phải khớp tên seed trong DB.

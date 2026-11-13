@@ -27,7 +27,9 @@ export function Switch({
         className,
       )}
       style={{
-        background: checked ? (onColor ?? 'var(--color-primary)') : (offColor ?? 'var(--color-border)'),
+        background: checked
+          ? (onColor ?? 'var(--color-primary)')
+          : (offColor ?? 'var(--color-border)'),
         color: onColor,
       }}
       {...props}

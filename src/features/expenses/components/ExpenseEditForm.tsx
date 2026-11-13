@@ -230,7 +230,7 @@ export function ExpenseEditForm({ expense, defaultDate, onDone }: ExpenseEditFor
         name="kind"
         render={({ field }) => (
           <div
-            role="tablist"
+            role="radiogroup"
             aria-label={t.expenseKind}
             className="flex gap-1 rounded-[14px] border-[1.5px] p-1"
             style={{ borderColor: theme.border, background: theme.chip }}
@@ -241,8 +241,8 @@ export function ExpenseEditForm({ expense, defaultDate, onDone }: ExpenseEditFor
                 <button
                   key={option}
                   type="button"
-                  role="tab"
-                  aria-selected={selected}
+                  role="radio"
+                  aria-checked={selected}
                   onClick={() => {
                     if (selected) return
                     field.onChange(option)
@@ -250,7 +250,7 @@ export function ExpenseEditForm({ expense, defaultDate, onDone }: ExpenseEditFor
                     // lại sẽ là một id vô hình mà bộ chọn không hiển thị được.
                     form.setValue('categoryId', NO_CATEGORY)
                   }}
-                  className="flex-1 rounded-[10px] py-1.5 text-[13px] font-extrabold transition-transform duration-150 active:scale-[0.98]"
+                  className="min-h-11 flex-1 rounded-[10px] py-1.5 text-[14px] font-extrabold sm:min-h-9 transition-transform duration-150 active:scale-[0.98]"
                   style={{
                     background: selected
                       ? option === 'income'
@@ -461,6 +461,7 @@ export function ExpenseEditForm({ expense, defaultDate, onDone }: ExpenseEditFor
       >
         {isEdit && seriesId && (
           <Button
+            size="touch"
             type="button"
             variant="outline"
             onClick={handleDeleteSeries}
@@ -476,6 +477,7 @@ export function ExpenseEditForm({ expense, defaultDate, onDone }: ExpenseEditFor
           </Button>
         )}
         <Button
+          size="touch"
           type="button"
           variant="outline"
           onClick={onDone}
@@ -484,7 +486,7 @@ export function ExpenseEditForm({ expense, defaultDate, onDone }: ExpenseEditFor
         >
           {t.cancel}
         </Button>
-        <GradientButton type="submit" disabled={isPending}>
+        <GradientButton type="submit" size="touch" disabled={isPending} className="min-w-[96px]">
           {t.save}
         </GradientButton>
       </div>

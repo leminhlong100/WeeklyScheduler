@@ -225,7 +225,7 @@ export function MoneyInput({
               key={chip.label}
               type="button"
               onClick={() => applyChip(chip)}
-              className="min-h-9 min-w-[56px] rounded-[10px] border-[1.5px] px-3 text-[13px] font-bold tabular-nums transition-transform active:scale-95"
+              className="min-h-11 min-w-[60px] rounded-[10px] sm:min-h-9 border-[1.5px] px-3 text-[13px] font-bold tabular-nums transition-transform active:scale-95"
               style={chipStyle}
             >
               {chip.label}

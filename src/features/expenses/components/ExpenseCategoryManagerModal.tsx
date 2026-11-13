@@ -99,6 +99,7 @@ export function ExpenseCategoryManagerModal({
               )}
             </div>
             <Button
+              size="touch"
               type="button"
               variant="outline"
               onClick={() => setEditTarget('new')}

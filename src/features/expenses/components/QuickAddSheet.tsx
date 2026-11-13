@@ -153,7 +153,7 @@ export function QuickAddSheet({ onDrafts, onEnterManually }: QuickAddSheetProps)
         // Khoá lúc đang nghe: giá trị hiển thị đang gồm cả đoạn tạm chưa vào
         // state, gõ chen vào lúc này sẽ mất chữ khi đoạn tạm bị thay.
         readOnly={speech.listening}
-        className="w-full resize-none rounded-xl border-[1.5px] px-3 py-2.5 text-[13.5px] font-semibold outline-none disabled:opacity-60"
+        className="w-full resize-none rounded-xl border-[1.5px] px-3 py-2.5 text-base font-semibold sm:text-[13.5px] outline-none disabled:opacity-60"
         style={{ background: theme.inputBg, borderColor: theme.border, color: theme.text }}
       />
 
