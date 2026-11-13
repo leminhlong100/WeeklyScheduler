@@ -1,5 +1,64 @@
 import { useEffect, useState } from 'react'
-import { isKeyboardLikelyOpen, isTextEntry } from '@/lib/utils/viewport'
+import { isKeyboardLikelyOpen, isTextEntry, keyboardInset } from '@/lib/utils/viewport'
+
+export interface VisualViewportInfo {
+  /** Chiều cao phần màn hình đang thấy được (trừ bàn phím trên iOS). */
+  height: number
+  offsetTop: number
+  /** Phần đáy layout bị bàn phím đè — chỉ khác 0 trên iOS. */
+  keyboardInset: number
+}
+
+/**
+ * Chỉ khi chạy dev: `?debugKbInset=320` giả một bàn phím iOS cao 320px để thử
+ * bố cục trên máy tính (iOS là nơi duy nhất `keyboardInset` khác 0).
+ */
+function debugInset(): number {
+  if (!import.meta.env.DEV) return 0
+  const raw = new URLSearchParams(window.location.search).get('debugKbInset')
+  const n = raw ? Number(raw) : 0
+  return Number.isFinite(n) && n > 0 ? n : 0
+}
+
+function read(): VisualViewportInfo {
+  const vv = window.visualViewport
+  const fake = debugInset()
+  const height = (vv?.height ?? window.innerHeight) - fake
+  const offsetTop = vv?.offsetTop ?? 0
+  return { height, offsetTop, keyboardInset: keyboardInset(window.innerHeight, height, offsetTop) }
+}
+
+const same = (a: VisualViewportInfo, b: VisualViewportInfo) =>
+  Math.round(a.height) === Math.round(b.height) &&
+  Math.round(a.offsetTop) === Math.round(b.offsetTop) &&
+  a.keyboardInset === b.keyboardInset
+
+/**
+ * Theo dõi `visualViewport`. Trên iOS đây là cách duy nhất biết bàn phím đang
+ * chiếm bao nhiêu (Safari bỏ qua `interactive-widget=resizes-content`).
+ * `enabled = false` thì không gắn listener nào.
+ */
+export function useVisualViewport(enabled = true): VisualViewportInfo {
+  const [info, setInfo] = useState<VisualViewportInfo>(read)
+
+  useEffect(() => {
+    if (!enabled) return
+    const vv = window.visualViewport
+    const update = () => setInfo((prev) => (same(prev, read()) ? prev : read()))
+    update()
+    vv?.addEventListener('resize', update)
+    // iOS cuộn ngầm trang khi focus ô nhập: `offsetTop` đổi mà không có `resize`.
+    vv?.addEventListener('scroll', update)
+    window.addEventListener('resize', update)
+    return () => {
+      vv?.removeEventListener('resize', update)
+      vv?.removeEventListener('scroll', update)
+      window.removeEventListener('resize', update)
+    }
+  }, [enabled])
+
+  return info
+}
 
 /**
  * `true` khi bàn phím ảo có vẻ đang mở (xem `isKeyboardLikelyOpen`).

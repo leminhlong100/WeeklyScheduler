@@ -339,7 +339,7 @@ nếu cấu hình sai, khiến app không mở được offline). Thông báo ph
 ## Checklist tổng
 
 - [x] **M1.1** Back đóng sheet/drawer/hộp xác nhận (`useBackToClose`)
-- [ ] **M1.2** SheetDialog khung cố định + `visualViewport` cho iOS (cần iPhone để chốt)
+- [ ] **M1.2** SheetDialog khung cố định + `visualViewport` cho iOS (cần iPhone để chốt) — *phần harness đã làm, **chưa xác nhận trên iPhone***
 - [x] **M1.3** Ẩn thanh dưới khi bàn phím mở
 - [x] **M1.4** Lưu offline báo ngay, giữ form (`networkMode: 'always'` + thông điệp)
 - [ ] **M1.5** Bỏ cache Supabase REST trong SW (chờ Q6)
@@ -378,6 +378,11 @@ nếu cấu hình sai, khiến app không mở được offline). Thông báo ph
 - 2026-11-13 — **M1.6 xong (bản build).** `PwaUpdatePrompt` giữ `registration` từ `onRegisteredSW`; `visibilitychange → visible` + quá 1 giờ
   (`shouldCheckForUpdate`, có test) + online → `registration.update()`. `vite preview` (cổng 4173, có SW): giả `Date.now` +61 phút → `update()` gọi **1** lần;
   quay lại ngay sau đó → không gọi thêm; chưa tới 1 giờ → 0 lần. Cần chủ repo: deploy A, mở PWA, để nền; deploy B; mở lại sau > 1 giờ → thấy toast "Có bản mới".
+- 2026-11-13 — **M1.2 làm phần harness, CHƯA xác nhận trên iPhone (chưa đánh [x]).** SheetDialog thành cột flex: tiêu đề + thân cuộn `.sheet-body`
+  (`overscroll-contain`); thanh nút form có `data-sheet-footer` tự chịu đáy + safe-area; `useVisualViewport()` → mobile đặt `max-height: min(88dvh, vv.height−12px)`,
+  `bottom: keyboardInset`, và kéo ô đang gõ vào chỗ thấy khi bàn phím đổi cỡ. Harness 375×812 (Nhập tay, cuộn hết): thanh nút y 738–811, thân cuộn kết thúc 811,
+  **không còn phần tử nào dưới thanh nút** (P9), `overscroll-behavior: contain` (P10). 375×470: ô tiền 281–337, Lưu 409–453. `?debugKbInset=320` (chỉ dev):
+  sheet `bottom: 320px`, Lưu 431–475 ngay trên mép bàn phím giả 492; focus Ghi chú → ô ở 222–266, trên thanh nút. Desktop: hộp giữa 460px như cũ.
 
 ---
 

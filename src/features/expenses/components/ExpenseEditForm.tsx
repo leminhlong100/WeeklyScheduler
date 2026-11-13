@@ -517,9 +517,11 @@ export function ExpenseEditForm({
 
       {/* Dính đáy modal: trên điện thoại, bàn phím ảo mở ra ăn hết chiều cao và
           nút Lưu bị đẩy xuống dưới vùng thấy được — người dùng gõ xong thì không
-          còn nút nào để bấm. Sticky giữ nó luôn nằm trong khung. */}
+          còn nút nào để bấm. Sticky giữ nó luôn nằm trong khung. Thanh này tự
+          chịu khoảng đáy + safe-area (xem `.sheet-body` trong index.css). */}
       <div
-        className="sticky bottom-0 -mx-5 flex flex-wrap justify-end gap-2 border-t px-5 pb-1 pt-3 sm:-mx-6 sm:px-6"
+        data-sheet-footer
+        className="sticky bottom-0 -mx-5 flex flex-wrap justify-end gap-2 border-t px-5 pt-3 pb-[calc(1rem+env(safe-area-inset-bottom))] sm:-mx-6 sm:px-6 sm:pb-6"
         style={{ background: theme.modalBg, borderColor: theme.border }}
       >
         {isEdit && (

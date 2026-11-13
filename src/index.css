@@ -150,6 +150,24 @@
 }
 
 /*
+ * Thân cuộn của SheetDialog. Có thanh nút dính đáy (`data-sheet-footer`) thì
+ * thanh đó tự chịu khoảng đáy + safe-area; thêm padding ở đây sẽ để nội dung
+ * cuộn lộ ra dưới thanh nút. Không có thanh nút thì chừa khoảng đáy như cũ.
+ * `scroll-padding-bottom` để ô đang gõ không bị cuộn vào ngay sau thanh nút.
+ */
+.sheet-body:not(:has([data-sheet-footer])) {
+  padding-bottom: calc(1.25rem + env(safe-area-inset-bottom));
+}
+.sheet-body:has([data-sheet-footer]) {
+  scroll-padding-bottom: calc(5rem + env(safe-area-inset-bottom));
+}
+@media (min-width: 640px) {
+  .sheet-body:not(:has([data-sheet-footer])) {
+    padding-bottom: 1.5rem;
+  }
+}
+
+/*
  * iOS Safari tự động zoom khi focus vào input/textarea có font-size < 16px.
  * Nhiều ô nhập trong app dùng cỡ chữ nhỏ hơn 16px cho vừa layout, nên ép sàn
  * 16px riêng trên mobile để tắt zoom mà không ảnh hưởng cỡ chữ trên desktop.
