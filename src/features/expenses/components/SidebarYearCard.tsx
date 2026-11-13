@@ -45,7 +45,7 @@ export function SidebarYearCard({
   return (
     <section>
       <div className="mb-2.5 flex items-center justify-between gap-2">
-        <span className="text-[11px] font-extrabold uppercase tracking-wider text-white/78">
+        <span className="text-[13px] font-extrabold text-white/85">
           {t.yearSection.replace('{year}', String(year))}
         </span>
         {summaries.length > 1 && (

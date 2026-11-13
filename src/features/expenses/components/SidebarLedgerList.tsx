@@ -29,7 +29,7 @@ export function SidebarLedgerList({
 
   return (
     <section>
-      <div className="mb-2.5 text-[11px] font-extrabold uppercase tracking-wider text-white/78">
+      <div className="mb-2.5 text-[13px] font-extrabold text-white/85">
         {t.moreLedgers}
       </div>
       <div className="flex flex-col gap-1.5">
