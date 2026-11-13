@@ -21,7 +21,13 @@ interface SliderProps extends Omit<SliderPrimitive.Root.Props, 'render'> {
  * `onValueCommitted` (from the primitive) fires on pointer-up rather than on
  * every move, which is what callers should use for anything expensive.
  */
-export function Slider({ trackColor, rangeColor, thumbColor, className, ...props }: SliderProps) {
+export function Slider({
+  trackColor,
+  rangeColor,
+  thumbColor,
+  className,
+  ...props
+}: SliderProps) {
   return (
     <SliderPrimitive.Root data-slot="slider" {...props}>
       <SliderPrimitive.Control
