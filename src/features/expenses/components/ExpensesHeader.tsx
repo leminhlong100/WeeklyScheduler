@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react'
-import { PlusIcon } from 'lucide-react'
+import { ChevronDownIcon, PlusIcon } from 'lucide-react'
 import type { Dictionary } from '@/features/i18n/dictionary'
 import type { DerivedTheme } from '@/features/theme/types'
 import { GradientButton } from '@/components/common/GradientButton'
@@ -12,6 +12,10 @@ interface ExpensesHeaderProps {
   onPrevMonth: () => void
   onNextMonth: () => void
   onThisMonth: () => void
+  /** Đang xem tháng hiện tại thì ẩn chip "Về tháng này". */
+  isCurrentMonth: boolean
+  /** Bấm vào tên tháng: mở bộ chọn tháng. */
+  onPickMonth: () => void
   /** Bỏ trống khi đang xem sổ người khác: ẩn nút thêm. */
   onAddExpense?: () => void
   userMenu: ReactNode
@@ -56,6 +60,8 @@ export function ExpensesHeader({
   onPrevMonth,
   onNextMonth,
   onThisMonth,
+  isCurrentMonth,
+  onPickMonth,
   onAddExpense,
   userMenu,
 }: ExpensesHeaderProps) {
@@ -80,25 +86,41 @@ export function ExpensesHeader({
       <ChromeButton onClick={onNextMonth} theme={theme} className="w-10 text-lg">
         ›
       </ChromeButton>
-      <ChromeButton onClick={onThisMonth} theme={theme} className="hidden w-auto px-4 sm:flex">
-        {t.today}
-      </ChromeButton>
-
-      <div
-        className="font-heading min-w-0 flex-1 truncate text-[15px] font-extrabold sm:text-[21px]"
-        style={{ color: theme.text }}
-      >
-        {monthLabel}
+      <div className="flex min-w-0 flex-1 items-center gap-1.5">
+        <button
+          type="button"
+          onClick={onPickMonth}
+          aria-label={`${t.pickMonth}: ${monthLabel}`}
+          className="font-heading flex min-h-10 min-w-0 items-center gap-1 truncate rounded-[12px] px-1.5 text-[15px] font-extrabold sm:text-[21px]"
+          style={{ color: theme.text }}
+        >
+          <span className="truncate">{monthLabel}</span>
+          <ChevronDownIcon className="size-4 flex-shrink-0 opacity-60" />
+        </button>
+        {!isCurrentMonth && (
+          <button
+            type="button"
+            onClick={onThisMonth}
+            className="flex min-h-9 flex-shrink-0 items-center rounded-full px-2.5 text-[12px] font-extrabold"
+            style={{
+              background: theme.chip,
+              color: theme.accent,
+              border: `1.5px solid ${theme.border}`,
+            }}
+          >
+            {t.backToThisMonth}
+          </button>
+        )}
       </div>
 
       {onAddExpense && (
         <GradientButton
           onClick={onAddExpense}
           aria-label={t.addTransaction}
-          className="h-10 gap-1.5 px-3 text-[13.5px] sm:px-[18px]"
+          className="hidden h-10 gap-1.5 px-[18px] text-[13.5px] md:flex"
         >
           <PlusIcon className="size-4" />
-          <span className="hidden sm:inline">{t.addTransaction}</span>
+          <span>{t.addTransaction}</span>
         </GradientButton>
       )}
 

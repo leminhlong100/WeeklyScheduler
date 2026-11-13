@@ -10,7 +10,9 @@ export {
 } from './hooks/useExpenseMutations'
 export { ExpenseList } from './components/ExpenseList'
 export { MonthlyReport } from './components/MonthlyReport'
-export { ExpenseTabs, type ExpenseTab } from './components/ExpenseTabs'
+export { ExpenseBottomNav, ExpenseTopNav } from './components/ExpenseBottomNav'
+export { OverviewTab } from './components/OverviewTab'
+export { useExpensesUrlState, type ExpenseView } from './hooks/useExpensesUrlState'
 export { ExpenseCategoryManagerModal } from './components/ExpenseCategoryManagerModal'
 export {
   useCreateExpenseCategory,

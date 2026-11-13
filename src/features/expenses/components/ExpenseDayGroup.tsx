@@ -1,7 +1,7 @@
 import { useMemo } from 'react'
 import { useTranslation } from '@/features/i18n/LocaleContext'
 import { useTheme } from '@/features/theme/ThemeContext'
-import { parseISODate, weekdayMondayIndex } from '@/lib/utils/date'
+import { parseISODate, todayISO, weekdayMondayIndex } from '@/lib/utils/date'
 import { formatSignedMoney } from '@/lib/utils/formatMoney'
 import { MaskedAmount } from './MaskedAmount'
 import type { Expense } from '../api/expensesApi'
@@ -14,6 +14,8 @@ interface ExpenseDayGroupProps {
   expenses: Expense[]
   categoryById: Map<string, ExpenseCategory>
   isToday: boolean
+  /** Ghi đè tiêu đề ngày (nhóm "Sắp tới"). */
+  title?: string
   /** Bỏ trống khi chỉ được xem. */
   onEdit?: (expense: Expense) => void
   onDelete?: (expense: Expense) => void
@@ -32,6 +34,7 @@ export function ExpenseDayGroup({
   expenses,
   categoryById,
   isToday,
+  title,
   onEdit,
   onDelete,
   onMarkPaid,
@@ -41,17 +44,23 @@ export function ExpenseDayGroup({
 
   const summaries = useMemo(() => summarizeByCurrency(expenses), [expenses])
   const day = parseISODate(date)
-  const label = `${t.dow[weekdayMondayIndex(day)]} ${day.format('DD/MM')}`
+  const isYesterday = day.add(1, 'day').format('YYYY-MM-DD') === todayISO()
+  const label =
+    title ??
+    (isToday
+      ? t.today
+      : isYesterday
+        ? t.dayYesterday
+        : `${t.dow[weekdayMondayIndex(day)]}, ${day.format('DD/MM')}`)
 
   return (
     <section className="flex flex-col gap-2">
       <div className="flex flex-wrap items-baseline gap-x-2.5 gap-y-0.5 px-1">
         <span
-          className="text-[12px] font-extrabold"
-          style={{ color: isToday ? theme.accent : theme.muted }}
+          className="text-[13px] font-extrabold"
+          style={{ color: isToday ? theme.accent : theme.mutedText }}
         >
           {label}
-          {isToday && ` · ${t.today}`}
         </span>
 
         <span className="flex flex-1 flex-wrap items-baseline justify-end gap-x-2.5 gap-y-0.5">
@@ -77,9 +86,30 @@ export function ExpenseDayGroup({
                   </MaskedAmount>
                 </span>
               )}
-              {(s.plannedExpense > 0 || s.plannedIncome > 0) && (
-                <span className="text-[11px] font-semibold" style={{ color: theme.mutedText }}>
-                  {t.expensePlannedShort}
+              {s.plannedExpense > 0 && (
+                <span
+                  className="text-[12px] font-bold tabular-nums"
+                  style={{ color: theme.warning }}
+                >
+                  <MaskedAmount scope="day">
+                    {t.plannedDayTotal.replace(
+                      '{amount}',
+                      formatSignedMoney(s.plannedExpense, s.currency, locale, 'expense'),
+                    )}
+                  </MaskedAmount>
+                </span>
+              )}
+              {s.plannedIncome > 0 && (
+                <span
+                  className="text-[12px] font-bold tabular-nums"
+                  style={{ color: theme.warning }}
+                >
+                  <MaskedAmount scope="day">
+                    {t.plannedDayTotal.replace(
+                      '{amount}',
+                      formatSignedMoney(s.plannedIncome, s.currency, locale, 'income'),
+                    )}
+                  </MaskedAmount>
                 </span>
               )}
             </span>

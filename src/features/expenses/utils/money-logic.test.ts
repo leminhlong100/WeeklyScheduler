@@ -70,7 +70,10 @@ describe('buildMonthlyReport', () => {
     row({ amount: 50000 }),
     row({ amount: 1200, currency: 'JPY' }),
   ]
-  const jul = [row({ amount: 350000, spent_at: '2026-07-05' }), row({ amount: 150000, spent_at: '2026-07-25' })]
+  const jul = [
+    row({ amount: 350000, spent_at: '2026-07-05' }),
+    row({ amount: 150000, spent_at: '2026-07-25' }),
+  ]
 
   it('tổng và tỉ lệ khớp tính tay', () => {
     const [vnd] = buildMonthlyReport(aug, jul)
@@ -98,7 +101,10 @@ describe('buildMonthlyReport', () => {
     expect(jpy?.change).toBe(-1)
   })
   it('planned không vào tổng', () => {
-    const [vnd] = buildMonthlyReport([row({ amount: 100, status: 'planned' }), row({ amount: 50 })], [])
+    const [vnd] = buildMonthlyReport(
+      [row({ amount: 100, status: 'planned' }), row({ amount: 50 })],
+      [],
+    )
     expect(vnd.expenseTotal).toBe(50)
     expect(vnd.plannedExpense).toBe(100)
   })
@@ -120,13 +126,50 @@ describe('filterExpenses', () => {
   })
   it('lọc theo kind và chưa phân loại', () => {
     expect(filterExpenses(data, { ...EMPTY_EXPENSE_FILTER, kind: 'income' })).toHaveLength(1)
-    expect(filterExpenses(data, { ...EMPTY_EXPENSE_FILTER, categoryId: UNCATEGORIZED })).toHaveLength(2)
+    expect(
+      filterExpenses(data, { ...EMPTY_EXPENSE_FILTER, categoryId: UNCATEGORIZED }),
+    ).toHaveLength(2)
   })
   it('gom theo ngày giữ thứ tự', () => {
-    const g = groupByDay([row({ spent_at: '2026-08-11' }), row({ spent_at: '2026-08-11' }), row({ spent_at: '2026-08-10' })])
+    const g = groupByDay([
+      row({ spent_at: '2026-08-11' }),
+      row({ spent_at: '2026-08-11' }),
+      row({ spent_at: '2026-08-10' }),
+    ])
     expect(g.map((x) => [x.date, x.expenses.length])).toEqual([
       ['2026-08-11', 2],
       ['2026-08-10', 1],
     ])
+  })
+})
+
+describe('filterExpenses — tìm số tiền và danh mục', () => {
+  const data = [
+    row({ note: 'Bún bò', amount: 40000, category_id: 'food' }),
+    row({ note: 'Grab', amount: 35000, category_id: 'move' }),
+  ]
+  const names = new Map([
+    ['food', 'Ăn uống'],
+    ['move', 'Di chuyển'],
+  ])
+  it.each(['40.000', '40k', '40000'])('"%s" ra khoản 40.000', (query) => {
+    const r = filterExpenses(data, { ...EMPTY_EXPENSE_FILTER, query }, { categoryNames: names })
+    expect(r.map((e) => e.note)).toEqual(['Bún bò'])
+  })
+  it('tìm theo tên danh mục, không dấu', () => {
+    const r = filterExpenses(
+      data,
+      { ...EMPTY_EXPENSE_FILTER, query: 'an uong' },
+      { categoryNames: names },
+    )
+    expect(r.map((e) => e.note)).toEqual(['Bún bò'])
+  })
+  it('đang che số tiền thì không khớp theo số', () => {
+    const r = filterExpenses(
+      data,
+      { ...EMPTY_EXPENSE_FILTER, query: '40k' },
+      { matchAmount: false },
+    )
+    expect(r).toHaveLength(0)
   })
 })

@@ -29,9 +29,11 @@ interface ParsedDraftListProps {
   /** Mọi thay đổi đi ngược lên trang để được lưu qua `sessionStorage`. */
   onChange: (rows: DraftRow[]) => void
   onDone: () => void
+  /** Sau khi lưu xong; mặc định giống onDone. */
+  onSaved?: () => void
 }
 
-export function ParsedDraftList({ draft, onChange, onDone }: ParsedDraftListProps) {
+export function ParsedDraftList({ draft, onChange, onDone, onSaved }: ParsedDraftListProps) {
   const { t } = useTranslation()
   const { theme } = useTheme()
   const { data: categories = [] } = useExpenseCategories()
@@ -93,7 +95,7 @@ export function ParsedDraftList({ draft, onChange, onDone }: ParsedDraftListProp
       {
         onSuccess: (created) => {
           toast.success(t.expensesSavedCount.replace('{n}', String(created.length)))
-          onDone()
+          ;(onSaved ?? onDone)()
         },
         onError: (error) => toast.error(describeError(t, error)),
       },

@@ -6,6 +6,8 @@ import { formatSignedMoney } from '@/lib/utils/formatMoney'
 import { MaskedAmount } from './MaskedAmount'
 import type { Expense } from '../api/expensesApi'
 import type { ExpenseCategory } from '../api/expenseCategoriesApi'
+import { todayISO } from '@/lib/utils/date'
+import { isOverdue } from '../utils/overview'
 
 /** Tiền vào tô xanh, dùng lại đúng màu "dưới hạn mức" của báo cáo. */
 
@@ -26,6 +28,8 @@ export function ExpenseRow({ expense, category, onEdit, onDelete, onMarkPaid }: 
 
   const isIncome = expense.kind === 'income'
   const isPlanned = expense.status === 'planned'
+  // Dự kiến mà đã qua ngày: chưa chắc đã trả — nhắc người dùng xác nhận.
+  const overdue = isOverdue(expense, todayISO())
 
   return (
     <div
@@ -72,10 +76,13 @@ export function ExpenseRow({ expense, category, onEdit, onDelete, onMarkPaid }: 
           )}
           {isPlanned && (
             <span
-              className="flex-shrink-0 rounded-md px-1.5 py-px text-[10px] font-extrabold"
-              style={{ background: theme.warningBg, color: theme.warning }}
+              className="flex-shrink-0 rounded-md px-1.5 py-px text-[11px] font-extrabold"
+              style={{
+                background: overdue ? `${theme.danger}1f` : theme.warningBg,
+                color: overdue ? theme.danger : theme.warning,
+              }}
             >
-              {t.expensePlannedBadge}
+              {overdue ? t.overdueBadge : t.expensePlannedBadge}
             </span>
           )}
         </div>

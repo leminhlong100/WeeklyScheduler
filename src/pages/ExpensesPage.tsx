@@ -1,18 +1,10 @@
 import { useMemo, useState } from 'react'
-import {
-  DownloadIcon,
-  EyeIcon,
-  EyeOffIcon,
-  ListChecksIcon,
-  PieChartIcon,
-  SlidersHorizontalIcon,
-} from 'lucide-react'
 import { toast } from 'sonner'
 import { describeError } from '@/lib/utils/errorMessage'
-import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog'
 import { useIsMobile, useIsTouchDevice } from '@/hooks/useMediaQuery'
 import { useSessionStorageState } from '@/hooks/useSessionStorageState'
 import { useTranslation } from '@/features/i18n/LocaleContext'
+import { translateExpenseCategoryName } from '@/features/i18n/defaultExpenseCategoryNames'
 import { useTheme } from '@/features/theme/ThemeContext'
 import { useAmountVisibility } from '@/features/expenses/AmountVisibilityContext'
 import { UserMenu } from '@/features/profile/components/UserMenu'
@@ -22,31 +14,27 @@ import { ExpensesHeader } from '@/features/expenses/components/ExpensesHeader'
 import { ExpenseList } from '@/features/expenses/components/ExpenseList'
 import { QueryStatus } from '@/features/expenses/components/QueryStatus'
 import { ExpenseEditForm } from '@/features/expenses/components/ExpenseEditForm'
-import { QuickAddSheet } from '@/features/expenses/components/QuickAddSheet'
-import { ParsedDraftList } from '@/features/expenses/components/ParsedDraftList'
-import { MonthlyReport } from '@/features/expenses/components/MonthlyReport'
-import { ExpenseTabs, type ExpenseTab } from '@/features/expenses/components/ExpenseTabs'
 import { AmountVisibilityDialog } from '@/features/expenses/components/AmountVisibilityDialog'
-import { ExpenseStatsDialog } from '@/features/expenses/components/ExpenseStatsDialog'
 import { ExpenseCategoryManagerModal } from '@/features/expenses/components/ExpenseCategoryManagerModal'
 import { LedgerBar } from '@/features/expenses/components/LedgerBar'
-import { LedgerBalanceCard } from '@/features/expenses/components/LedgerBalanceCard'
 import {
   LedgerSettingsDialog,
   type LedgerDialogTarget,
 } from '@/features/expenses/components/LedgerSettingsDialog'
+import { ExpenseBottomNav, ExpenseTopNav } from '@/features/expenses/components/ExpenseBottomNav'
+import { OverviewTab } from '@/features/expenses/components/OverviewTab'
+import { ReportTab } from '@/features/expenses/components/ReportTab'
+import { MoreTab } from '@/features/expenses/components/MoreTab'
+import { MonthPicker } from '@/features/expenses/components/MonthPicker'
+import { AddTransactionSheet } from '@/features/expenses/components/AddTransactionSheet'
+import { SheetDialog } from '@/features/expenses/components/SheetDialog'
 import { LedgerProvider, useCurrentLedger } from '@/features/expenses/LedgerContext'
 import {
   buildExpensesCsv,
   downloadCsv,
   expensesCsvFilename,
 } from '@/features/expenses/utils/exportCsv'
-import {
-  isExpenseDraft,
-  toDraftRows,
-  type DraftRow,
-  type ExpenseDraft,
-} from '@/features/expenses/utils/draft'
+import { isExpenseDraft, type ExpenseDraft } from '@/features/expenses/utils/draft'
 import {
   EMPTY_EXPENSE_FILTER,
   filterExpenses,
@@ -54,6 +42,7 @@ import {
 } from '@/features/expenses/utils/filter'
 import { useExpensesForMonth } from '@/features/expenses/hooks/useExpenses'
 import { useExpenseCategories } from '@/features/expenses/hooks/useExpenseCategories'
+import { useExpensesUrlState } from '@/features/expenses/hooks/useExpensesUrlState'
 import { useDeleteExpense, useUpdateExpense } from '@/features/expenses/hooks/useExpenseMutations'
 import type { Expense } from '@/features/expenses/api/expensesApi'
 import { todayISO } from '@/lib/utils/date'
@@ -63,9 +52,6 @@ import {
   monthRange,
   shiftMonth,
 } from '@/features/expenses/utils/month'
-
-/** `null` = đóng, `'new'` = thêm mới, một `Expense` = đang sửa dòng đó. */
-type EditTarget = Expense | 'new' | null
 
 /**
  * Bản nháp AI nằm trong `sessionStorage`, không chỉ trong state.
@@ -79,7 +65,7 @@ const DRAFT_STORAGE_KEY = 'weekly-scheduler:expense-draft'
 
 /**
  * Mọi thứ bên trong đọc sổ đang mở từ `LedgerProvider` — danh sách, báo cáo,
- * thống kê, form sửa và AI nhập nhanh đều tự đi theo sổ.
+ * form sửa và AI nhập nhanh đều tự đi theo sổ.
  */
 export function ExpensesPage() {
   return (
@@ -89,22 +75,27 @@ export function ExpensesPage() {
   )
 }
 
+/**
+ * Bố cục: header (tháng) → chip sổ → nội dung theo tab. Tab và tháng nằm trên
+ * URL (`useExpensesUrlState`). Mobile có thanh dưới 4 tab + nút ＋ ở giữa;
+ * desktop có hàng tab ở đầu nội dung và nút "Thêm giao dịch" có chữ ở header.
+ */
 function ExpensesPageContent() {
   const { t, locale, setLocale } = useTranslation()
   const { ledgerId, canEdit } = useCurrentLedger()
-  const [ledgerDialog, setLedgerDialog] = useState<LedgerDialogTarget>(null)
   const { theme } = useTheme()
-  const { hidden: amountsHidden, toggleHidden: toggleAmountsHidden } = useAmountVisibility()
+  const { hidden: amountsHidden } = useAmountVisibility()
   const isMobile = useIsMobile()
   const isTouch = useIsTouchDevice()
+  const { month, view, setMonth, setView } = useExpensesUrlState()
 
   const [sidebarOpen, setSidebarOpen] = useState(!isMobile && !isTouch)
-  const [month, setMonth] = useState(currentMonthKey)
-  const [tab, setTab] = useState<ExpenseTab>('list')
+  const [ledgerDialog, setLedgerDialog] = useState<LedgerDialogTarget>(null)
   const [categoryManagerOpen, setCategoryManagerOpen] = useState(false)
   const [hideOptionsOpen, setHideOptionsOpen] = useState(false)
-  const [statsOpen, setStatsOpen] = useState(false)
-  const [editTarget, setEditTarget] = useState<EditTarget>(null)
+  const [monthPickerOpen, setMonthPickerOpen] = useState(false)
+  const [addOpen, setAddOpen] = useState(false)
+  const [editTarget, setEditTarget] = useState<Expense | null>(null)
   const [filter, setFilter] = useState<ExpenseFilter>(EMPTY_EXPENSE_FILTER)
   // Bộ lọc danh mục trỏ vào danh mục của chủ sổ; sang sổ của người khác thì
   // danh mục đó không còn, lọc tiếp chỉ ra một danh sách rỗng khó hiểu.
@@ -128,16 +119,23 @@ function ExpensesPageContent() {
 
   const { monthIndex, year } = monthLabelParts(month)
   const monthLabel = `${t.mon[monthIndex]} ${year}`
+  const isCurrentMonth = month === currentMonthKey()
 
+  const categoryNames = useMemo(
+    () => new Map(categories.map((c) => [c.id, translateExpenseCategoryName(c.name, t)] as const)),
+    [categories, t],
+  )
   const visibleExpenses = useMemo(
-    () => filterExpenses(expenses, filter, { matchAmount: !amountsHidden }),
-    [expenses, filter, amountsHidden],
+    () => filterExpenses(expenses, filter, { matchAmount: !amountsHidden, categoryNames }),
+    [expenses, filter, amountsHidden, categoryNames],
   )
 
   // Đang xem tháng này thì điền hôm nay; xem tháng khác thì điền ngày 1 của
   // tháng đó — nếu cứ điền hôm nay, khoản vừa thêm sẽ rơi ra ngoài danh sách
   // đang mở và trông như bị mất.
-  const defaultDateForMonth = month === currentMonthKey() ? todayISO() : monthRange(month).startISO
+  const defaultDateForMonth = isCurrentMonth ? todayISO() : monthRange(month).startISO
+
+  const openAdd = canEdit ? () => setAddOpen(true) : undefined
 
   const handleExportCsv = () => {
     // Xuất đúng tập đang xem: đã lọc thì file phải khớp với những gì trên màn
@@ -187,104 +185,48 @@ function ExpensesPageContent() {
           theme={theme}
           t={t}
           monthLabel={monthLabel}
+          isCurrentMonth={isCurrentMonth}
+          onPickMonth={() => setMonthPickerOpen(true)}
           onToggleSidebar={() => setSidebarOpen((v) => !v)}
           onPrevMonth={() => setMonth((m) => shiftMonth(m, -1))}
           onNextMonth={() => setMonth((m) => shiftMonth(m, 1))}
           onThisMonth={() => setMonth(currentMonthKey())}
-          onAddExpense={canEdit ? () => setEditTarget('new') : undefined}
+          onAddExpense={openAdd}
           userMenu={<UserMenu />}
         />
       }
+      bottomBar={<ExpenseBottomNav view={view} onChange={setView} onAdd={openAdd} />}
     >
       <div className="mx-auto flex w-full max-w-[720px] flex-col gap-4 px-3 py-4 sm:px-5 sm:py-6">
-        {/* Bản nháp thay chỗ ô nhập cho tới khi user quyết định: để cả hai cùng
-            lúc thì rất dễ gửi câu thứ hai và mất bản nháp đang sửa dở. */}
+        <ExpenseTopNav view={view} onChange={setView} />
+
         <LedgerBar
           onCreate={() => setLedgerDialog('new')}
           onOpenSettings={() => ledgerId && setLedgerDialog(ledgerId)}
         />
 
-        {ledgerId && <LedgerBalanceCard ledgerId={ledgerId} />}
-
-        {/* Sổ được mời xem thì không có chỗ nhập: người xem không ghi được. */}
-        {canEdit &&
-          (draft ? (
-            <ParsedDraftList
-              draft={draft}
-              onChange={(rows: DraftRow[]) => setDraft({ ...draft, rows })}
-              onDone={() => setDraft(null)}
+        {view === 'overview' && (
+          <QueryStatus query={expensesQuery}>
+            <OverviewTab
+              month={month}
+              expenses={expenses}
+              categories={categories}
+              ledgerId={ledgerId}
+              canEdit={canEdit}
+              onAdd={() => setAddOpen(true)}
+              onOpenCategories={() => setCategoryManagerOpen(true)}
+              onSeeTransactions={() => setView('transactions')}
+              onSeeReport={() => setView('report')}
+              onEdit={canEdit ? setEditTarget : undefined}
+              onMarkPaid={canEdit ? handleMarkPaid : undefined}
             />
-          ) : (
-            <QuickAddSheet
-              onDrafts={(items, rawText) => setDraft({ rawText, rows: toDraftRows(items) })}
-              onEnterManually={() => setEditTarget('new')}
-            />
-          ))}
+          </QueryStatus>
+        )}
 
-        <ExpenseTabs value={tab} onChange={setTab} />
-
-        {/* Hai việc phụ, để cạnh nhau ngay dưới tab: nhét vào header thì thanh
-            trên đã có 6 nút và tràn trên máy nhỏ. */}
-        <div className="-mt-1 flex flex-wrap justify-end gap-2">
-          <button
-            type="button"
-            onClick={toggleAmountsHidden}
-            aria-label={amountsHidden ? t.showAmounts : t.hideAmounts}
-            title={amountsHidden ? t.showAmounts : t.hideAmounts}
-            className="flex items-center gap-1.5 rounded-[11px] border-[1.5px] px-2.5 py-1.5 text-[12px] font-bold transition-transform duration-150 active:scale-95"
-            style={{ borderColor: theme.border, background: theme.chip, color: theme.mutedText }}
-          >
-            {amountsHidden ? <EyeOffIcon className="size-3.5" /> : <EyeIcon className="size-3.5" />}
-          </button>
-          <button
-            type="button"
-            onClick={() => setHideOptionsOpen(true)}
-            aria-label={t.hideCustomTitle}
-            title={t.hideCustomTitle}
-            className="flex items-center gap-1.5 rounded-[11px] border-[1.5px] px-2.5 py-1.5 text-[12px] font-bold transition-transform duration-150 active:scale-95"
-            style={{ borderColor: theme.border, background: theme.chip, color: theme.mutedText }}
-          >
-            <ListChecksIcon className="size-3.5" />
-          </button>
-          {canEdit && (
-            <button
-              type="button"
-              onClick={() => setCategoryManagerOpen(true)}
-              aria-label={t.manageExpenseCategories}
-              title={t.manageExpenseCategories}
-              className="flex items-center gap-1.5 rounded-[11px] border-[1.5px] px-2.5 py-1.5 text-[12px] font-bold transition-transform duration-150 active:scale-95"
-              style={{ borderColor: theme.border, background: theme.chip, color: theme.mutedText }}
-            >
-              <SlidersHorizontalIcon className="size-3.5" />
-            </button>
-          )}
-          <button
-            type="button"
-            onClick={() => setStatsOpen(true)}
-            aria-label={t.expenseStats}
-            title={t.expenseStats}
-            className="flex items-center gap-1.5 rounded-[11px] border-[1.5px] px-2.5 py-1.5 text-[12px] font-bold transition-transform duration-150 active:scale-95"
-            style={{ borderColor: theme.border, background: theme.chip, color: theme.mutedText }}
-          >
-            <PieChartIcon className="size-3.5" />
-          </button>
-          <button
-            type="button"
-            onClick={handleExportCsv}
-            aria-label={t.exportCsv}
-            title={t.exportCsv}
-            className="flex items-center gap-1.5 rounded-[11px] border-[1.5px] px-2.5 py-1.5 text-[12px] font-bold transition-transform duration-150 active:scale-95"
-            style={{ borderColor: theme.border, background: theme.chip, color: theme.mutedText }}
-          >
-            <DownloadIcon className="size-3.5" />
-          </button>
-        </div>
-
-        {tab === 'list' ? (
+        {view === 'transactions' && (
           <QueryStatus query={expensesQuery}>
             <ExpenseList
               expenses={visibleExpenses}
-              year={year}
               monthCount={expenses.length}
               categories={categories}
               filter={filter}
@@ -294,10 +236,22 @@ function ExpensesPageContent() {
               onMarkPaid={canEdit ? handleMarkPaid : undefined}
             />
           </QueryStatus>
-        ) : (
-          // Báo cáo cố ý KHÔNG chịu ảnh hưởng của bộ lọc: nó là bức tranh cả
-          // tháng, một báo cáo đã lọc mà không nói rõ sẽ bị đọc thành toàn cảnh.
-          <MonthlyReport month={month} />
+        )}
+
+        {/* Báo cáo cố ý KHÔNG chịu ảnh hưởng của bộ lọc: nó là bức tranh cả
+            tháng, một báo cáo đã lọc mà không nói rõ sẽ bị đọc thành toàn cảnh. */}
+        {view === 'report' && <ReportTab month={month} />}
+
+        {view === 'more' && (
+          <MoreTab
+            canEdit={canEdit}
+            ledgerId={ledgerId}
+            onCreateLedger={() => setLedgerDialog('new')}
+            onLedgerSettings={() => ledgerId && setLedgerDialog(ledgerId)}
+            onCategories={() => setCategoryManagerOpen(true)}
+            onHideOptions={() => setHideOptionsOpen(true)}
+            onExportCsv={handleExportCsv}
+          />
         )}
       </div>
 
@@ -307,39 +261,38 @@ function ExpensesPageContent() {
         onOpenChange={setCategoryManagerOpen}
       />
       <AmountVisibilityDialog open={hideOptionsOpen} onOpenChange={setHideOptionsOpen} />
-      <ExpenseStatsDialog open={statsOpen} onOpenChange={setStatsOpen} month={month} />
+      <MonthPicker
+        open={monthPickerOpen}
+        onOpenChange={setMonthPickerOpen}
+        value={month}
+        onChange={setMonth}
+      />
 
-      <Dialog
+      {canEdit && (
+        <AddTransactionSheet
+          open={addOpen}
+          onOpenChange={setAddOpen}
+          defaultDate={defaultDateForMonth}
+          draft={draft}
+          onDraftChange={setDraft}
+        />
+      )}
+
+      <SheetDialog
         open={canEdit && editTarget !== null}
         onOpenChange={(next) => !next && setEditTarget(null)}
+        title={editTarget?.kind === 'income' ? t.editIncome : t.editExpense}
       >
-        <DialogContent
-          showCloseButton={false}
-          className="max-h-[85dvh] w-full max-w-full overflow-y-auto rounded-t-[26px] rounded-b-none border-[1.5px] p-5 max-sm:pb-[calc(1.25rem+env(safe-area-inset-bottom))] sm:w-[calc(100%-2rem)] sm:max-w-[440px] sm:rounded-[26px] sm:p-6"
-          style={{ background: theme.modalBg, borderColor: theme.border, color: theme.text }}
-        >
-          <DialogTitle
-            className="font-heading text-xl font-extrabold"
-            style={{ color: theme.text }}
-          >
-            {editTarget === 'new'
-              ? t.addTransaction
-              : editTarget?.kind === 'income'
-                ? t.editIncome
-                : t.editExpense}
-          </DialogTitle>
-          {editTarget !== null && (
-            <ExpenseEditForm
-              // Remount khi đổi mục tiêu, nếu không react-hook-form giữ nguyên
-              // defaultValues của lần mở trước và form hiện dữ liệu dòng cũ.
-              key={editTarget === 'new' ? 'new' : editTarget.id}
-              expense={editTarget === 'new' ? undefined : editTarget}
-              defaultDate={defaultDateForMonth}
-              onDone={() => setEditTarget(null)}
-            />
-          )}
-        </DialogContent>
-      </Dialog>
+        {editTarget && (
+          <ExpenseEditForm
+            // Remount khi đổi mục tiêu, nếu không react-hook-form giữ nguyên
+            // defaultValues của lần mở trước và form hiện dữ liệu dòng cũ.
+            key={editTarget.id}
+            expense={editTarget}
+            onDone={() => setEditTarget(null)}
+          />
+        )}
+      </SheetDialog>
     </AppShell>
   )
 }

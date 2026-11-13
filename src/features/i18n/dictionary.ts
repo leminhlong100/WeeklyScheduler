@@ -330,6 +330,40 @@ export interface Dictionary {
   /* --- Module switcher (sidebar) --- */
   navScheduler: string
   navExpenses: string
+  navOverview: string
+  navTransactions: string
+  navReport: string
+  navMore: string
+  spendableTitle: string
+  spendableOver: string
+  spendablePerDay: string
+  spendableUsed: string
+  spendablePlanned: string
+  balanceTitle: string
+  allTimeBalanceTitle: string
+  setBudgetCta: string
+  monthIncomeShort: string
+  monthExpenseShort: string
+  budgetsTitle: string
+  seeAll: string
+  upcomingTitle: string
+  overdueBadge: string
+  recentTitle: string
+  seeAllTransactions: string
+  emptyTitle: string
+  emptyStep1: string
+  emptyStep2: string
+  emptyStep3: string
+  backToThisMonth: string
+  pickMonth: string
+  filterResultSummary: string
+  moreLedgers: string
+  moreSettings: string
+  moreLanguage: string
+  moreGoScheduler: string
+  dayYesterday: string
+  plannedDayTotal: string
+  yearSection: string
 
   /* --- Expenses --- */
   expensesTitle: string
@@ -409,6 +443,7 @@ export interface Dictionary {
   /* --- Nhập nhanh bằng AI (Bước 4) --- */
   quickAdd: string
   quickAddPh: string
+  quickAddLabel: string
   quickAddSend: string
   quickAddThinking: string
   /** "{n}" = số ký tự tối đa cho một lần nhập. */

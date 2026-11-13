@@ -1,4 +1,5 @@
 import { QueryStatus } from './QueryStatus'
+import { ExpenseDonut } from './ExpenseDonut'
 import { useMemo } from 'react'
 import { TrendingDownIcon, TrendingUpIcon } from 'lucide-react'
 import { useTranslation } from '@/features/i18n/LocaleContext'
@@ -327,6 +328,7 @@ export function MonthlyReport({ month }: { month: MonthKey }) {
           {report.expenseCategories.length > 0 && (
             <div className="flex flex-col gap-3">
               <SectionLabel>{t.reportByExpenseCategory}</SectionLabel>
+              <ExpenseDonut report={report} categoryById={categoryById} />
               {report.expenseCategories.map((row) => (
                 <CategoryLine
                   key={row.categoryId}

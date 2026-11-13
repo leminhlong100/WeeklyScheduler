@@ -15,32 +15,34 @@ export const KINDS = ['expense', 'income'] as const satisfies readonly ExpenseKi
  */
 export const DEFAULT_CURRENCY = 'VND' as const
 
-export const expenseSchema = z.object({
-  /**
-   * Chuỗi do `<MoneyInput>` đẩy ra: chuỗi số thô ("30000") khi đọc được, hoặc
-   * nguyên chữ người dùng gõ khi chưa đọc được. Kiểm tra thật nằm ở
-   * `superRefine` bên dưới vì quy tắc phụ thuộc `currency` (VND/JPY không có
-   * số lẻ). Chuyển sang số ở `parseAmount`.
-   */
-  amount: z.string().min(1, 'fieldRequired'),
-  currency: z.enum(CURRENCIES),
-  /**
-   * Tiền ra hay tiền vào. `amount` vẫn dương ở cả hai — dấu nằm ở đây, nên
-   * không chỗ nào phải nhớ quy ước dấu khi cộng tổng.
-   */
-  kind: z.enum(KINDS),
-  categoryId: z.string(),
-  note: z.string().max(200, 'fieldTooLong'),
-  spentAt: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'fieldRequired'),
-  /**
-   * Số kỳ khi TẠO MỚI: 1 = khoản lẻ, >1 = chuỗi định kỳ hàng tháng. Không dùng
-   * khi sửa — sửa một kỳ đã có không đổi được độ dài chuỗi.
-   */
-  repeatMonths: z.number().int().min(1).max(24),
-}).superRefine((v, ctx) => {
-  const message = amountErrorKey(v.amount, v.currency)
-  if (message && v.amount !== '') ctx.addIssue({ code: 'custom', path: ['amount'], message })
-})
+export const expenseSchema = z
+  .object({
+    /**
+     * Chuỗi do `<MoneyInput>` đẩy ra: chuỗi số thô ("30000") khi đọc được, hoặc
+     * nguyên chữ người dùng gõ khi chưa đọc được. Kiểm tra thật nằm ở
+     * `superRefine` bên dưới vì quy tắc phụ thuộc `currency` (VND/JPY không có
+     * số lẻ). Chuyển sang số ở `parseAmount`.
+     */
+    amount: z.string().min(1, 'fieldRequired'),
+    currency: z.enum(CURRENCIES),
+    /**
+     * Tiền ra hay tiền vào. `amount` vẫn dương ở cả hai — dấu nằm ở đây, nên
+     * không chỗ nào phải nhớ quy ước dấu khi cộng tổng.
+     */
+    kind: z.enum(KINDS),
+    categoryId: z.string(),
+    note: z.string().max(200, 'fieldTooLong'),
+    spentAt: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'fieldRequired'),
+    /**
+     * Số kỳ khi TẠO MỚI: 1 = khoản lẻ, >1 = chuỗi định kỳ hàng tháng. Không dùng
+     * khi sửa — sửa một kỳ đã có không đổi được độ dài chuỗi.
+     */
+    repeatMonths: z.number().int().min(1).max(24),
+  })
+  .superRefine((v, ctx) => {
+    const message = amountErrorKey(v.amount, v.currency)
+    if (message && v.amount !== '') ctx.addIssue({ code: 'custom', path: ['amount'], message })
+  })
 
 export type ExpenseFormInput = z.infer<typeof expenseSchema>
 
@@ -51,7 +53,12 @@ export type ExpenseFormInput = z.infer<typeof expenseSchema>
 export function amountErrorKey(
   value: string,
   currency: Currency,
-): 'fieldRequired' | 'expenseAmountPositive' | 'expenseAmountWhole' | 'expenseAmountTooLarge' | null {
+):
+  | 'fieldRequired'
+  | 'expenseAmountPositive'
+  | 'expenseAmountWhole'
+  | 'expenseAmountTooLarge'
+  | null {
   if (value.trim() === '') return 'fieldRequired'
   const r = parseMoneyInput(value, currency)
   if (r.ok) return null

@@ -1,4 +1,5 @@
 import type { Expense } from '../api/expensesApi'
+import { parseMoneyInput } from '@/lib/utils/parseMoneyInput'
 import { UNCATEGORIZED } from './report'
 
 /** 'all' = không lọc theo loại. */
@@ -53,9 +54,20 @@ export function filterExpenses(
    * `false` khi số tiền đang bị che: gõ thử một con số mà danh sách lọc ra đúng
    * dòng thì vẫn biết được số tiền bị che là bao nhiêu.
    */
-  { matchAmount = true }: { matchAmount?: boolean } = {},
+  {
+    matchAmount = true,
+    categoryNames,
+  }: {
+    matchAmount?: boolean
+    /** id → tên danh mục ĐÃ DỊCH, để gõ "ăn" ra các khoản thuộc Ăn uống. */
+    categoryNames?: ReadonlyMap<string, string>
+  } = {},
 ): Expense[] {
   const needle = normalize(filter.query.trim())
+  // Gõ đúng như đang hiển thị ("40.000") hay kiểu nói ("40k") đều phải ra khoản
+  // 40.000 — so số thô "40000" với chuỗi người dùng gõ thì không bao giờ khớp.
+  const parsedAmount = matchAmount && needle !== '' ? parseMoneyInput(filter.query, 'USD') : null
+  const amountNeedle = parsedAmount?.ok ? parsedAmount.value : null
 
   return expenses.filter((e) => {
     if (filter.kind !== 'all' && e.kind !== filter.kind) return false
@@ -67,7 +79,11 @@ export function filterExpenses(
     }
 
     if (needle === '') return true
-    const haystack = normalize(`${e.note} ${e.raw_text ?? ''} ${matchAmount ? e.amount : ''}`)
+    if (amountNeedle !== null && e.amount === amountNeedle) return true
+    const categoryName = e.category_id ? (categoryNames?.get(e.category_id) ?? '') : ''
+    const haystack = normalize(
+      `${e.note} ${e.raw_text ?? ''} ${categoryName} ${matchAmount ? e.amount : ''}`,
+    )
     return haystack.includes(needle)
   })
 }
