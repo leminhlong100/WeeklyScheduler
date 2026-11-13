@@ -66,7 +66,11 @@ function ConfirmDialogView({
     <Dialog open={pending !== null} onOpenChange={(open) => !open && onClose(false)}>
       <DialogContent
         showCloseButton={false}
-        className="w-[calc(100%-2rem)] max-w-[400px] rounded-[22px] border-[1.5px] p-5"
+        // z-[90]: phải nằm TRÊN Theme Studio (z-80), nếu không hộp "bỏ thay đổi?"
+        // bị panel che và không bấm được. Luôn căn giữa, kể cả điện thoại (mặc định
+        // của Dialog là bottom sheet bám trái dưới).
+        overlayClassName="z-[90]"
+        className="z-[90] w-[calc(100%-2rem)] max-w-[400px] rounded-[22px] border-[1.5px] p-5 max-sm:top-1/2 max-sm:bottom-auto max-sm:left-1/2 max-sm:-translate-x-1/2 max-sm:-translate-y-1/2 max-sm:pb-5 max-sm:rounded-[22px]"
         style={{ background: theme.modalBg, borderColor: theme.border, color: theme.text }}
       >
         <DialogTitle className="font-heading text-lg font-extrabold" style={{ color: theme.text }}>
