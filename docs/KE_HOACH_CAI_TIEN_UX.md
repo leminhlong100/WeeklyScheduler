@@ -465,7 +465,7 @@ làm mặc định thay cho `DEFAULT_CURRENCY` cố định (`QuickAddSheet.tsx:
 - [x] **D2** hoàn tác cho xoá / đã trả / thêm; `ConfirmDialog` thay 7 `window.confirm`
 - [x] **D3** bấm cả hàng để sửa, cột tiền thẳng hàng
 - [x] **D4** bảng nháp AI: tổng, câu gốc, lỗi theo dòng, giữ câu khi bỏ nháp
-- [ ] Sau mỗi bước: `npm test && npm run typecheck && npm run lint && npm run build`
+- [x] Sau mỗi bước: `npm test && npm run typecheck && npm run lint && npm run build`
 - [ ] Sau mỗi đợt: kiểm trên điện thoại thật (375px), cả theme sáng và tối, cả 4 ngôn ngữ
 
 ---
@@ -492,3 +492,25 @@ làm mặc định thay cho `DEFAULT_CURRENCY` cố định (`QuickAddSheet.tsx:
 - 2026-11-13 — D3 xong: cả hàng là nút sửa (nút phủ absolute), nút 'Đã trả/Đã nhận' 44px nằm dưới số tiền (cột tiền thẳng hàng), Xoá (có Hoàn tác) nằm trong form sửa, ghi chú trống thì tên danh mục làm tiêu đề.
 - 2026-11-13 — D4 xong: bảng nháp có câu gốc, dòng tổng theo tiền tệ, dòng sai viền đỏ + lý do, nút Lưu tất cả không khoá câm (cuộn tới dòng lỗi), bỏ nháp → câu cũ quay lại ô AI, AI lỗi → Nhập tay điền sẵn số tiền đầu tiên (firstAmountIn + test) và cả câu làm ghi chú, spinner + aria-busy.
 - 2026-11-13 — **KIỂM CHỨNG ĐỢT D: ĐẠT** — 137 test, typecheck/lint(0 lỗi)/build sạch. Trang thử: form nhập tay 4 chạm, tự focus ô tiền; xoá có Hoàn tác; xoá danh mục hiện ConfirmDialog; bấm hàng mở form sửa có nút Xoá; bản nháp hiện câu gốc + tổng 14.960.000 ₫, dòng lỗi được đánh dấu, bỏ nháp trả lại câu.
+
+---
+
+## Trạng thái cuối (2026-11-13): Đợt A–D HOÀN THÀNH trên nhánh `feat/ux-overhaul`
+
+Chưa merge vào `main`, chưa push. Việc còn lại cần **chủ repo** làm (AI không làm được vì không đăng nhập được tài khoản Google):
+
+1. **Kiểm trên điện thoại thật**, đăng nhập thật, cả theme sáng/tối và 4 ngôn ngữ (dòng checklist cuối còn trống).
+   Đặc biệt: iPhone — bàn phím có che nút Lưu trong bảng "Thêm giao dịch" không (D1 chưa làm phần `visualViewport`).
+2. **Dữ liệu cũ có thể bị lưu sai** do lỗi "30.000 → 30": trong Supabase SQL editor chạy
+   `select id, spent_at, amount, note from expenses where currency = 'VND' and amount < 1000 order by spent_at desc;`
+   rồi tự sửa những dòng sai. AI không tự sửa DB.
+3. Xem lại, rồi merge nhánh (`git switch main && git merge feat/ux-overhaul`) và deploy.
+
+**Trang thử cục bộ** (cho AI phiên sau, không commit): `harness.html` + `harness/main.tsx` ở gốc repo, đã nằm trong
+`.git/info/exclude`. Mở `http://localhost:5173/harness.html` khi chạy `npm run dev`: dựng `ExpensesPage` thật với
+dữ liệu giả nạp thẳng vào cache TanStack Query (thêm `?empty` để xem người dùng mới, `?scheduler` để xem Lịch tuần).
+Lưu ý: sửa file harness bằng `cat >` đôi khi làm Vite phục vụ bản rỗng — `touch harness/main.tsx` rồi tải lại.
+Có thể xoá cả hai khi không cần nữa.
+
+**Đợt E** (tính năng mới: hạn mức tổng tháng, cảnh báo 80%, khoản hay dùng, chụp hoá đơn, ví, sổ nợ, mục tiêu…)
+chưa bắt đầu — cần lập kế hoạch riêng và hỏi chủ repo trước.
