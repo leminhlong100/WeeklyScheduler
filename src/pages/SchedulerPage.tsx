@@ -4,9 +4,7 @@ import { describeError } from '@/lib/utils/errorMessage'
 import { useIsMobile, useIsTouchDevice } from '@/hooks/useMediaQuery'
 import { useTranslation } from '@/features/i18n/LocaleContext'
 import { useTheme } from '@/features/theme/ThemeContext'
-import { ThemePickerModal } from '@/features/theme/components/ThemePickerModal'
-import { ThemeStudioPanel } from '@/features/theme/studio/ThemeStudioPanel'
-import type { CustomThemeRecord } from '@/features/theme/recipe/types'
+import { useThemeUi } from '@/features/theme/components/ThemeUiProvider'
 import { UserMenu } from '@/features/profile/components/UserMenu'
 import { useWeekAnchor } from '@/features/calendar-nav/hooks/useWeekAnchor'
 import { MiniCalendar, type DayNoteMarks } from '@/features/calendar-nav/components/MiniCalendar'
@@ -64,10 +62,7 @@ export function SchedulerPage() {
   const isMobile = useIsMobile()
   const isTouch = useIsTouchDevice()
   const [sidebarOpen, setSidebarOpen] = useState(!isMobile && !isTouch)
-  const [themePickerOpen, setThemePickerOpen] = useState(false)
-  // Wrapped in an object so "create" (record: null) is distinguishable from
-  // "closed" without a second boolean that could disagree with it.
-  const [studioTarget, setStudioTarget] = useState<{ record: CustomThemeRecord | null } | null>(null)
+  const { openThemePicker, studioOpen } = useThemeUi()
   const [categoryManagerOpen, setCategoryManagerOpen] = useState(false)
   const [taskDraft, setTaskDraft] = useState<TaskDraft | null>(null)
   const [searchOpen, setSearchOpen] = useState(false)
@@ -90,7 +85,6 @@ export function SchedulerPage() {
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
       if (e.key !== 'Escape') return
-      setThemePickerOpen(false)
       setCategoryManagerOpen(false)
       setTaskDraft(null)
       setSearchOpen(false)
@@ -170,7 +164,7 @@ export function SchedulerPage() {
   return (
     <AppShell
       theme={theme}
-      insetRight={studioTarget !== null}
+      insetRight={studioOpen}
       sidebar={
         <Sidebar
           open={sidebarOpen}
@@ -209,7 +203,7 @@ export function SchedulerPage() {
           onPrevWeek={prevWeek}
           onNextWeek={nextWeek}
           onToday={goToday}
-          onOpenTheme={() => setThemePickerOpen(true)}
+          onOpenTheme={openThemePicker}
           onNewEvent={openNewEventFromHeader}
           onCopyLastWeek={handleCopyLastWeek}
           copyLastWeekPending={copyPreviousWeek.isPending}
@@ -223,11 +217,10 @@ export function SchedulerPage() {
         <MobileActionBar
           theme={theme}
           t={t}
-          currentThemeName={theme.name[locale]}
           onPrevWeek={prevWeek}
           onNextWeek={nextWeek}
           onToday={goToday}
-          onOpenTheme={() => setThemePickerOpen(true)}
+          onOpenTheme={openThemePicker}
           onNewEvent={openNewEventFromHeader}
           onCopyLastWeek={handleCopyLastWeek}
           copyLastWeekPending={copyPreviousWeek.isPending}
@@ -277,19 +270,6 @@ export function SchedulerPage() {
         categories={categories}
         weekStart={weekStart}
       />
-      <ThemePickerModal
-        open={themePickerOpen}
-        onOpenChange={setThemePickerOpen}
-        onEditTheme={(record) => setStudioTarget({ record })}
-      />
-      {/* Mounted conditionally on purpose: unmounting is what clears the live
-          preview, so there is no way to leave an unsaved draft applied. */}
-      {studioTarget && (
-        <ThemeStudioPanel
-          record={studioTarget.record}
-          onClose={() => setStudioTarget(null)}
-        />
-      )}
       <CategoryManagerModal open={categoryManagerOpen} onOpenChange={setCategoryManagerOpen} />
     </AppShell>
   )

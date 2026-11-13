@@ -260,7 +260,7 @@ export function ArtTab({ draft, chrome, t, userId, onBusyChange }: ArtTabProps) 
         <>
           <div className="flex flex-col gap-1">
             <div className="flex items-baseline justify-between gap-2">
-              <span className="text-[11px] font-extrabold" style={{ color: chrome.mutedText }}>
+              <span className="text-[12px] font-extrabold" style={{ color: chrome.mutedText }}>
                 {t.studioSceneOpacity}
               </span>
               <span
@@ -301,7 +301,7 @@ export function ArtTab({ draft, chrome, t, userId, onBusyChange }: ArtTabProps) 
                         patch: { sceneOpacity: sceneIssue.suggestedOpacity },
                       })
                     }
-                    className="shrink-0 rounded-full px-2 py-0.5 text-[10px] font-extrabold"
+                    className="shrink-0 min-h-9 rounded-full px-3 text-[12px] font-extrabold"
                     style={{ background: chrome.chip, color: chrome.text }}
                   >
                     {t.studioUseOpacity.replace(
@@ -315,7 +315,7 @@ export function ArtTab({ draft, chrome, t, userId, onBusyChange }: ArtTabProps) 
           </div>
 
           <div className="flex flex-col gap-1.5">
-            <span className="text-[11px] font-extrabold" style={{ color: chrome.mutedText }}>
+            <span className="text-[12px] font-extrabold" style={{ color: chrome.mutedText }}>
               {t.studioScenePosition}
             </span>
             <div className="grid grid-cols-3 gap-1.5">
@@ -326,7 +326,7 @@ export function ArtTab({ draft, chrome, t, userId, onBusyChange }: ArtTabProps) 
                     key={position}
                     type="button"
                     onClick={() => dispatch({ type: 'art', patch: { scenePosition: position } })}
-                    className="rounded-[10px] border-[1.5px] px-1.5 py-1.5 text-[10px] font-extrabold"
+                    className="min-h-10 rounded-[10px] border-[1.5px] px-1.5 py-1.5 text-[12px] font-extrabold"
                     style={{
                       borderColor: active ? chrome.accent : chrome.border,
                       background: active ? chrome.chip : 'transparent',
@@ -364,14 +364,14 @@ export function ArtTab({ draft, chrome, t, userId, onBusyChange }: ArtTabProps) 
 
       <div className="flex flex-col gap-2">
         <div className="flex items-center justify-between gap-2">
-          <span className="text-[11px] font-extrabold" style={{ color: chrome.mutedText }}>
+          <span className="text-[12px] font-extrabold" style={{ color: chrome.mutedText }}>
             {t.studioFigures}
           </span>
           <span className="font-mono text-[10px] font-bold" style={{ color: chrome.mutedText }}>
             {figures.length}/{MAX_FIGURES}
           </span>
         </div>
-        <p className="text-[10px] font-semibold leading-snug" style={{ color: chrome.mutedText }}>
+        <p className="text-[12px] font-semibold leading-snug" style={{ color: chrome.mutedText }}>
           {t.studioFiguresHint}
         </p>
 
@@ -400,7 +400,7 @@ export function ArtTab({ draft, chrome, t, userId, onBusyChange }: ArtTabProps) 
                 }
                 aria-label={t.studioCropEdit}
                 title={t.studioCropEdit}
-                className="grid size-6 place-items-center rounded-md disabled:opacity-40"
+                className="grid size-9 place-items-center rounded-lg max-md:size-11 disabled:opacity-40"
                 style={{ color: chrome.mutedText }}
               >
                 <Crop className="size-3.5" />
@@ -410,7 +410,7 @@ export function ArtTab({ draft, chrome, t, userId, onBusyChange }: ArtTabProps) 
                 onClick={() => dispatch({ type: 'removeFigure', index })}
                 aria-label={t.studioRemove}
                 title={t.studioRemove}
-                className="grid size-6 place-items-center rounded-md"
+                className="grid size-9 place-items-center rounded-lg max-md:size-11"
                 style={{ color: chrome.mutedText }}
               >
                 <X className="size-3.5" />
@@ -453,7 +453,7 @@ export function ArtTab({ draft, chrome, t, userId, onBusyChange }: ArtTabProps) 
               }
             />
             <div className="flex items-center justify-between gap-2">
-              <span className="text-[11px] font-extrabold" style={{ color: chrome.mutedText }}>
+              <span className="text-[12px] font-extrabold" style={{ color: chrome.mutedText }}>
                 {t.studioFigureFlip}
               </span>
               <Switch
@@ -574,8 +574,8 @@ function FigurePicker({
         type="button"
         disabled={busy}
         onClick={() => inputRef.current?.click()}
-        className="flex h-9 items-center justify-center gap-1.5 rounded-[12px] border-[1.5px] border-dashed text-[12px] font-extrabold disabled:opacity-50"
-        style={{ borderColor: chrome.border, color: chrome.muted }}
+        className="flex h-11 items-center justify-center gap-1.5 rounded-[12px] border-[1.5px] border-dashed text-[13px] font-extrabold disabled:opacity-50"
+        style={{ borderColor: chrome.border, color: chrome.mutedText }}
       >
         <Plus className="size-3.5" />
         {label}

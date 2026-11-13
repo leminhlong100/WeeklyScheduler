@@ -115,6 +115,12 @@ export const themeRecipeSchema = z.object({
   sidebarDepth: unitInterval,
   lineTint: z.enum(['white', 'accent']).optional(),
   /**
+   * Phiên bản công thức (xem `ThemeRecipe.v`). Phải khai báo ở đây: `z.object`
+   * bỏ khoá lạ, nên thiếu dòng này thì `v` mất sau mỗi lần tải lại và theme mới
+   * quay về kiểu thanh bên cũ. Bản ghi cũ không có `v` vẫn hợp lệ.
+   */
+  v: z.literal(2).optional(),
+  /**
    * `min(1)` on both is load-bearing, not defensive:
    * `DecorBackground.tsx:53-54` indexes with `arr[i % arr.length]`, and `i % 0`
    * is `NaN` — an empty array renders `undefined` colours, not zero decorations.

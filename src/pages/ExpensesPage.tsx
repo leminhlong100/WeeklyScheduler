@@ -6,6 +6,7 @@ import { useBackToClose } from '@/hooks/useBackToClose'
 import { useTranslation } from '@/features/i18n/LocaleContext'
 import { translateExpenseCategoryName } from '@/features/i18n/defaultExpenseCategoryNames'
 import { useTheme } from '@/features/theme/ThemeContext'
+import { useThemeUi } from '@/features/theme/components/ThemeUiProvider'
 import { useAmountVisibility } from '@/features/expenses/AmountVisibilityContext'
 import { UserMenu } from '@/features/profile/components/UserMenu'
 import { AppShell } from '@/features/layout/components/AppShell'
@@ -86,6 +87,7 @@ function ExpensesPageContent() {
   const { t, locale, setLocale } = useTranslation()
   const { ledgerId, canEdit, info: ledgerInfo } = useCurrentLedger()
   const { theme } = useTheme()
+  const { studioOpen } = useThemeUi()
   const { hidden: amountsHidden } = useAmountVisibility()
   const isMobile = useIsMobile()
   const isTouch = useIsTouchDevice()
@@ -176,6 +178,7 @@ function ExpensesPageContent() {
   return (
     <AppShell
       theme={theme}
+      insetRight={studioOpen}
       sidebar={
         <Sidebar
           open={sidebarOpen}

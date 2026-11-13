@@ -41,11 +41,18 @@ export interface ThemeRecipe {
   /** 0..1, 0.5 neutral. Scales every chroma ratio, so 0 lands near-greyscale. */
   intensity: number
   /**
-   * 0..1, darkening only. 0 is the lightest sidebar that still passes the white-
-   * text guard; anything above the guard's ceiling would render identically, so
-   * there is no "lighter" direction to offer.
+   * 0..1, 0 = lightest sidebar, 1 = deepest. What the range covers depends on `v`.
    */
   sidebarDepth: number
+  /**
+   * Phiên bản công thức.
+   *
+   * - Không có (mọi theme lưu trước 2026-11): thanh bên bị kẹp cho chữ TRẮNG đạt
+   *   2.4:1, nên không nhạt được hơn mức đó. Giữ nguyên để theme đã lưu trông y cũ.
+   * - `2`: không kẹp. `deriveTheme` đã tự chọn chữ trắng hoặc chữ tối đạt 4.5:1
+   *   cho thanh bên, nên thanh bên nhạt như preset Chanh vàng vẫn đọc được.
+   */
+  v?: 2
   lineTint?: LineTint
   decor: DecorShape[]
   decorColors: Hex[]

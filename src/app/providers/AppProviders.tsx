@@ -10,6 +10,7 @@ import { AmountVisibilityProvider } from '@/features/expenses/AmountVisibilityCo
 import { PreferenceSync } from '@/features/profile/components/PreferenceSync'
 import { LocaleProvider } from '@/features/i18n/LocaleContext'
 import { ConfirmProvider } from '@/components/common/ConfirmDialog'
+import { ThemeUiProvider } from '@/features/theme/components/ThemeUiProvider'
 import { PwaUpdatePrompt } from '@/app/PwaUpdatePrompt'
 import { QUERY_CACHE_BUSTER, queryPersister } from '@/lib/queryPersister'
 
@@ -44,7 +45,10 @@ export function AppProviders({ children }: { children: ReactNode }) {
             <ConfirmProvider>
               <AmountVisibilityProvider>
                 <TooltipProvider>
-                  <BrowserRouter>{children}</BrowserRouter>
+                  {/* Inside ConfirmProvider: the picker and studio ask before discarding. */}
+                  <ThemeUiProvider>
+                    <BrowserRouter>{children}</BrowserRouter>
+                  </ThemeUiProvider>
                   <Toaster
                     position="top-center"
                     richColors

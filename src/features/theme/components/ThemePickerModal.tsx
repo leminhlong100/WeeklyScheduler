@@ -1,7 +1,9 @@
-import { MoreHorizontal, Plus } from 'lucide-react'
+import type { ReactNode } from 'react'
+import { MoreHorizontal, Plus, X } from 'lucide-react'
 import { toast } from 'sonner'
 import { describeError } from '@/lib/utils/errorMessage'
 
+import { useConfirm } from '@/components/common/ConfirmDialog'
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog'
 import {
   DropdownMenu,
@@ -10,32 +12,41 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { useTranslation } from '@/features/i18n/LocaleContext'
+import { useBackToClose } from '@/hooks/useBackToClose'
 import { MAX_CUSTOM_THEMES } from '../art/constants'
 import type { CustomThemeRecord } from '../recipe/types'
 import { listThemeDefinitions } from '../themes'
 import { useTheme } from '../ThemeContext'
-import { customThemeId } from '../types'
+import { customThemeId, isThemeKey } from '../types'
 import { ThemeSwatchButton } from './ThemeSwatchButton'
+import type { StudioTarget } from './ThemeUiProvider'
 
 interface ThemePickerModalProps {
   open: boolean
   onOpenChange: (open: boolean) => void
   /** Closes the picker and opens the studio; the two are never open together. */
-  onEditTheme: (record: CustomThemeRecord | null) => void
+  onEditTheme: (target: StudioTarget) => void
 }
 
 export function ThemePickerModal({ open, onOpenChange, onEditTheme }: ThemePickerModalProps) {
   const { t, locale } = useTranslation()
+  const confirm = useConfirm()
   const { themeId, setThemeId, theme, customThemes, removeCustomTheme, saveCustomTheme, newCustomThemeId } =
     useTheme()
+  // Nút Back của điện thoại đóng bảng chọn, không rời trang.
+  useBackToClose(open, () => onOpenChange(false))
 
   const atLimit = customThemes.length >= MAX_CUSTOM_THEMES
 
-  const openStudio = (record: CustomThemeRecord | null) => {
+  const openStudio = (target: StudioTarget) => {
+    if (target.record === null && atLimit) {
+      toast.error(t.themeLimitReached.replace('{n}', String(MAX_CUSTOM_THEMES)))
+      return
+    }
     // The studio needs to see the app it is restyling, so the picker gets out of
     // the way first.
     onOpenChange(false)
-    onEditTheme(record)
+    onEditTheme(target)
   }
 
   const duplicate = async (record: CustomThemeRecord) => {
@@ -64,7 +75,7 @@ export function ThemePickerModal({ open, onOpenChange, onEditTheme }: ThemePicke
   }
 
   const remove = async (record: CustomThemeRecord) => {
-    if (!window.confirm(t.themeDeleteConfirm)) return
+    if (!(await confirm({ message: t.themeDeleteConfirm }))) return
     try {
       await removeCustomTheme(record.id)
     } catch (error) {
@@ -76,66 +87,85 @@ export function ThemePickerModal({ open, onOpenChange, onEditTheme }: ThemePicke
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
         showCloseButton={false}
-        className="max-h-[85dvh] w-full max-w-full overflow-y-auto rounded-t-[28px] rounded-b-none border-[1.5px] p-5 max-sm:pb-[calc(1.25rem+env(safe-area-inset-bottom))] sm:w-[calc(100%-2rem)] sm:max-w-[540px] sm:rounded-[28px] sm:p-6"
+        className="max-h-[85dvh] w-full max-w-full overflow-y-auto overscroll-contain rounded-t-[28px] rounded-b-none border-[1.5px] p-5 max-sm:pb-[calc(1.25rem+env(safe-area-inset-bottom))] sm:w-[calc(100%-2rem)] sm:max-w-[540px] sm:rounded-[28px] sm:p-6"
         style={{ background: theme.modalBg, borderColor: theme.border, color: theme.text }}
       >
-        <DialogTitle className="font-heading text-xl font-extrabold" style={{ color: theme.text }}>
-          {t.themeTitle}
-        </DialogTitle>
-        <p className="mb-1 text-[13px] font-semibold" style={{ color: theme.mutedText }}>
-          {t.themeSub}
-        </p>
+        <div className="flex items-start gap-2">
+          <div className="min-w-0 flex-1">
+            <DialogTitle className="font-heading text-xl font-extrabold" style={{ color: theme.text }}>
+              {t.themeTitle}
+            </DialogTitle>
+            <p className="mb-1 text-[13px] font-semibold" style={{ color: theme.mutedText }}>
+              {t.themeSub}
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={() => onOpenChange(false)}
+            aria-label={t.studioClose}
+            title={t.studioClose}
+            className="-mt-1 -mr-2 grid size-11 shrink-0 place-items-center rounded-full"
+            style={{ color: theme.mutedText }}
+          >
+            <X className="size-5" />
+          </button>
+        </div>
 
-        {/* "Mine" first: a theme the user built is a stronger candidate than any
-            preset, and burying it under sixteen built-ins would say otherwise. */}
+        {/* Có sẵn trước: đổi sang một theme có sẵn là việc của hầu hết mọi người;
+            ô "Tạo" to đứng đầu từng đẩy chúng xuống nửa dưới màn hình điện thoại. */}
         <section className="flex flex-col gap-2">
-          <h3 className="text-[11px] font-extrabold" style={{ color: theme.mutedText }}>
-            {t.themeMine}
+          <h3 className="text-[12px] font-extrabold" style={{ color: theme.mutedText }}>
+            {t.themePresets}
           </h3>
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
-            <button
-              type="button"
-              onClick={() => {
-                if (atLimit) {
-                  toast.error(t.themeLimitReached.replace('{n}', String(MAX_CUSTOM_THEMES)))
-                  return
-                }
-                openStudio(null)
-              }}
-              className="flex min-h-[118px] flex-col items-center justify-center gap-1.5 rounded-[20px] border-[2.5px] border-dashed"
-              style={{ borderColor: theme.accent, color: theme.accent }}
-            >
-              <span
-                className="grid size-9 place-items-center rounded-full"
-                style={{ background: theme.brandGrad, color: theme.onBrand }}
-              >
-                <Plus className="size-4" />
-              </span>
-              <span className="text-[12px] font-extrabold">{t.themeCreate}</span>
-            </button>
-
-            {customThemes.map((record) => (
-              <div key={record.id} className="relative">
+            {listThemeDefinitions().map((def) => (
+              <div key={def.key} className="relative">
                 <ThemeSwatchButton
-                  def={record.definition}
-                  active={record.definition.key === themeId}
+                  def={def}
+                  active={def.key === themeId}
                   activeTheme={theme}
                   locale={locale}
                   onSelect={() => {
-                    setThemeId(customThemeId(record.id))
+                    setThemeId(def.key)
                     onOpenChange(false)
                   }}
                 />
-                <DropdownMenu>
-                  <DropdownMenuTrigger
-                    className="absolute top-1.5 right-1.5 grid size-6 place-items-center rounded-full shadow-md"
-                    style={{ background: 'rgba(255,255,255,.92)', color: record.definition.accent }}
-                    aria-label={record.name}
-                  >
-                    <MoreHorizontal className="size-3.5" />
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end">
-                    <DropdownMenuItem onClick={() => openStudio(record)}>
+                {isThemeKey(def.key) && (
+                  <CardMenu label={`${def.name[locale]} — ${t.themeCreateFrom}`}>
+                    <DropdownMenuItem
+                      onClick={() =>
+                        isThemeKey(def.key) && openStudio({ record: null, basePreset: def.key })
+                      }
+                    >
+                      {t.themeCreateFrom}
+                    </DropdownMenuItem>
+                  </CardMenu>
+                )}
+              </div>
+            ))}
+          </div>
+        </section>
+
+        <section className="mt-5 flex flex-col gap-2">
+          <h3 className="text-[12px] font-extrabold" style={{ color: theme.mutedText }}>
+            {t.themeMine}
+          </h3>
+          {customThemes.length > 0 && (
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+              {customThemes.map((record) => (
+                <div key={record.id} className="relative">
+                  <ThemeSwatchButton
+                    def={record.definition}
+                    active={record.definition.key === themeId}
+                    activeTheme={theme}
+                    locale={locale}
+                    onSelect={() => {
+                      setThemeId(customThemeId(record.id))
+                      onOpenChange(false)
+                    }}
+                  />
+                  <CardMenu label={record.name}>
+                    <DropdownMenuItem onClick={() => openStudio({ record })}>
                       {t.themeEdit}
                     </DropdownMenuItem>
                     <DropdownMenuItem onClick={() => void duplicate(record)}>
@@ -144,34 +174,48 @@ export function ThemePickerModal({ open, onOpenChange, onEditTheme }: ThemePicke
                     <DropdownMenuItem onClick={() => void remove(record)}>
                       {t.themeDelete}
                     </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </div>
-            ))}
-          </div>
-        </section>
-
-        <section className="mt-4 flex flex-col gap-2">
-          <h3 className="text-[11px] font-extrabold" style={{ color: theme.mutedText }}>
-            {t.themePresets}
-          </h3>
-          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
-            {listThemeDefinitions().map((def) => (
-              <ThemeSwatchButton
-                key={def.key}
-                def={def}
-                active={def.key === themeId}
-                activeTheme={theme}
-                locale={locale}
-                onSelect={() => {
-                  setThemeId(def.key)
-                  onOpenChange(false)
-                }}
-              />
-            ))}
-          </div>
+                  </CardMenu>
+                </div>
+              ))}
+            </div>
+          )}
+          <button
+            type="button"
+            onClick={() => openStudio({ record: null })}
+            className="flex min-h-12 items-center justify-center gap-2 rounded-[16px] border-[2px] border-dashed px-4 text-[14px] font-extrabold"
+            style={{ borderColor: theme.borderStrong, color: theme.accentText }}
+          >
+            <span
+              className="grid size-7 place-items-center rounded-full"
+              style={{ background: theme.brandGrad, color: theme.onBrand }}
+            >
+              <Plus className="size-4" />
+            </span>
+            {t.themeCreate}
+          </button>
         </section>
       </DialogContent>
     </Dialog>
+  )
+}
+
+/** Nút ⋯ ở góc thẻ: icon nhỏ cho gọn, vùng chạm 44px. */
+function CardMenu({ label, children }: { label: string; children: ReactNode }) {
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger
+        className="absolute top-0 right-0 flex size-11 items-start justify-end p-1.5"
+        aria-label={label}
+        title={label}
+      >
+        <span
+          className="grid size-7 place-items-center rounded-full shadow-md"
+          style={{ background: 'rgba(255,255,255,.92)', color: '#3a3550' }}
+        >
+          <MoreHorizontal className="size-4" />
+        </span>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end">{children}</DropdownMenuContent>
+    </DropdownMenu>
   )
 }

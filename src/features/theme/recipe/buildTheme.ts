@@ -9,6 +9,7 @@ import {
   solveLightnessForContrast,
   withWhiteContrastAtLeast,
 } from '@/lib/utils/color'
+import { sidebarTextFor } from '../deriveTheme'
 import type { ThemeDefinition, ThemeId, ThemeTokens } from '../types'
 import type { Hex, ThemeRecipe, TokenOverrides } from './types'
 
@@ -76,28 +77,42 @@ const TEXT_SEED = { light: { l: 0.43, c: 0.42 }, dark: { l: 0.94, c: 0.18 } } as
 const MUTED_SEED = { light: { l: 0.77, c: 0.43 }, dark: { l: 0.66, c: 0.4 } } as const
 
 /**
- * `Sidebar` hardcodes white text, so the mid stop of `sideGrad` is the one token
- * with a hard legibility floor. The shipped light presets land between 1.38:1
- * (`lemon` — white on pale yellow, effectively unreadable) and 4.59:1, with a
- * median of 2.27:1. Targeting 2.4:1 fixes the broken tail without darkening the
- * typical pastel sidebar.
+ * LEGACY (recipe không có `v`). Hồi `Sidebar` còn gắn cứng chữ trắng, điểm giữa
+ * của `sideGrad` bị kẹp cho chữ trắng đạt 2.4:1. Từ khi `deriveTheme` tự chọn
+ * chữ trắng/tối, kẹp này chỉ làm thanh bên tối hơn preset gốc (Chanh vàng
+ * `#ffd93d` → `#caa200`). Chỉ còn giữ để theme đã lưu trông y như cũ.
  */
 export const SIDEBAR_MIN_WHITE_CONTRAST = 2.4
 
 /**
- * `sidebarDepth` runs 0..1 and only ever darkens — a two-directional control
- * would have a dead half.
- *
- * `SIDEBAR_L` is the *lightest* value worth offering, because the 2.4:1 guard
- * above is a hard ceiling: the four presets authored lighter than this
- * (`peach` 0.813, `sakura` 0.839, `lemon` 0.893) all get pulled back to
- * 0.727–0.741 by it, so every "lighter" setting would render identically. The
- * ranges then cover the real span of the presets below the ceiling (light
- * 0.563–0.749, dark 0.218–0.288) with headroom to go darker than any of them.
+ * LEGACY: `sidebarDepth` 0..1 chỉ làm tối, từ mức nhạt nhất mà kẹp 2.4:1 còn cho
+ * phép (light 0.75, dark 0.29).
  */
 export const SIDEBAR_L = { light: 0.75, dark: 0.29 } as const
 export const SIDEBAR_C_RATIO = { light: 0.85, dark: 0.42 } as const
 export const SIDEBAR_DEPTH_RANGE = { light: 0.3, dark: 0.14 } as const
+
+/**
+ * Công thức `v: 2`: `sidebarDepth` 0 = nhạt nhất, 1 = đậm nhất, không kẹp. Dải
+ * phủ trọn các preset (light: lemon 0.893 … basiclight 0.57; dark 0.22–0.29) và
+ * còn dư hai đầu. Độ đọc được do `deriveTheme` lo (chữ trắng hoặc tối, ≥ 4.5:1).
+ */
+export const SIDEBAR_V2 = {
+  light: { max: 0.93, range: 0.5 },
+  dark: { max: 0.42, range: 0.28 },
+} as const
+
+/** Độ sáng OKLCH của điểm giữa thanh bên theo công thức `v: 2`. */
+export function sidebarLightnessV2(dark: boolean, depth: number): number {
+  const band = SIDEBAR_V2[dark ? 'dark' : 'light']
+  return band.max - clamp(depth, 0, 1) * band.range
+}
+
+/** Nghịch đảo của `sidebarLightnessV2`. */
+export function sidebarDepthV2(dark: boolean, lightness: number): number {
+  const band = SIDEBAR_V2[dark ? 'dark' : 'light']
+  return clamp((band.max - lightness) / band.range, 0, 1)
+}
 
 /** Cream hue for the `warm` paper style. */
 export const WARM_HUE = 75
@@ -155,22 +170,27 @@ export function buildTokensFromRecipe(recipe: ThemeRecipe): ThemeTokens {
   )
 
   // --- sidebar gradient ------------------------------------------------------
-  const depthRange = SIDEBAR_DEPTH_RANGE[dark ? 'dark' : 'light']
-  const sideL = clamp(
-    SIDEBAR_L[dark ? 'dark' : 'light'] - clamp(recipe.sidebarDepth, 0, 1) * depthRange,
-    0.08,
-    0.95,
-  )
+  const v2 = recipe.v === 2
+  const sideL = v2
+    ? sidebarLightnessV2(dark, recipe.sidebarDepth)
+    : clamp(
+        SIDEBAR_L[dark ? 'dark' : 'light'] -
+          clamp(recipe.sidebarDepth, 0, 1) * SIDEBAR_DEPTH_RANGE[dark ? 'dark' : 'light'],
+        0.08,
+        0.95,
+      )
   const sideMidRaw = oklchToHex({
     l: sideL,
     c: Math.min(a.c * SIDEBAR_C_RATIO[dark ? 'dark' : 'light'] * k, a.c),
     h: a.h,
   })
-  const sideMid = withWhiteContrastAtLeast(sideMidRaw, SIDEBAR_MIN_WHITE_CONTRAST)
+  // Theme cũ (không có `v`) giữ kẹp để trông y như lúc lưu; xem SIDEBAR_MIN_WHITE_CONTRAST.
+  const sideMid = v2 ? sideMidRaw : withWhiteContrastAtLeast(sideMidRaw, SIDEBAR_MIN_WHITE_CONTRAST)
   const sideTop = shiftHue(lighten(sideMid, dark ? 0.04 : 0.07), 6)
   // mixOklch, not mixHex: a Cartesian OKLab blend between two far-apart hues
   // passes through the neutral axis and the tail stop would go grey.
   const sideBottom = lighten(mixOklch(sideMid, secondary, 0.45), dark ? 0.045 : 0.035)
+  const sideGrad = readableSidebar(sideTop, sideMid, sideBottom, accent)
 
   // --- line tokens -----------------------------------------------------------
   const tint = recipe.lineTint ?? 'white'
@@ -205,12 +225,46 @@ export function buildTokensFromRecipe(recipe: ThemeRecipe): ThemeTokens {
     gridLine: dark ? darkLine('gridLine') : surface(LIGHT_SURFACES.gridLine),
     nowLine: highlight,
     dark,
-    sideGrad: `linear-gradient(175deg,${sideTop},${sideMid} 58%,${sideBottom})`,
+    sideGrad,
     decor: recipe.decor.length ? recipe.decor : ['star'],
     decorColors: recipe.decorColors.length
       ? recipe.decorColors.map((c) => normalizeHex(c, accent))
       : defaultDecorColors(accent, secondary, highlight, dark),
   }
+}
+
+/** Chữ thanh bên phải đạt mức này trên mọi điểm dừng (có chừa sai số làm tròn). */
+const SIDEBAR_TEXT_TARGET = 4.55
+
+const sidebarGradient = (top: string, mid: string, bottom: string) =>
+  `linear-gradient(175deg,${top},${mid} 58%,${bottom})`
+
+/**
+ * Gradient thanh bên mà chữ (trắng hoặc tối, do `deriveTheme` chọn) đạt 4.5:1
+ * trên MỌI điểm dừng và lớp thẻ đè lên.
+ *
+ * Gradient dựng từ công thức trải khá rộng về độ sáng (đuôi pha màu phụ, đầu làm
+ * sáng thêm). Ở hai đầu thanh trượt và với mọi theme tối, một đầu rơi vào vùng
+ * lưng chừng mà chữ trắng lẫn chữ tối đều không đạt (đo được 2.4–4.4:1). Nên:
+ * 1. thu hẹp hai đầu về phía điểm giữa (giữ được dáng gradient);
+ * 2. còn thiếu thì đẩy cả dải ra khỏi vùng lưng chừng — tối hơn nếu điểm giữa
+ *    đang tối, sáng hơn nếu đang sáng.
+ * Gradient vốn đã đạt thì trả về nguyên vẹn, nên theme đang đọc tốt không đổi.
+ */
+function readableSidebar(top: string, mid: string, bottom: string, accent: string): string {
+  let [a, b, c] = [top, mid, bottom]
+  for (let i = 0; i < 40; i++) {
+    const grad = sidebarGradient(a, b, c)
+    if (sidebarTextFor(grad, accent).worst >= SIDEBAR_TEXT_TARGET) return grad
+    if (i < 4) {
+      a = mixOklch(a, b, 0.4)
+      c = mixOklch(c, b, 0.4)
+    } else {
+      const step = hexToOklch(b).l < 0.62 ? -0.02 : 0.02
+      ;[a, b, c] = [lighten(a, step), lighten(b, step), lighten(c, step)]
+    }
+  }
+  return sidebarGradient(a, b, c)
 }
 
 /**

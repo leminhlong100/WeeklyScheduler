@@ -115,6 +115,8 @@ export interface Dictionary {
   themeMine: string
   themePresets: string
   themeCreate: string
+  themeMenu: string
+  themeCreateFrom: string
   themeEdit: string
   themeDuplicate: string
   themeDelete: string
@@ -136,10 +138,8 @@ export interface Dictionary {
   studioPeek: string
   studioMinimize: string
   studioExpand: string
-  studioTabBasics: string
   studioTabColors: string
   studioTabDecor: string
-  studioTabArt: string
   studioTabAdvanced: string
 
   // --- basics tab ---
@@ -147,8 +147,6 @@ export interface Dictionary {
   studioNamePh: string
   studioIcon: string
   studioIconPh: string
-  studioBasedOn: string
-  studioReseedConfirm: string
   studioMode: string
   studioModeLight: string
   studioModeDark: string
@@ -168,14 +166,11 @@ export interface Dictionary {
   studioLineTintWhite: string
   studioLineTintAccent: string
   studioRandomize: string
-  studioTokens: string
-  studioTokensHint: string
 
   // --- decor tab ---
   studioShapes: string
   studioShapesHint: string
   studioDecorColors: string
-  studioSidebarShapeNote: string
 
   // --- artwork tab ---
   studioScene: string
@@ -209,6 +204,20 @@ export interface Dictionary {
 
   // --- advanced tab ---
   studioAdvancedNote: string
+  studioDiscard: string
+  studioSuggested: string
+  studioIntensityLow: string
+  studioIntensityHigh: string
+  studioSidebarLight: string
+  studioSidebarDeep: string
+  studioSidebarUpgrade: string
+  studioReadability: string
+  studioReadabilityOk: string
+  studioIssuesCount: string
+  studioFixAuto: string
+  studioSaveBlocked: string
+  studioMoreOptions: string
+  studioTokensTitle: string
   studioGroupSurfaces: string
   studioGroupText: string
   studioGroupLines: string
@@ -220,11 +229,9 @@ export interface Dictionary {
   // --- readability warnings ---
   themeIssueTextSurface: string
   themeIssueMuted: string
-  themeIssueSidebar: string
   themeIssueScene: string
   /** Contains `{n}`. */
   studioUseOpacity: string
-  studioDarkenSidebar: string
 
   // --- validation + image errors ---
   themeErrHex: string

@@ -4,6 +4,7 @@ import { CheckIcon } from 'lucide-react'
 import { toast } from 'sonner'
 import type { Dictionary } from '@/features/i18n/dictionary'
 import type { DerivedTheme } from '@/features/theme/types'
+import { useThemeUi } from '@/features/theme/components/ThemeUiProvider'
 import { cn } from '@/lib/utils'
 import { GradientButton } from '@/components/common/GradientButton'
 import { STICKER_CATEGORIES } from '../data/stickerCatalog'
@@ -51,6 +52,8 @@ export function StickersOverlay({
   onToggleDesktopPanel,
 }: StickersOverlayProps) {
   const [category, setCategory] = useState<StickerCategory>(STICKER_CATEGORIES[0].id)
+  // The dock sits above the studio (z-92 vs z-80) and covered its Save button.
+  const { studioOpen } = useThemeUi()
   const {
     stickers,
     selectedId,
@@ -110,7 +113,12 @@ export function StickersOverlay({
       <PlacingGhost placing={placing} />
 
       {createPortal(
-        <div className="fixed right-3 bottom-[calc(72px+env(safe-area-inset-bottom))] z-[40] flex flex-col items-end gap-2.5 sm:right-[22px] sm:bottom-[22px] sm:z-[92]">
+        <div
+          className={cn(
+            'fixed right-3 bottom-[calc(72px+env(safe-area-inset-bottom))] z-[40] flex flex-col items-end gap-2.5 sm:right-[22px] sm:bottom-[22px] sm:z-[92]',
+            studioOpen && 'hidden',
+          )}
+        >
           {trayOpen && (
             <StickerDock
               t={t}

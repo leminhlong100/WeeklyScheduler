@@ -1,40 +1,28 @@
-import { Shuffle } from 'lucide-react'
+import { useState } from 'react'
+import { AlertTriangle, CheckCircle2, Shuffle } from 'lucide-react'
 
 import { ColorField } from '@/components/form/ColorField'
+import { EmojiField } from '@/components/form/EmojiField'
 import { SegmentedControl } from '@/components/ui/segmented-control'
 import { Slider } from '@/components/ui/slider'
-import { contrastRatio, oklchToHex, shiftHue } from '@/lib/utils/color'
-import { ContrastBadge } from '../../components/ContrastBadge'
-import { CONTRAST_LIMITS, resolveTokenColors } from '../../recipe/validate'
-import type { ThemeTokens } from '../../types'
+import { Switch } from '@/components/ui/switch'
+import { oklchToHex, shiftHue } from '@/lib/utils/color'
+import { hasBlockingIssue } from '../../recipe/validate'
 import type { StudioTabProps } from '../types'
 
 /** Offset that turns one accent into a plausible gradient partner. */
-const AUTO_SECONDARY_HUE_SHIFT = 65
+export const AUTO_SECONDARY_HUE_SHIFT = 65
 
-/** The twenty tokens, in the order the strip shows them. */
-const TOKEN_STRIP: (keyof ThemeTokens)[] = [
-  'accent',
-  'grad',
-  'appBg',
-  'mainBg',
-  'panel',
-  'modalBg',
-  'inputBg',
-  'chip',
-  'text',
-  'muted',
-  'border',
-  'borderStrong',
-  'gridLine',
-  'nowLine',
-  'sideGrad',
-]
+const THEME_ICON_PRESETS = [
+  '🎨', '🌿', '🌸', '🌙', '⭐', '🍵', '🍓', '🧁',
+  '🌊', '🔮', '🦄', '🐈', '☁️', '🌈', '🍋', '💜',
+] as const
 
-interface ColorsTabProps extends StudioTabProps {
-  /** Jumps to Advanced with a token focused. */
-  onEditToken: (token: keyof ThemeTokens) => void
-}
+/** Một hàng màu chạm-là-dùng: người dùng phổ thông chọn màu ở đây, không gõ mã hex. */
+const SUGGESTED_ACCENTS = [
+  '#8b7be8', '#ff7aa8', '#ff8a5c', '#f2b705', '#2fb58c',
+  '#3fa7f5', '#5b6cff', '#b05cff', '#e0294b', '#5a6474',
+] as const
 
 function randomHex(): string {
   // Random in OKLCH, not in RGB: uniform RGB noise is mostly muddy dark colours,
@@ -45,217 +33,203 @@ function randomHex(): string {
   return oklchToHex({ l, c, h: Math.random() * 360 })
 }
 
-export function ColorsTab({ draft, chrome, t, onEditToken }: ColorsTabProps) {
-  const { state, dispatch, definition } = draft
-  const { recipe } = state
-  const dark = recipe.mode === 'dark'
+const autoSecondary = (accent: string) => shiftHue(accent, AUTO_SECONDARY_HUE_SHIFT)
 
-  const panelHex = resolveTokenColors(definition.panel, dark ? '#12132a' : '#ffffff')[0]
+/**
+ * Tab đầu của Studio: mọi thứ một người dùng phổ thông cần để có một giao diện
+ * của riêng mình — tên, sáng/tối, một màu chính, độ rực — và một dòng cho biết
+ * chữ có đọc được không. Phần còn lại nằm ở "Nâng cao".
+ */
+export function ColorsTab({ draft, chrome, t }: StudioTabProps) {
+  const { state, dispatch, issues } = draft
+  const { recipe } = state
+  const [iconOpen, setIconOpen] = useState(false)
+
+  // "Tự động" không phải một cờ lưu riêng: màu phụ đang đúng bằng màu tự suy ra
+  // từ màu chính thì coi là đang tự động.
+  const secondaryAuto = recipe.secondary.toLowerCase() === autoSecondary(recipe.accent).toLowerCase()
+
+  const setAccent = (accent: string) =>
+    dispatch({
+      type: 'recipe',
+      patch: secondaryAuto ? { accent, secondary: autoSecondary(accent) } : { accent },
+    })
 
   const randomize = () => {
     const accent = randomHex()
     dispatch({
       type: 'recipe',
-      patch: {
-        accent,
-        secondary: shiftHue(accent, AUTO_SECONDARY_HUE_SHIFT),
-        highlight: shiftHue(accent, -120),
-      },
+      patch: { accent, secondary: autoSecondary(accent), highlight: shiftHue(accent, -120) },
     })
   }
 
+  const label = 'text-[12px] font-extrabold'
+  const blocked = hasBlockingIssue(issues)
+
   return (
     <div className="flex flex-col gap-4">
-      <button
-        type="button"
-        onClick={randomize}
-        className="flex h-8 items-center justify-center gap-1.5 rounded-[12px] border-[1.5px] text-[12px] font-extrabold"
-        style={{ borderColor: chrome.border, background: chrome.chip, color: chrome.text }}
-      >
-        <Shuffle className="size-3.5" />
-        {t.studioRandomize}
-      </button>
-
-      <ColorField
-        label={t.studioAccent}
-        value={recipe.accent}
-        onChange={(accent) => dispatch({ type: 'recipe', patch: { accent } })}
-        colors={chrome}
-      />
-
-      <div className="flex flex-col gap-1">
-        <ColorField
-          label={t.studioSecondary}
-          value={recipe.secondary}
-          onChange={(secondary) => dispatch({ type: 'recipe', patch: { secondary } })}
-          colors={chrome}
-        />
-        {/* Not derivable from the accent — the shipped presets disagree on even the
-            sign of the offset (lavender +51 degrees, cottoncandy -51) — so this is
-            an input with a suggestion, not a computed value. */}
+      <div className="flex items-end gap-2">
+        <label className="flex min-w-0 flex-1 flex-col gap-1.5">
+          <span className={label} style={{ color: chrome.mutedText }}>
+            {t.studioName}
+          </span>
+          <input
+            value={state.name}
+            onChange={(event) => dispatch({ type: 'identity', name: event.target.value })}
+            onFocus={(event) => state.isNew && event.target.select()}
+            placeholder={t.studioNamePh}
+            maxLength={40}
+            className="h-11 rounded-[12px] border-[1.5px] px-3 text-[16px] font-bold outline-none lg:h-10 lg:text-[14px]"
+            style={{ background: chrome.inputBg, borderColor: chrome.border, color: chrome.text }}
+          />
+        </label>
         <button
           type="button"
-          onClick={() =>
-            dispatch({
-              type: 'recipe',
-              patch: { secondary: shiftHue(recipe.accent, AUTO_SECONDARY_HUE_SHIFT) },
-            })
-          }
-          className="self-start text-[11px] font-extrabold underline"
-          style={{ color: chrome.accentText }}
+          onClick={() => setIconOpen((open) => !open)}
+          aria-expanded={iconOpen}
+          aria-label={t.studioIcon}
+          title={t.studioIcon}
+          className="grid size-11 shrink-0 place-items-center rounded-[12px] border-[1.5px] text-xl lg:size-10"
+          style={{ background: chrome.inputBg, borderColor: iconOpen ? chrome.accent : chrome.border }}
         >
-          {t.studioSecondaryAuto}
+          {state.icon}
         </button>
       </div>
 
-      <ColorField
-        label={t.studioHighlight}
-        value={recipe.highlight}
-        onChange={(highlight) => dispatch({ type: 'recipe', patch: { highlight } })}
-        colors={chrome}
-      />
-
-      {!dark && (
-        <div className="flex flex-col gap-1.5">
-          <span className="text-[11px] font-extrabold" style={{ color: chrome.mutedText }}>
-            {t.studioPaper}
-          </span>
-          <SegmentedControl
-            value={recipe.paper}
-            onChange={(paper) => dispatch({ type: 'recipe', patch: { paper } })}
-            options={[
-              { value: 'pure', label: t.studioPaperPure },
-              { value: 'tinted', label: t.studioPaperTinted },
-              { value: 'warm', label: t.studioPaperWarm },
-            ]}
-            trackColor={chrome.chip}
-            activeColor={chrome.accent}
-            activeTextColor="#ffffff"
-            textColor={chrome.mutedText}
-            aria-label={t.studioPaper}
-          />
-        </div>
+      {iconOpen && (
+        <EmojiField
+          value={state.icon}
+          onChange={(icon) => dispatch({ type: 'identity', icon })}
+          presets={THEME_ICON_PRESETS}
+          colors={chrome}
+          allowCustom
+          customPlaceholder={t.studioIconPh}
+          aria-label={t.studioIcon}
+        />
       )}
 
-      <SliderRow
-        label={t.studioIntensity}
-        value={recipe.intensity}
-        onChange={(intensity) => dispatch({ type: 'recipe', patch: { intensity } })}
-        chrome={chrome}
+      <SegmentedControl
+        value={recipe.mode}
+        onChange={(mode) => dispatch({ type: 'recipe', patch: { mode } })}
+        options={[
+          { value: 'light', label: t.studioModeLight },
+          { value: 'dark', label: t.studioModeDark },
+        ]}
+        trackColor={chrome.chip}
+        activeColor={chrome.accentFill}
+        activeTextColor={chrome.onAccent}
+        textColor={chrome.mutedText}
+        aria-label={t.studioMode}
       />
 
-      <SliderRow
-        label={t.studioSidebarDepth}
-        value={recipe.sidebarDepth}
-        onChange={(sidebarDepth) => dispatch({ type: 'recipe', patch: { sidebarDepth } })}
-        chrome={chrome}
-      />
-
-      {dark && (
-        <div className="flex flex-col gap-1.5">
-          <span className="text-[11px] font-extrabold" style={{ color: chrome.mutedText }}>
-            {t.studioLineTint}
+      <div className="flex flex-col gap-2">
+        <div className="flex items-center justify-between gap-2">
+          <span className={label} style={{ color: chrome.mutedText }}>
+            {t.studioAccent}
           </span>
-          {/* Dark-only: light presets paint lines as opaque surfaces where the
-              distinction does not exist. */}
-          <SegmentedControl
-            value={recipe.lineTint ?? 'white'}
-            onChange={(lineTint) => dispatch({ type: 'recipe', patch: { lineTint } })}
-            options={[
-              { value: 'white', label: t.studioLineTintWhite },
-              { value: 'accent', label: t.studioLineTintAccent },
-            ]}
-            trackColor={chrome.chip}
-            activeColor={chrome.accent}
-            activeTextColor="#ffffff"
-            textColor={chrome.mutedText}
-            aria-label={t.studioLineTint}
-          />
+          <button
+            type="button"
+            onClick={randomize}
+            className="flex min-h-9 items-center gap-1.5 rounded-full px-3 text-[12px] font-extrabold"
+            style={{ background: chrome.chip, color: chrome.text }}
+          >
+            <Shuffle className="size-3.5" />
+            {t.studioRandomize}
+          </button>
         </div>
-      )}
-
-      <div className="flex flex-col gap-1.5">
-        <div className="flex items-baseline justify-between gap-2">
-          <span className="text-[11px] font-extrabold" style={{ color: chrome.mutedText }}>
-            {t.studioTokens}
-          </span>
-          <div className="flex items-center gap-1.5">
-            <span className="text-[10px] font-bold" style={{ color: chrome.mutedText }}>
-              {t.studioAccent}
-            </span>
-            <ContrastBadge
-              ratio={contrastRatio(definition.text, panelHex)}
-              threshold={CONTRAST_LIMITS.textFloor}
-            />
-          </div>
-        </div>
-        <p className="text-[10px] font-semibold leading-snug" style={{ color: chrome.mutedText }}>
-          {t.studioTokensHint}
-        </p>
-        {/* Answers "what do my seven inputs actually do?" honestly, and doubles as
-            the route into per-token editing. */}
-        <div className="grid grid-cols-5 gap-1.5">
-          {TOKEN_STRIP.map((token) => (
-            <button
-              key={token}
-              type="button"
-              onClick={() => onEditToken(token)}
-              title={token}
-              className="flex flex-col items-center gap-1"
-            >
-              <span
-                className="h-7 w-full rounded-[8px] border"
+        <div className="grid grid-cols-5 gap-2" role="group" aria-label={t.studioSuggested}>
+          {SUGGESTED_ACCENTS.map((hex) => {
+            const active = recipe.accent.toLowerCase() === hex
+            return (
+              <button
+                key={hex}
+                type="button"
+                onClick={() => setAccent(hex)}
+                aria-label={hex}
+                aria-pressed={active}
+                className="h-11 rounded-[12px] border-[2.5px] transition-transform active:scale-95 lg:h-9"
                 style={{
-                  background: String(definition[token]),
-                  borderColor: state.overrides[token] ? chrome.accent : chrome.border,
-                  borderWidth: state.overrides[token] ? 2 : 1,
+                  background: hex,
+                  borderColor: active ? chrome.text : 'transparent',
+                  boxShadow: active ? `inset 0 0 0 2px ${chrome.panel}` : undefined,
                 }}
               />
-              <span
-                className="w-full truncate text-center text-[8px] font-bold"
-                style={{ color: chrome.mutedText }}
-              >
-                {token}
-              </span>
-            </button>
-          ))}
+            )
+          })}
+        </div>
+        <ColorField label="" value={recipe.accent} onChange={setAccent} colors={chrome} />
+      </div>
+
+      <div className="flex flex-col gap-2">
+        <div className="flex min-h-11 items-center justify-between gap-2">
+          <span className={label} style={{ color: chrome.mutedText }}>
+            {t.studioSecondaryAuto}
+          </span>
+          <Switch
+            checked={secondaryAuto}
+            onCheckedChange={(on) =>
+              dispatch({
+                type: 'recipe',
+                // Bật: về màu tự suy ra. Tắt: lệch đi 1° — đủ để không còn "tự
+                // động" và hiện ô màu, mà mắt không thấy khác.
+                patch: {
+                  secondary: on
+                    ? autoSecondary(recipe.accent)
+                    : shiftHue(recipe.accent, AUTO_SECONDARY_HUE_SHIFT + 1),
+                },
+              })
+            }
+            onColor={chrome.accentFill}
+            offColor={chrome.borderStrong}
+            aria-label={t.studioSecondaryAuto}
+          />
+        </div>
+        {!secondaryAuto && (
+          <ColorField
+            label={t.studioSecondary}
+            value={recipe.secondary}
+            onChange={(secondary) => dispatch({ type: 'recipe', patch: { secondary } })}
+            colors={chrome}
+          />
+        )}
+      </div>
+
+      <div className="flex flex-col gap-1.5">
+        <span className={label} style={{ color: chrome.mutedText }}>
+          {t.studioIntensity}
+        </span>
+        <Slider
+          value={recipe.intensity}
+          min={0}
+          max={1}
+          step={0.01}
+          onValueChange={(next) =>
+            dispatch({ type: 'recipe', patch: { intensity: typeof next === 'number' ? next : next[0] } })
+          }
+          trackColor={chrome.border}
+          rangeColor={chrome.accentFill}
+          aria-label={t.studioIntensity}
+        />
+        <div className="flex justify-between text-[11px] font-bold" style={{ color: chrome.mutedText }}>
+          <span>{t.studioIntensityLow}</span>
+          <span>{t.studioIntensityHigh}</span>
         </div>
       </div>
-    </div>
-  )
-}
 
-function SliderRow({
-  label,
-  value,
-  onChange,
-  chrome,
-}: {
-  label: string
-  value: number
-  onChange: (value: number) => void
-  chrome: StudioTabProps['chrome']
-}) {
-  return (
-    <div className="flex flex-col gap-1">
-      <div className="flex items-baseline justify-between">
-        <span className="text-[11px] font-extrabold" style={{ color: chrome.mutedText }}>
-          {label}
-        </span>
-        <span className="font-mono text-[10px] font-bold tabular-nums" style={{ color: chrome.mutedText }}>
-          {Math.round(value * 100)}%
+      <div
+        className="flex items-center gap-2 rounded-[14px] px-3 py-2.5 text-[12.5px] font-bold"
+        style={{ background: chrome.chip, color: blocked ? chrome.danger : chrome.text }}
+      >
+        {blocked ? (
+          <AlertTriangle className="size-4 shrink-0" />
+        ) : (
+          <CheckCircle2 className="size-4 shrink-0" style={{ color: chrome.income }} />
+        )}
+        <span>
+          <span style={{ color: chrome.mutedText }}>{t.studioReadability}: </span>
+          {blocked ? t.studioSaveBlocked : t.studioReadabilityOk}
         </span>
       </div>
-      <Slider
-        value={value}
-        min={0}
-        max={1}
-        step={0.01}
-        onValueChange={(next) => onChange(typeof next === 'number' ? next : next[0])}
-        trackColor={chrome.border}
-        rangeColor={chrome.accent}
-        aria-label={label}
-      />
     </div>
   )
 }

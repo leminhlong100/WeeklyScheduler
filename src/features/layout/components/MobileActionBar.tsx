@@ -13,7 +13,6 @@ import {
 interface MobileActionBarProps {
   theme: DerivedTheme
   t: Dictionary
-  currentThemeName: string
   onPrevWeek: () => void
   onNextWeek: () => void
   onToday: () => void
@@ -61,7 +60,6 @@ function BarButton({
 export function MobileActionBar({
   theme,
   t,
-  currentThemeName,
   onPrevWeek,
   onNextWeek,
   onToday,
@@ -118,7 +116,8 @@ export function MobileActionBar({
           </DropdownMenuItem>
           <DropdownMenuItem onClick={onOpenTheme}>
             <span className="text-base leading-none">🎨</span>
-            {currentThemeName}
+            {/* "Giao diện", không phải "Oải hương": tên theme không nói nút này làm gì. */}
+            {t.themeMenu}
           </DropdownMenuItem>
           <DropdownMenuItem onClick={onToggleStickerPanel}>
             <span className="text-base leading-none">🌈</span>

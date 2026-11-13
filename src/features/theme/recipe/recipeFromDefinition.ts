@@ -3,8 +3,7 @@ import type { ThemeDefinition, ThemeKey } from '../types'
 import {
   DARK_SURFACES,
   LIGHT_SURFACES,
-  SIDEBAR_DEPTH_RANGE,
-  SIDEBAR_L,
+  sidebarDepthV2,
   WARM_HUE,
 } from './buildTheme'
 import type { Hex, PaperStyle, ThemeRecipe } from './types'
@@ -81,16 +80,13 @@ function detectIntensity(def: ThemeDefinition, accentChroma: number): number {
 }
 
 /**
- * Recovers `sidebarDepth` from where the sidebar's mid stop actually sits.
- *
- * Presets authored lighter than the guard's ceiling read back as 0, which is
- * exact rather than lossy — the guard would darken them to the same place.
+ * Recovers `sidebarDepth` (công thức `v: 2`) from where the sidebar's mid stop
+ * actually sits. Không còn kẹp, nên preset nhạt như Chanh vàng dựng lại vẫn nhạt.
  */
-function detectSidebarDepth(def: ThemeDefinition): number {
+export function detectSidebarDepth(def: Pick<ThemeDefinition, 'sideGrad' | 'dark'>): number {
   const mid = midHex(def.sideGrad, '')
-  if (!mid) return 0
-  const band = def.dark ? 'dark' : 'light'
-  return clamp((SIDEBAR_L[band] - hexToOklch(mid).l) / SIDEBAR_DEPTH_RANGE[band], 0, 1)
+  if (!mid) return 0.5
+  return sidebarDepthV2(def.dark, hexToOklch(mid).l)
 }
 
 export function recipeFromDefinition(def: ThemeDefinition, basePreset: ThemeKey): ThemeRecipe {
@@ -110,6 +106,7 @@ export function recipeFromDefinition(def: ThemeDefinition, basePreset: ThemeKey)
     paper: def.dark ? 'tinted' : detectPaper(def.panel, accentHue),
     intensity: detectIntensity(def, accentChroma),
     sidebarDepth: detectSidebarDepth(def),
+    v: 2,
     // Dark presets express lines as alpha, so the tint is readable straight off
     // the string. Light presets are opaque hex surfaces where the distinction
     // does not exist, and 'white' is the value that reproduces them.

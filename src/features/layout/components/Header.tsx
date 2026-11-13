@@ -128,6 +128,10 @@ export function Header({
       <button
         type="button"
         onClick={onOpenTheme}
+        // Chữ trên nút là tên theme (người dùng thấy ngay mình đang dùng gì); nhãn
+        // cho trình đọc màn hình và tooltip nói rõ nút làm gì.
+        aria-label={`${t.themeMenu}: ${currentThemeName}`}
+        title={t.themeMenu}
         className="hidden h-10 flex-shrink-0 items-center justify-center gap-2 rounded-2xl border-[1.5px] px-[15px] text-[13.5px] font-bold transition-transform duration-150 active:scale-95 sm:flex"
         style={{ borderColor: theme.border, background: theme.chip, color: theme.text }}
       >

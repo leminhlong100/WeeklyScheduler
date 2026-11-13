@@ -5,6 +5,7 @@ import {
   ChevronRightIcon,
   DownloadIcon,
   EyeOffIcon,
+  PaletteIcon,
   PlusIcon,
   SettingsIcon,
   SlidersHorizontalIcon,
@@ -13,6 +14,7 @@ import {
 import { useTranslation } from '@/features/i18n/LocaleContext'
 import type { Locale } from '@/features/i18n/types'
 import { useTheme } from '@/features/theme/ThemeContext'
+import { useThemeUi } from '@/features/theme/components/ThemeUiProvider'
 
 const LANGUAGES: Array<[Locale, string]> = [
   ['vi', 'Tiếng Việt'],
@@ -49,6 +51,7 @@ export function MoreTab({
   const { t, locale, setLocale } = useTranslation()
   const { theme } = useTheme()
   const navigate = useNavigate()
+  const { openThemePicker } = useThemeUi()
 
   return (
     <div className="flex flex-col gap-4">
@@ -67,6 +70,7 @@ export function MoreTab({
             onClick={onCategories}
           />
         )}
+        <Row icon={PaletteIcon} label={t.themeMenu} onClick={openThemePicker} />
         <Row icon={EyeOffIcon} label={t.hideCustomTitle} onClick={onHideOptions} />
         <Row icon={DownloadIcon} label={t.exportCsv} onClick={onExportCsv} />
         <Row icon={CalendarDaysIcon} label={t.moreGoScheduler} onClick={() => navigate('/')} />

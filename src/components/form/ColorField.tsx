@@ -59,30 +59,33 @@ export function ColorField({
 
   return (
     <div className={cn('flex flex-col gap-1.5', className)}>
-      <div className="flex items-center justify-between gap-2">
-        <span className="text-[11px] font-extrabold" style={{ color: colors.mutedText }}>
-          {label}
-        </span>
-        <div className="flex items-center gap-1.5">
-          {badge}
-          {onReset && (
-            <button
-              type="button"
-              onClick={onReset}
-              aria-label={resetLabel}
-              title={resetLabel}
-              className="grid size-5 place-items-center rounded-md"
-              style={{ color: colors.mutedText }}
-            >
-              <RotateCcw className="size-3" />
-            </button>
-          )}
+      {(label || badge || onReset) && (
+        <div className="flex items-center justify-between gap-2">
+          <span className="text-[11px] font-extrabold" style={{ color: colors.mutedText }}>
+            {label}
+          </span>
+          <div className="flex items-center gap-1.5">
+            {badge}
+            {onReset && (
+              <button
+                type="button"
+                onClick={onReset}
+                aria-label={resetLabel}
+                title={resetLabel}
+                className="grid size-8 place-items-center rounded-md"
+                style={{ color: colors.mutedText }}
+              >
+                <RotateCcw className="size-3.5" />
+              </button>
+            )}
+          </div>
         </div>
-      </div>
+      )}
 
+      {/* Phone: 44px targets, and 16px text so iOS doesn't zoom the page on focus. */}
       <div className="flex items-center gap-2">
         <label
-          className="relative size-8 shrink-0 overflow-hidden rounded-[10px] border-[1.5px]"
+          className="relative size-8 shrink-0 overflow-hidden rounded-[10px] border-[1.5px] max-md:size-11"
           style={{ borderColor: colors.border, background: isHex(draft) ? draft : value }}
         >
           <input
@@ -90,7 +93,7 @@ export function ColorField({
             value={isHex(draft) ? normalizeHex(draft) : normalizeHex(value)}
             onChange={(event) => commit(event.target.value)}
             className="absolute inset-0 cursor-pointer opacity-0"
-            aria-label={label}
+            aria-label={label || value}
           />
         </label>
 
@@ -100,7 +103,8 @@ export function ColorField({
           onBlur={() => setDraft(value)}
           spellCheck={false}
           autoComplete="off"
-          className="h-8 min-w-0 flex-1 rounded-[10px] border-[1.5px] px-2 font-mono text-[12px] font-bold outline-none"
+          aria-label={label || undefined}
+          className="h-8 min-w-0 flex-1 rounded-[10px] border-[1.5px] px-2 font-mono text-[12px] font-bold outline-none max-md:h-11 max-md:text-[16px]"
           style={{
             background: colors.inputBg,
             // A live signal that the text isn't a colour yet, without an error row

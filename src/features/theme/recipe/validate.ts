@@ -24,8 +24,6 @@ export const CONTRAST_LIMITS = {
   textFloor: 4.5,
   /** `mint` ships 1.98:1, so warning starts just under it. */
   mutedWarn: 2,
-  /** Best of white or dark sidebar text (the sidebar picks whichever reads). */
-  sidebarWarn: 4.5,
   /** Text over the composited scene. */
   sceneWarn: 4.5,
 } as const
@@ -88,13 +86,6 @@ export function worstContrast(fg: string, token: string, base: string): number {
   return candidates.reduce((worst, hex) => Math.min(worst, contrastRatio(fg, hex)), Infinity)
 }
 
-/** The mid stop of `sideGrad`, or its only colour. */
-function sidebarMid(sideGrad: string): string | null {
-  const stops = sideGrad.match(HEX_GLOBAL)?.map((h) => h.toLowerCase())
-  if (!stops?.length) return null
-  return stops[1] ?? stops[0]
-}
-
 /**
  * Scene art is painted as an `opacity` layer directly on `mainBg` with nothing
  * between (`ThemeArtLayer.tsx:38-46`), so an sRGB mix of the two *is* what the
@@ -140,16 +131,9 @@ export function validateTheme(tokens: ThemeTokens, art?: ThemeArt | null): Theme
     issues.push({ code: 'themeIssueMuted', severity: 'warn', ratio: mutedRatio, token: 'muted' })
   }
 
-  // --- sidebar text ----------------------------------------------------------
-  // `deriveTheme` picks white or a dark tint for the sidebar text, whichever
-  // reads, so only a mid-tone gradient that neither can reach is a problem.
-  const mid = sidebarMid(tokens.sideGrad)
-  if (mid) {
-    const ratio = Math.max(contrastRatio('#ffffff', mid), contrastRatio('#000000', mid))
-    if (ratio < CONTRAST_LIMITS.sidebarWarn) {
-      issues.push({ code: 'themeIssueSidebar', severity: 'warn', ratio, token: 'sideGrad' })
-    }
-  }
+  // Không kiểm chữ thanh bên: `deriveTheme` chọn chữ trắng hoặc tối, và với mọi
+  // màu nền max(tương phản trắng, tương phản đen) ≥ √21 ≈ 4.58 — một cảnh báo
+  // "thanh bên khó đọc" không bao giờ có thể hiện ra.
 
   // --- text over the scene artwork -----------------------------------------
   // Worst case is the darkest scene cell under dark text, the lightest under

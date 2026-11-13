@@ -17,7 +17,7 @@ import { toLocalizedText } from '../utils/localizedText'
  */
 const PREVIEW_DEBOUNCE_MS = 60
 
-export type StudioTab = 'basics' | 'colors' | 'decor' | 'art' | 'advanced'
+export type StudioTab = 'colors' | 'decor' | 'advanced'
 
 export interface StudioState {
   /**
@@ -34,12 +34,11 @@ export interface StudioState {
   recipe: ThemeRecipe
   overrides: TokenOverrides
   art: ThemeArt | null
-  /** Whether anything has changed since the last save or reseed. */
+  /** Whether anything has changed since the studio opened. */
   dirty: boolean
 }
 
 export type StudioAction =
-  | { type: 'reseed'; preset: ThemeKey }
   | { type: 'identity'; name?: string; icon?: string }
   | { type: 'recipe'; patch: Partial<ThemeRecipe> }
   | { type: 'override'; patch: TokenOverrides }
@@ -50,7 +49,6 @@ export type StudioAction =
   | { type: 'addFigure'; figure: ThemeArtFigure }
   | { type: 'figure'; index: number; patch: Partial<ThemeArtFigure> }
   | { type: 'removeFigure'; index: number }
-  | { type: 'saved' }
 
 function recipeForPreset(preset: ThemeKey): ThemeRecipe {
   return recipeFromDefinition(getThemeDefinition(preset), preset)
@@ -71,14 +69,6 @@ function mergeArt(current: ThemeArt | null, patch: Partial<ThemeArt>): ThemeArt 
 
 function reducer(state: StudioState, action: StudioAction): StudioState {
   switch (action.type) {
-    case 'reseed': {
-      const recipe = recipeForPreset(action.preset)
-      // Overrides are dropped: they were deltas against the *old* preset's derived
-      // values, so carrying them over would paint the new palette with stale
-      // fragments of the previous one. Artwork and identity are the user's own and
-      // have nothing to do with which preset seeded the colours, so they stay.
-      return { ...state, recipe, overrides: {}, dirty: true }
-    }
     case 'identity':
       return {
         ...state,
@@ -140,8 +130,6 @@ function reducer(state: StudioState, action: StudioAction): StudioState {
       const figures = (state.art?.figures ?? []).filter((_, index) => index !== action.index)
       return { ...state, art: mergeArt(state.art, { figures }), dirty: true }
     }
-    case 'saved':
-      return { ...state, isNew: false, dirty: false }
   }
 }
 

@@ -10,9 +10,10 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { DownloadIcon } from 'lucide-react'
+import { DownloadIcon, PaletteIcon } from 'lucide-react'
 import { useTranslation } from '@/features/i18n/LocaleContext'
 import { useTheme } from '@/features/theme/ThemeContext'
+import { useThemeUi } from '@/features/theme/components/ThemeUiProvider'
 import { useSignOut } from '@/features/auth/hooks/useAuthMutations'
 import { useInstallPrompt } from '@/features/pwa/useInstallPrompt'
 import { useProfile } from '../hooks/useProfile'
@@ -28,6 +29,7 @@ export function UserMenu() {
   const { data: profile } = useProfile()
   const signOut = useSignOut()
   const { canInstall, promptInstall } = useInstallPrompt()
+  const { openThemePicker } = useThemeUi()
 
   const name = profile?.display_name ?? '…'
 
@@ -58,6 +60,11 @@ export function UserMenu() {
         <DropdownMenuGroup>
           <DropdownMenuLabel>{name}</DropdownMenuLabel>
         </DropdownMenuGroup>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem onClick={openThemePicker}>
+          <PaletteIcon className="size-4" />
+          {t.themeMenu}
+        </DropdownMenuItem>
         {canInstall && (
           <>
             <DropdownMenuSeparator />

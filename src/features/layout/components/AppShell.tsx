@@ -45,7 +45,7 @@ export function AppShell({
         className={cn(
           'relative z-[1] flex h-[100dvh] w-full max-w-full flex-col overflow-hidden rounded-none transition-[margin] duration-200 sm:h-[calc(100vh-52px)] sm:max-w-[1460px] sm:rounded-[26px]',
           // 380px dock + the 26px gutter on each side.
-          insetRight && 'md:mr-[406px]',
+          insetRight && 'lg:mr-[406px]',
         )}
         style={{
           background: theme.panel,

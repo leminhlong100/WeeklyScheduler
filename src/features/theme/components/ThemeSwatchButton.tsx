@@ -21,7 +21,7 @@ export function ThemeSwatchButton({
     <button
       type="button"
       onClick={onSelect}
-      className="relative overflow-hidden rounded-[20px] border-[2.5px] p-0 transition-transform hover:-translate-y-0.5"
+      className="relative w-full overflow-hidden rounded-[20px] border-[2.5px] p-0 transition-transform hover:-translate-y-0.5"
       style={{
         borderColor: active ? def.accent : activeTheme.border,
         background: activeTheme.chip,
@@ -37,7 +37,8 @@ export function ThemeSwatchButton({
             style={{ background: `${cssUrl(def.art.scene)} center/cover no-repeat` }}
           />
         )}
-        <div className="absolute top-2 right-2 text-base">{def.icon}</div>
+        {/* Bottom-right: the top-right corner holds the card's ⋯ menu. */}
+        <div className="absolute right-2 bottom-1.5 text-base">{def.icon}</div>
       </div>
       <div className="flex items-center gap-2 px-3 py-2.5">
         <span
@@ -51,7 +52,8 @@ export function ThemeSwatchButton({
       {active && (
         <div
           className="absolute top-2 left-2 grid h-6 w-6 place-items-center rounded-full bg-white text-sm font-extrabold shadow-md"
-          style={{ color: def.accent }}
+          // Fixed dark ink: the accent itself (lemon, peach…) is unreadable on white.
+          style={{ color: '#2f2a45', boxShadow: `0 0 0 2px ${def.accent}` }}
         >
           ✓
         </div>

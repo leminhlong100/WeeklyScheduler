@@ -79,6 +79,24 @@ function softenedOn(fg: string, bgs: string[]): string {
   return solveLightnessForContrast(candidate, worst, TEXT_AA + 0.1, goDarker ? 'darker' : 'lighter')
 }
 
+/**
+ * Màu chữ thanh bên cho một `sideGrad`, cùng tương phản tệ nhất của nó trên mọi
+ * nền thanh bên (các điểm dừng và lớp thẻ trắng 22% đè lên chúng).
+ *
+ * Dùng chung với `buildTheme`: công thức `v: 2` dựa vào con số `worst` để chỉnh
+ * gradient cho tới khi chữ đạt 4.5:1.
+ */
+export function sidebarTextFor(
+  sideGrad: string,
+  accent: string,
+): { text: string; worst: number; surfaces: string[] } {
+  const sideStops = hexStops(sideGrad)
+  const sideBase = sideStops.length ? sideStops : [accent]
+  const surfaces = [...sideBase, ...sideBase.map((s) => flattenAlpha('#ffffff', 0.22, s))]
+  const text = readableOn(surfaces, sideBase[Math.floor(sideBase.length / 2)])
+  return { text, worst: worstContrast(text, surfaces), surfaces }
+}
+
 /** Adds computed gradients/shadows on top of a theme's static tokens. */
 export function deriveTheme(def: ThemeDefinition): DerivedTheme {
   const { accent, dark, decorColors } = def
@@ -112,10 +130,7 @@ export function deriveTheme(def: ThemeDefinition): DerivedTheme {
   // đạt 1.15–2.66:1. Giờ chọn trắng hoặc chữ tối cùng tông theo gradient. Thẻ
   // và nút trong thanh bên là lớp trắng 13–22% đè lên gradient, nên tính cả các
   // nền đã phủ đó.
-  const sideStops = hexStops(def.sideGrad)
-  const sideBase = sideStops.length ? sideStops : [accent]
-  const sideSurfaces = [...sideBase, ...sideBase.map((s) => flattenAlpha('#ffffff', 0.22, s))]
-  const sidebarText = readableOn(sideSurfaces, sideBase[Math.floor(sideBase.length / 2)])
+  const { text: sidebarText, surfaces: sideSurfaces } = sidebarTextFor(def.sideGrad, accent)
   const sidebarMuted = softenedOn(sidebarText, sideSurfaces)
 
   // --- Nút tô màu nhấn ---------------------------------------------------------
