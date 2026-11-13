@@ -2,7 +2,7 @@ import { useMemo } from 'react'
 import { useTranslation } from '@/features/i18n/LocaleContext'
 import { useTheme } from '@/features/theme/ThemeContext'
 import { parseISODate, weekdayMondayIndex } from '@/lib/utils/date'
-import { formatMoney } from '@/lib/utils/formatMoney'
+import { formatSignedMoney } from '@/lib/utils/formatMoney'
 import { MaskedAmount } from './MaskedAmount'
 import type { Expense } from '../api/expensesApi'
 import type { ExpenseCategory } from '../api/expenseCategoriesApi'
@@ -64,7 +64,9 @@ export function ExpenseDayGroup({
                   className="text-[12px] font-extrabold tabular-nums"
                   style={{ color: INCOME_COLOR }}
                 >
-                  <MaskedAmount scope="day">{`+${formatMoney(s.income, s.currency, locale)}`}</MaskedAmount>
+                  <MaskedAmount scope="day">
+                    {formatSignedMoney(s.income, s.currency, locale, 'income')}
+                  </MaskedAmount>
                 </span>
               )}
               {s.expense > 0 && (
@@ -72,7 +74,9 @@ export function ExpenseDayGroup({
                   className="text-[12px] font-extrabold tabular-nums"
                   style={{ color: theme.text }}
                 >
-                  <MaskedAmount scope="day">{`−${formatMoney(s.expense, s.currency, locale)}`}</MaskedAmount>
+                  <MaskedAmount scope="day">
+                    {formatSignedMoney(s.expense, s.currency, locale, 'expense')}
+                  </MaskedAmount>
                 </span>
               )}
               {(s.plannedExpense > 0 || s.plannedIncome > 0) && (

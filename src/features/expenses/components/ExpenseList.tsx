@@ -88,7 +88,6 @@ export function ExpenseList({
           {yearCard}
           <ExpenseSummaryCard summaries={summaries} />
 
-
           <div className="flex flex-col gap-3.5">
             {days.map((group) => (
               <ExpenseDayGroup

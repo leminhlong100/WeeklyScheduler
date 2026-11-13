@@ -14,3 +14,13 @@ describe('formatMoney', () => {
     expect(formatMoney(40000, 'VND', 'vi')).toMatch(/^40\.000\s₫$/)
   })
 })
+
+import { formatSignedMoney } from './formatMoney'
+describe('formatSignedMoney', () => {
+  it('một quy tắc dấu', () => {
+    expect(formatSignedMoney(40000, 'VND', 'vi', 'expense')).toMatch(/^−40\.000\s₫$/)
+    expect(formatSignedMoney(40000, 'VND', 'vi', 'income')).toMatch(/^\+40\.000\s₫$/)
+    expect(formatSignedMoney(-5000, 'VND', 'vi', 'auto')).toMatch(/^−5\.000\s₫$/)
+    expect(formatSignedMoney(5000, 'VND', 'vi', 'auto')).toMatch(/^5\.000\s₫$/)
+  })
+})

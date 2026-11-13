@@ -51,3 +51,26 @@ export function formatPercent(ratio: number, locale: Locale): string {
     maximumFractionDigits: digits,
   }).format(ratio)
 }
+
+/** Dấu trừ thật (U+2212), cùng độ rộng với "+" trong font tabular-nums. */
+const MINUS = '−'
+
+/**
+ * Số tiền kèm dấu, MỘT quy tắc cho cả app:
+ * - `'expense'`: luôn "−40.000 ₫" (amount trong DB luôn dương, dấu nằm ở kind);
+ * - `'income'`: luôn "+40.000 ₫";
+ * - `'auto'` (số dư): âm thì "−", dương/0 không dấu.
+ * Trước đây hàng chi không có dấu nhưng tổng ngày lại có "−", và số dư âm đi
+ * qua `Intl` ra dấu "-" ngắn lệch cột.
+ */
+export function formatSignedMoney(
+  amount: number,
+  currency: Currency,
+  locale: Locale,
+  sign: 'expense' | 'income' | 'auto',
+): string {
+  const abs = formatMoney(Math.abs(amount), currency, locale)
+  if (sign === 'income') return `+${abs}`
+  if (sign === 'expense') return `${MINUS}${abs}`
+  return amount < 0 ? `${MINUS}${abs}` : abs
+}

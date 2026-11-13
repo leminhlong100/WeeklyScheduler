@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { ChevronDownIcon, ChevronUpIcon, EyeIcon, EyeOffIcon } from 'lucide-react'
 import { useTranslation } from '@/features/i18n/LocaleContext'
 import { useTheme } from '@/features/theme/ThemeContext'
-import { formatMoney } from '@/lib/utils/formatMoney'
+import { formatSignedMoney } from '@/lib/utils/formatMoney'
 import { useAmountVisibility, type AmountScope } from '../AmountVisibilityContext'
 import { MaskedAmount } from './MaskedAmount'
 import type { CurrencySummary } from '../utils/totals'
@@ -95,7 +95,9 @@ export function ExpenseSummaryCard({
                 className="font-heading text-[14px] font-extrabold tabular-nums"
                 style={{ color: s.balance < 0 ? NEGATIVE_COLOR : INCOME_COLOR }}
               >
-                <MaskedAmount scope={scope}>{formatMoney(s.balance, s.currency, locale)}</MaskedAmount>
+                <MaskedAmount scope={scope}>
+                  {formatSignedMoney(s.balance, s.currency, locale, 'auto')}
+                </MaskedAmount>
               </span>
               <ChevronDownIcon className="size-4" style={{ color: theme.muted }} />
             </span>
@@ -156,20 +158,20 @@ export function ExpenseSummaryCard({
             <Line
               scope={scope}
               label={t.expenseIncomeTotal}
-              value={`+${formatMoney(s.income, s.currency, locale)}`}
+              value={formatSignedMoney(s.income, s.currency, locale, 'income')}
               color={INCOME_COLOR}
             />
             <Line
               scope={scope}
               label={t.expenseExpenseTotal}
-              value={`−${formatMoney(s.expense, s.currency, locale)}`}
+              value={formatSignedMoney(s.expense, s.currency, locale, 'expense')}
               color={theme.text}
             />
             <div className="mt-0.5 border-t pt-1.5" style={{ borderColor: theme.border }}>
               <Line
-              scope={scope}
+                scope={scope}
                 label={t.expenseBalance}
-                value={formatMoney(s.balance, s.currency, locale)}
+                value={formatSignedMoney(s.balance, s.currency, locale, 'auto')}
                 // Âm là tín hiệu cần thấy ngay: tháng này tiêu quá thu.
                 color={s.balance < 0 ? NEGATIVE_COLOR : INCOME_COLOR}
                 strong
@@ -184,12 +186,16 @@ export function ExpenseSummaryCard({
                 <span>{t.expensePlannedNotCounted}</span>
                 {s.plannedExpense > 0 && (
                   <span className="tabular-nums">
-                    <MaskedAmount scope={scope}>{`−${formatMoney(s.plannedExpense, s.currency, locale)}`}</MaskedAmount>
+                    <MaskedAmount scope={scope}>
+                      {formatSignedMoney(s.plannedExpense, s.currency, locale, 'expense')}
+                    </MaskedAmount>
                   </span>
                 )}
                 {s.plannedIncome > 0 && (
                   <span className="tabular-nums">
-                    <MaskedAmount scope={scope}>{`+${formatMoney(s.plannedIncome, s.currency, locale)}`}</MaskedAmount>
+                    <MaskedAmount scope={scope}>
+                      {formatSignedMoney(s.plannedIncome, s.currency, locale, 'income')}
+                    </MaskedAmount>
                   </span>
                 )}
               </div>

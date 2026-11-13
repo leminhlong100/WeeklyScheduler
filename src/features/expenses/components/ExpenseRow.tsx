@@ -2,7 +2,7 @@ import { CheckIcon, PencilIcon, RepeatIcon, Trash2Icon } from 'lucide-react'
 import { useTranslation } from '@/features/i18n/LocaleContext'
 import { useTheme } from '@/features/theme/ThemeContext'
 import { translateExpenseCategoryName } from '@/features/i18n/defaultExpenseCategoryNames'
-import { formatMoney } from '@/lib/utils/formatMoney'
+import { formatSignedMoney } from '@/lib/utils/formatMoney'
 import { MaskedAmount } from './MaskedAmount'
 import type { Expense } from '../api/expensesApi'
 import type { ExpenseCategory } from '../api/expenseCategoriesApi'
@@ -91,7 +91,7 @@ export function ExpenseRow({ expense, category, onEdit, onDelete, onMarkPaid }: 
         style={{ color: isIncome ? INCOME_COLOR : theme.text }}
       >
         <MaskedAmount categoryId={expense.category_id}>
-          {`${isIncome ? '+' : ''}${formatMoney(expense.amount, expense.currency, locale)}`}
+          {formatSignedMoney(expense.amount, expense.currency, locale, expense.kind)}
         </MaskedAmount>
       </span>
 

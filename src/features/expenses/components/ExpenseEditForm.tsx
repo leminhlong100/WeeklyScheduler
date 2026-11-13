@@ -295,7 +295,11 @@ export function ExpenseEditForm({ expense, defaultDate, onDone }: ExpenseEditFor
                   invalid={!!errors.amount}
                   placeholder={t.expenseAmountPh}
                   style={inputStyle}
-                  chipStyle={{ borderColor: theme.border, background: theme.chip, color: theme.text }}
+                  chipStyle={{
+                    borderColor: theme.border,
+                    background: theme.chip,
+                    color: theme.text,
+                  }}
                 />
               )}
             />

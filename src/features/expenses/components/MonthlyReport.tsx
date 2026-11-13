@@ -7,7 +7,7 @@ import type { Dictionary } from '@/features/i18n/dictionary'
 import type { Locale } from '@/features/i18n/types'
 import type { DerivedTheme } from '@/features/theme/types'
 import { translateExpenseCategoryName } from '@/features/i18n/defaultExpenseCategoryNames'
-import { formatMoney, formatPercent } from '@/lib/utils/formatMoney'
+import { formatMoney, formatPercent, formatSignedMoney } from '@/lib/utils/formatMoney'
 import { MaskedAmount } from './MaskedAmount'
 import type { Currency, ExpenseKind } from '@/lib/supabase/database.types'
 import type { ExpenseCategory } from '../api/expenseCategoriesApi'
@@ -259,7 +259,7 @@ export function MonthlyReport({ month }: { month: MonthKey }) {
                   style={{ color: report.balance < 0 ? OVER_BUDGET_COLOR : INCOME_COLOR }}
                 >
                   <MaskedAmount scope="month">
-                    {formatMoney(report.balance, report.currency, locale)}
+                    {formatSignedMoney(report.balance, report.currency, locale, 'auto')}
                   </MaskedAmount>
                 </div>
               </div>
@@ -272,13 +272,17 @@ export function MonthlyReport({ month }: { month: MonthKey }) {
               <span className="text-[12.5px] font-bold" style={{ color: INCOME_COLOR }}>
                 {t.expenseIncomeTotal}{' '}
                 <span className="tabular-nums">
-                  <MaskedAmount scope="month">{`+${formatMoney(report.incomeTotal, report.currency, locale)}`}</MaskedAmount>
+                  <MaskedAmount scope="month">
+                    {formatSignedMoney(report.incomeTotal, report.currency, locale, 'income')}
+                  </MaskedAmount>
                 </span>
               </span>
               <span className="text-[12.5px] font-bold" style={{ color: theme.text }}>
                 {t.expenseExpenseTotal}{' '}
                 <span className="tabular-nums">
-                  <MaskedAmount scope="month">{`−${formatMoney(report.expenseTotal, report.currency, locale)}`}</MaskedAmount>
+                  <MaskedAmount scope="month">
+                    {formatSignedMoney(report.expenseTotal, report.currency, locale, 'expense')}
+                  </MaskedAmount>
                 </span>
               </span>
             </div>
@@ -308,12 +312,16 @@ export function MonthlyReport({ month }: { month: MonthKey }) {
                 <span>{t.expensePlannedNotCounted}</span>
                 {report.plannedExpense > 0 && (
                   <span className="tabular-nums">
-                    <MaskedAmount scope="month">{`−${formatMoney(report.plannedExpense, report.currency, locale)}`}</MaskedAmount>
+                    <MaskedAmount scope="month">
+                      {formatSignedMoney(report.plannedExpense, report.currency, locale, 'expense')}
+                    </MaskedAmount>
                   </span>
                 )}
                 {report.plannedIncome > 0 && (
                   <span className="tabular-nums">
-                    <MaskedAmount scope="month">{`+${formatMoney(report.plannedIncome, report.currency, locale)}`}</MaskedAmount>
+                    <MaskedAmount scope="month">
+                      {formatSignedMoney(report.plannedIncome, report.currency, locale, 'income')}
+                    </MaskedAmount>
                   </span>
                 )}
               </div>
