@@ -231,7 +231,6 @@ export function ArtTab({ draft, chrome, t, userId, onBusyChange }: ArtTabProps) 
     : []
 
   const sceneOpacity = art?.sceneOpacity ?? DEFAULT_SCENE_OPACITY
-  const sceneIssue = draft.issues.find((issue) => issue.code === 'themeIssueScene')
   const figures = art?.figures ?? []
 
   return (
@@ -285,33 +284,8 @@ export function ArtTab({ draft, chrome, t, userId, onBusyChange }: ArtTabProps) 
               rangeColor={chrome.accent}
               aria-label={t.studioSceneOpacity}
             />
-            {sceneIssue && (
-              // A fix, not just a complaint: the number offered is the highest
-              // opacity that still clears the text threshold.
-              <div className="flex items-center justify-between gap-2 pt-0.5">
-                <span className="text-[10px] font-bold" style={{ color: '#f0a92e' }}>
-                  {t.themeIssueScene} ({sceneIssue.ratio.toFixed(1)}:1)
-                </span>
-                {sceneIssue.suggestedOpacity !== undefined && (
-                  <button
-                    type="button"
-                    onClick={() =>
-                      dispatch({
-                        type: 'art',
-                        patch: { sceneOpacity: sceneIssue.suggestedOpacity },
-                      })
-                    }
-                    className="shrink-0 min-h-9 rounded-full px-3 text-[12px] font-extrabold"
-                    style={{ background: chrome.chip, color: chrome.text }}
-                  >
-                    {t.studioUseOpacity.replace(
-                      '{n}',
-                      String(Math.round(sceneIssue.suggestedOpacity * 100)),
-                    )}
-                  </button>
-                )}
-              </div>
-            )}
+            {/* Cảnh báo "tranh nền làm chữ khó đọc" + nút "Dùng N%" nằm ở dải cảnh
+                báo ghim cuối Studio (hiện ở mọi tab); lặp lại ở đây là hai lần. */}
           </div>
 
           <div className="flex flex-col gap-1.5">

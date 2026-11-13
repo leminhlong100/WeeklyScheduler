@@ -518,3 +518,7 @@ chính: Tạo → chọn 1 màu → (sáng/tối) → đặt tên → Lưu, tấ
     hiện ngay.
   - Vẫn chưa kiểm được: tải ảnh lên Supabase Storage thật và dọn ảnh mồ côi, bàn phím ảo, Back cứng, trình đọc màn
     hình, máy yếu.
+- 2026-11-14 (lượt 4) — Sửa cảnh báo tranh nền hiện hai lần: bỏ khối cảnh báo + nút "Dùng N%" dưới thanh độ mờ
+  trong `ArtTab.tsx`; chỉ còn dòng ở dải cảnh báo ghim cuối Studio (hiện ở mọi tab, cùng nút "Dùng N%" — đã kiểm ở
+  lượt 3). Test 334/334, typecheck, lint 0 lỗi. Chưa xem lại trên trình duyệt vì tab Tranh nền cần user giả, mà bản
+  giả đã gỡ.
