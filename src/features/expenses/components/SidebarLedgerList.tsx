@@ -29,9 +29,7 @@ export function SidebarLedgerList({
 
   return (
     <section>
-      <div className="mb-2.5 text-[13px] font-extrabold text-white/85">
-        {t.moreLedgers}
-      </div>
+      <div className="mb-2.5 text-[13px] font-extrabold text-white/85">{t.moreLedgers}</div>
       <div className="flex flex-col gap-1.5">
         {items.map((item) => {
           const active = item.id === ledgerId
