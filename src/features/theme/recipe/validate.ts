@@ -138,17 +138,28 @@ export function validateTheme(tokens: ThemeTokens, art?: ThemeArt | null): Theme
   // --- text over the scene artwork -----------------------------------------
   // Worst case is the darkest scene cell under dark text, the lightest under
   // light text — the cell that pulls the composite *toward* the text colour.
-  const cell = dark ? art?.sceneLightestCell : art?.sceneDarkestCell
-  if (art?.scene && cell) {
+  // The desktop and phone backdrops share one opacity, so the warning reports
+  // whichever of the two is harder to read and suggests an opacity that suits both.
+  const cells = [
+    art?.scene && (dark ? art.sceneLightestCell : art.sceneDarkestCell),
+    art?.mobileScene && (dark ? art.mobileSceneLightestCell : art.mobileSceneDarkestCell),
+  ].filter((cell): cell is string => !!cell)
+  if (art && cells.length > 0) {
     const opacity = art.sceneOpacity ?? 0.42
     const mainBg = resolveTokenColors(tokens.mainBg, fallbackBase)[0]
-    const ratio = contrastRatio(text, compositeScene(mainBg, cell, opacity))
-    if (ratio < CONTRAST_LIMITS.sceneWarn) {
+    let worst: { ratio: number; cell: string } | null = null
+    for (const cell of cells) {
+      const ratio = contrastRatio(text, compositeScene(mainBg, cell, opacity))
+      if (!worst || ratio < worst.ratio) worst = { ratio, cell }
+    }
+    if (worst && worst.ratio < CONTRAST_LIMITS.sceneWarn) {
       issues.push({
         code: 'themeIssueScene',
         severity: 'warn',
-        ratio,
-        suggestedOpacity: maxPassingOpacity(text, mainBg, cell, CONTRAST_LIMITS.sceneWarn),
+        ratio: worst.ratio,
+        suggestedOpacity: Math.min(
+          ...cells.map((cell) => maxPassingOpacity(text, mainBg, cell, CONTRAST_LIMITS.sceneWarn)),
+        ),
       })
     }
   }

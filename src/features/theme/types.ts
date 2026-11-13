@@ -63,6 +63,12 @@ export interface ThemeArtFigure {
 /** Optional illustration layers: scenery behind the grid/sidebar plus figures. */
 export interface ThemeArt {
   scene?: string
+  /**
+   * Portrait backdrop for phones. A landscape `scene` under `cover` on a tall
+   * screen keeps only a narrow vertical strip of the picture, so phones prefer
+   * this one and fall back to `scene` when it is absent.
+   */
+  mobileScene?: string
   sideScene?: string
   scenePosition?: string
   sceneOpacity?: number
@@ -73,6 +79,9 @@ export interface ThemeArt {
    */
   sceneDarkestCell?: string
   sceneLightestCell?: string
+  /** Same statistics for `mobileScene`. */
+  mobileSceneDarkestCell?: string
+  mobileSceneLightestCell?: string
 }
 
 /** Static design tokens for one theme, ported from the design's `themeDef()`. */

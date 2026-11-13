@@ -42,6 +42,8 @@ type CropRequest = {
 /** First entry is the default frame for each slot. */
 const CROP_RATIOS: Record<ThemeImageKind, (number | null)[]> = {
   scene: [16 / 9, 21 / 9, 4 / 3, null],
+  // 9:19.5 is the shape of most current phones; 9:16 suits older/shorter ones.
+  mobileScene: [9 / 19.5, 9 / 16, 3 / 4, null],
   sideScene: [9 / 16, 3 / 4, null],
   figure: [null, 1, 3 / 4, 4 / 3],
 }
@@ -50,6 +52,7 @@ const RATIO_LABELS = new Map<number, string>([
   [21 / 9, '21:9'],
   [4 / 3, '4:3'],
   [9 / 16, '9:16'],
+  [9 / 19.5, '9:19.5'],
   [3 / 4, '3:4'],
   [1, '1:1'],
 ])
@@ -122,7 +125,9 @@ export function ArtTab({ draft, chrome, t, userId, onBusyChange }: ArtTabProps) 
       const previous =
         kind === 'scene'
           ? art?.scene
-          : kind === 'sideScene'
+          : kind === 'mobileScene'
+            ? art?.mobileScene
+            : kind === 'sideScene'
             ? art?.sideScene
             : figureIndex !== undefined
               ? art?.figures?.[figureIndex]?.src
@@ -146,6 +151,15 @@ export function ArtTab({ draft, chrome, t, userId, onBusyChange }: ArtTabProps) 
             sceneLightestCell: prepared.lightestCell,
           },
         })
+      } else if (kind === 'mobileScene') {
+        dispatch({
+          type: 'art',
+          patch: {
+            mobileScene: localUrl,
+            mobileSceneDarkestCell: prepared.darkestCell,
+            mobileSceneLightestCell: prepared.lightestCell,
+          },
+        })
       } else {
         dispatch({ type: 'art', patch: { sideScene: localUrl } })
       }
@@ -161,6 +175,7 @@ export function ArtTab({ draft, chrome, t, userId, onBusyChange }: ArtTabProps) 
       const index = figureIndex ?? (art?.figures?.length ?? 0)
       if (kind === 'figure') dispatch({ type: 'figure', index, patch: { src: remoteUrl } })
       else if (kind === 'scene') dispatch({ type: 'art', patch: { scene: remoteUrl } })
+      else if (kind === 'mobileScene') dispatch({ type: 'art', patch: { mobileScene: remoteUrl } })
       else dispatch({ type: 'art', patch: { sideScene: remoteUrl } })
 
       if (localUrl) {
@@ -174,7 +189,14 @@ export function ArtTab({ draft, chrome, t, userId, onBusyChange }: ArtTabProps) 
         void removeThemeArt([previous]).catch(() => {})
       }
 
-      setSlot(slot, { busy: false, error: prepared.warning })
+      // `warning` is a dictionary key, not display text.
+      const warningText = prepared.warning
+        ? t[prepared.warning as keyof typeof t]
+        : undefined
+      setSlot(slot, {
+        busy: false,
+        error: typeof warningText === 'string' ? warningText : prepared.warning,
+      })
     } catch (error) {
       if (localUrl) {
         URL.revokeObjectURL(localUrl)
@@ -255,7 +277,37 @@ export function ArtTab({ draft, chrome, t, userId, onBusyChange }: ArtTabProps) 
         aspect="16 / 9"
       />
 
-      {art?.scene && (
+      <ImageDropField
+        label={t.studioMobileScene}
+        hint={t.studioMobileSceneHint}
+        value={art?.mobileScene ?? null}
+        onPick={(file) => requestCrop('mobile', 'mobileScene', file)}
+        onEdit={
+          art?.mobileScene
+            ? () => void editExisting('mobile', 'mobileScene', art.mobileScene!)
+            : undefined
+        }
+        editLabel={t.studioCropEdit}
+        onClear={() =>
+          dispatch({
+            type: 'art',
+            patch: {
+              mobileScene: undefined,
+              mobileSceneDarkestCell: undefined,
+              mobileSceneLightestCell: undefined,
+            },
+          })
+        }
+        colors={chrome}
+        busy={slots.mobile?.busy}
+        error={slots.mobile?.error}
+        clearLabel={t.studioRemove}
+        aspect="9 / 16"
+        className="max-w-[160px]"
+      />
+
+      {/* Opacity and anchor apply to both backdrops, so they show for either. */}
+      {(art?.scene || art?.mobileScene) && (
         <>
           <div className="flex flex-col gap-1">
             <div className="flex items-baseline justify-between gap-2">

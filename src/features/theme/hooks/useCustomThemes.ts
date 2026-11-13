@@ -21,6 +21,7 @@ function referencedArtUrls(themes: CustomThemeRecord[]): string[] {
     if (!art) return []
     return [
       art.scene,
+      art.mobileScene,
       art.sideScene,
       ...(art.figures ?? []).map((figure) => figure.src),
     ].filter((url): url is string => !!url)

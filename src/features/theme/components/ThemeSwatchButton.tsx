@@ -17,6 +17,7 @@ export function ThemeSwatchButton({
   locale,
   onSelect,
 }: ThemeSwatchButtonProps) {
+  const swatchScene = def.art?.scene ?? def.art?.mobileScene
   return (
     <button
       type="button"
@@ -31,10 +32,10 @@ export function ThemeSwatchButton({
         {/* A theme's backdrop is the most recognisable thing about it, so the band
             shows it rather than just the sidebar gradient. Presets leave `art`
             undefined and are unaffected. */}
-        {def.art?.scene && (
+        {swatchScene && (
           <div
             className="absolute inset-0 opacity-40"
-            style={{ background: `${cssUrl(def.art.scene)} center/cover no-repeat` }}
+            style={{ background: `${cssUrl(swatchScene)} center/cover no-repeat` }}
           />
         )}
         {/* Bottom-right: the top-right corner holds the card's ⋯ menu. */}

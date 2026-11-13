@@ -63,7 +63,8 @@ function mergeArt(current: ThemeArt | null, patch: Partial<ThemeArt>): ThemeArt 
   if (next.figures?.length === 0) delete next.figures
   // An art object with no scene, no side scene and no figures renders nothing;
   // keeping it would persist `{}` and make `theme.art` truthy for no reason.
-  const hasContent = !!next.scene || !!next.sideScene || !!next.figures?.length
+  const hasContent =
+    !!next.scene || !!next.mobileScene || !!next.sideScene || !!next.figures?.length
   return hasContent ? next : null
 }
 

@@ -53,7 +53,10 @@ export function ThemeArtLayer({ theme, variant }: ThemeArtLayerProps) {
   const isMain = variant === 'main'
   const isPage = variant === 'page'
   const ownSideScene = variant === 'sidebar' ? art.sideScene : undefined
-  const scene = ownSideScene ?? art.scene
+  // Phones prefer the portrait backdrop: `cover` on a tall screen would keep only
+  // a thin vertical strip of the landscape one.
+  const sharedScene = isMobile ? (art.mobileScene ?? art.scene) : art.scene
+  const scene = ownSideScene ?? sharedScene
   const figures = isMain ? art.figures : undefined
   if (!scene && !figures?.length) return null
 

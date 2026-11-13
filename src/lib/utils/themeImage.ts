@@ -9,7 +9,7 @@ import { relativeLuminance } from './color'
  * has to travel to Storage and back on every cold load.
  */
 
-export type ThemeImageKind = 'scene' | 'sideScene' | 'figure'
+export type ThemeImageKind = 'scene' | 'mobileScene' | 'sideScene' | 'figure'
 
 interface KindSpec {
   /** Contain box. Images are only ever scaled down. */
@@ -36,9 +36,21 @@ const SPECS: Record<ThemeImageKind, KindSpec> = {
     flatten: true,
     trim: false,
     soft: 260 * 1024,
-    hard: 500 * 1024,
+    hard: 700 * 1024,
     minEdge: 960,
     minEdgeAxis: 'w',
+  },
+  mobileScene: {
+    // Portrait phone screen; 1920 tall covers a 1080x2400 display at its CSS
+    // size with room to spare.
+    box: { w: 1080, h: 1920 },
+    quality: 0.82,
+    flatten: true,
+    trim: false,
+    soft: 260 * 1024,
+    hard: 700 * 1024,
+    minEdge: 1000,
+    minEdgeAxis: 'h',
   },
   sideScene: {
     box: { w: 660, h: 1600 },
@@ -46,7 +58,7 @@ const SPECS: Record<ThemeImageKind, KindSpec> = {
     flatten: true,
     trim: false,
     soft: 190 * 1024,
-    hard: 380 * 1024,
+    hard: 520 * 1024,
     minEdge: 800,
     minEdgeAxis: 'h',
   },
@@ -58,14 +70,51 @@ const SPECS: Record<ThemeImageKind, KindSpec> = {
     flatten: false,
     trim: true,
     soft: 110 * 1024,
-    hard: 220 * 1024,
+    hard: 300 * 1024,
     minEdge: 192,
     minEdgeAxis: 'max',
   },
 }
 
-const MAX_ATTEMPTS = 3
-const OUTPUT_MIME = 'image/webp'
+/**
+ * One quality step, then repeated 0.85x shrinks. 0.85^6 ≈ 0.38 of the box edge
+ * (~14% of the pixels), which brings even a noisy photo under the soft budget —
+ * the old 3-attempt loop gave up after a single 0.8x shrink and rejected
+ * ordinary phone photos.
+ */
+const MAX_ATTEMPTS = 8
+const SHRINK = 0.85
+/** Never shrink below this edge; past it the image is useless anyway. */
+const MIN_OUTPUT_EDGE = 96
+
+type OutputMime = 'image/webp' | 'image/jpeg' | 'image/png'
+
+let webpSupport: Promise<boolean> | null = null
+
+/**
+ * Whether `canvas.toBlob` can actually write WebP here.
+ *
+ * Safari ignores an unsupported type and silently returns PNG — which also
+ * ignores `quality`, so every compression step became a no-op and a 1920x1080
+ * backdrop came out at several MB. Probed once on a 1x1 canvas.
+ */
+function canEncodeWebp(): Promise<boolean> {
+  webpSupport ??= new Promise((resolve) => {
+    const canvas = makeCanvas(1, 1)
+    canvas.toBlob((blob) => resolve(blob?.type === 'image/webp'), 'image/webp', 0.8)
+  })
+  return webpSupport
+}
+
+/**
+ * WebP where available. Otherwise JPEG for the flattened backdrops (no alpha to
+ * lose, and it honours `quality`) and PNG for figures, which need transparency
+ * and rely on the shrink steps alone.
+ */
+async function outputMime(flatten: boolean): Promise<OutputMime> {
+  if (await canEncodeWebp()) return 'image/webp'
+  return flatten ? 'image/jpeg' : 'image/png'
+}
 
 export interface PreparedThemeImage {
   blob: Blob
@@ -208,11 +257,11 @@ function cellColors(canvas: HTMLCanvasElement, cols = 6, rows = 4): string[] {
   return out
 }
 
-function toBlob(canvas: HTMLCanvasElement, quality: number): Promise<Blob> {
+function toBlob(canvas: HTMLCanvasElement, mime: OutputMime, quality: number): Promise<Blob> {
   return new Promise((resolve, reject) => {
     canvas.toBlob(
       (blob) => (blob ? resolve(blob) : reject(new ThemeImageError('themeImageFailed'))),
-      OUTPUT_MIME,
+      mime,
       quality,
     )
   })
@@ -249,6 +298,9 @@ export async function prepareThemeImage(
   if (measured < spec.minEdge) warning = 'themeImageTooSmall'
   else if (kind === 'figure' && !hasAlpha) warning = 'themeWarnNoAlpha'
 
+  const mime = await outputMime(spec.flatten)
+  const lossy = mime !== 'image/png'
+
   let boxScale = 1
   let quality = spec.quality
   let best: { blob: Blob; canvas: HTMLCanvasElement } | null = null
@@ -267,18 +319,31 @@ export async function prepareThemeImage(
     ctx.imageSmoothingQuality = 'high'
     ctx.drawImage(source, crop.x, crop.y, crop.w, crop.h, 0, 0, canvas.width, canvas.height)
 
-    const blob = await toBlob(canvas, quality)
+    const blob = await toBlob(canvas, mime, quality)
     best = { blob, canvas }
     if (blob.size <= spec.soft) break
+    if (Math.max(canvas.width, canvas.height) * SHRINK < MIN_OUTPUT_EDGE) break
 
-    if (attempt === 0) quality = Math.max(0.5, quality - 0.12)
-    else boxScale *= 0.8
+    // Quality first (cheap, keeps resolution), then resolution. PNG has no
+    // quality knob, so it goes straight to shrinking.
+    if (attempt === 0 && lossy) quality = Math.max(0.6, quality - 0.12)
+    else boxScale *= SHRINK
   }
 
   if (!best) throw new ThemeImageError('themeImageFailed')
   if (best.blob.size > spec.hard) {
     throw new ThemeImageError('themeImageTooBig', { n: Math.round(best.blob.size / 1024) })
   }
+
+  // Only flag a shrink the user would notice: the output ended up below the
+  // size this slot needs to stay sharp, and the source was not already that small.
+  const outEdge =
+    spec.minEdgeAxis === 'w'
+      ? best.canvas.width
+      : spec.minEdgeAxis === 'h'
+        ? best.canvas.height
+        : Math.max(best.canvas.width, best.canvas.height)
+  if (!warning && boxScale < 1 && outEdge < spec.minEdge) warning = 'themeImageShrunk'
 
   const cells = cellColors(best.canvas)
   const sorted = cells
@@ -289,7 +354,8 @@ export async function prepareThemeImage(
 
   return {
     blob: best.blob,
-    mime: OUTPUT_MIME,
+    // The blob's own type is the truth; `mime` is only what was asked for.
+    mime: best.blob.type || mime,
     w: best.canvas.width,
     h: best.canvas.height,
     bytes: best.blob.size,

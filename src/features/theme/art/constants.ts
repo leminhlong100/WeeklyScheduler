@@ -15,8 +15,11 @@ export const ART_BUCKET = 'theme-art'
  */
 export const ART_PREFIX = `${import.meta.env.VITE_SUPABASE_URL}/storage/v1/object/public/${ART_BUCKET}/`
 
-/** The five art slots. One object per slot per theme, hence the 20-theme cap. */
-export const ART_SLOTS = ['scene', 'side', 'figure1', 'figure2', 'figure3'] as const
+/**
+ * The art slots. One object per slot per theme, hence the 20-theme cap.
+ * `mobile` is the portrait backdrop phones use instead of the landscape `scene`.
+ */
+export const ART_SLOTS = ['scene', 'mobile', 'side', 'figure1', 'figure2', 'figure3'] as const
 export type ArtSlot = (typeof ART_SLOTS)[number]
 
 /**

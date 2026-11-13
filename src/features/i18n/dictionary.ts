@@ -175,6 +175,8 @@ export interface Dictionary {
   // --- artwork tab ---
   studioScene: string
   studioSceneHint: string
+  studioMobileScene: string
+  studioMobileSceneHint: string
   studioSceneOpacity: string
   studioScenePosition: string
   studioPosCenterBottom: string
@@ -249,6 +251,7 @@ export interface Dictionary {
   themeImageTooSmall: string
   themeImageFailed: string
   themeWarnNoAlpha: string
+  themeImageShrunk: string
   stickerCatLove: string
   stickerCatNature: string
   stickerCatAnimals: string

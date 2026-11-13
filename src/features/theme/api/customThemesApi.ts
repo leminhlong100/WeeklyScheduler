@@ -18,7 +18,7 @@ export async function listCustomThemes(userId: string): Promise<CustomThemeRow[]
 /**
  * The id is generated here rather than by the database.
  *
- * Artwork lives at `<userId>/<themeId>/<slot>-<ts>.webp`, so the theme has to
+ * Artwork lives at `<userId>/<themeId>/<slot>-<ts>.<webp|jpg|png>`, so the theme has to
  * have an id before its first upload — which happens while the user is still
  * editing, long before the row exists. `Insert.id?: string` accommodates this.
  */
@@ -102,7 +102,10 @@ export async function uploadThemeArt(args: {
   blob: Blob
   mime: string
 }): Promise<string> {
-  const path = `${args.userId}/${args.themeId}/${args.slot}-${Date.now()}.webp`
+  // The encoder falls back to JPEG/PNG where the browser cannot write WebP
+  // (Safari), so the extension follows the real type rather than assuming it.
+  const ext = args.mime === 'image/jpeg' ? 'jpg' : args.mime === 'image/png' ? 'png' : 'webp'
+  const path = `${args.userId}/${args.themeId}/${args.slot}-${Date.now()}.${ext}`
   const { error } = await supabase.storage.from(ART_BUCKET).upload(path, args.blob, {
     contentType: args.mime,
     upsert: false,

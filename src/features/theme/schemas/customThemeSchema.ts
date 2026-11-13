@@ -91,12 +91,15 @@ export const themeArtFigureSchema = z.object({
 
 export const themeArtSchema = z.object({
   scene: artUrl.optional(),
+  mobileScene: artUrl.optional(),
   sideScene: artUrl.optional(),
   scenePosition: z.enum(SCENE_POSITIONS).optional(),
   sceneOpacity: unitInterval.optional(),
   figures: z.array(themeArtFigureSchema).max(MAX_FIGURES).optional(),
   sceneDarkestCell: hexColor.optional(),
   sceneLightestCell: hexColor.optional(),
+  mobileSceneDarkestCell: hexColor.optional(),
+  mobileSceneLightestCell: hexColor.optional(),
 })
 
 /** `THEME_KEYS` is declared as an array, so the tuple shape `z.enum` wants has
