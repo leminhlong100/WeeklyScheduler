@@ -8,6 +8,8 @@ import {
 } from 'lucide-react'
 import { useTranslation } from '@/features/i18n/LocaleContext'
 import { useTheme } from '@/features/theme/ThemeContext'
+import { useKeyboardOpen } from '@/hooks/useVisualViewport'
+import { cn } from '@/lib/utils'
 import type { ExpenseView } from '../hooks/useExpensesUrlState'
 
 interface Props {
@@ -27,6 +29,9 @@ interface Props {
 export function ExpenseBottomNav({ view, onChange, onAdd }: Props) {
   const { t } = useTranslation()
   const { theme } = useTheme()
+  // Android co layout khi bàn phím mở: thanh dưới (57px + nút ＋ nhô lên) sẽ nằm
+  // ngay trên bàn phím và ăn mất vùng xem kết quả tìm. Đang gõ thì ẩn hẳn.
+  const keyboardOpen = useKeyboardOpen()
 
   const item = (key: ExpenseView, label: string, Icon: LucideIcon) => {
     const active = view === key
@@ -48,7 +53,10 @@ export function ExpenseBottomNav({ view, onChange, onAdd }: Props) {
   return (
     <nav
       aria-label={t.navExpenses}
-      className="relative z-[60] flex flex-shrink-0 items-stretch border-t px-1 pb-[env(safe-area-inset-bottom)] md:hidden"
+      className={cn(
+        'relative z-[60] flex flex-shrink-0 items-stretch border-t px-1 pb-[env(safe-area-inset-bottom)] md:hidden',
+        keyboardOpen && 'hidden',
+      )}
       style={{ background: theme.panel, borderColor: theme.border }}
     >
       {item('overview', t.navOverview, HomeIcon)}

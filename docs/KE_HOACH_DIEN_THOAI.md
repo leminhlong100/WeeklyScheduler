@@ -340,7 +340,7 @@ nếu cấu hình sai, khiến app không mở được offline). Thông báo ph
 
 - [x] **M1.1** Back đóng sheet/drawer/hộp xác nhận (`useBackToClose`)
 - [ ] **M1.2** SheetDialog khung cố định + `visualViewport` cho iOS (cần iPhone để chốt)
-- [ ] **M1.3** Ẩn thanh dưới khi bàn phím mở
+- [x] **M1.3** Ẩn thanh dưới khi bàn phím mở
 - [ ] **M1.4** Lưu offline báo ngay, giữ form (`networkMode: 'always'` + thông điệp)
 - [ ] **M1.5** Bỏ cache Supabase REST trong SW (chờ Q6)
 - [ ] **M1.6** Kiểm tra bản mới khi app quay lại từ nền
@@ -368,6 +368,9 @@ nếu cấu hình sai, khiến app không mở được offline). Thông báo ph
   AmountVisibility/CategoryManager/LedgerSettings, ConfirmDialog, drawer mobile. Harness 375×812: mở ＋ ở `?tab=report` → `history.back()` → sheet đóng,
   URL vẫn `?tab=report`; Sửa → Hủy 5 lần không để lại mục thừa (state về `{usr,key,idx}`); Danh mục → Xoá → Back → chỉ hộp xác nhận đóng (độ sâu 2→1);
   đổi tab rồi Back vẫn về tab trước (C1); chọn tháng trong MonthPicker không để lại mục (đổi URL đợi `popstate` — `whenHistorySettles`). Cần chủ repo thử Back cứng/cử chỉ trên Android.
+- 2026-11-13 — **M1.3 xong (harness).** `useKeyboardOpen()` trong `src/hooks/useVisualViewport.ts`, hàm thuần `src/lib/utils/viewport.ts` (có test).
+  `harness.html?tab=transactions`: 812 + focus ô tìm → thanh dưới vẫn `flex`; thu còn 375×470 → `display: none`, vùng cuộn 348 → **405px**; blur → `flex`.
+  Pane trình duyệt bị ẩn nên `resize`/`focusin`/`focusout` phải bắn tay (trang không có focus hệ thống). Cần chủ repo thử gõ ô tìm trên Android + iPhone.
 
 ---
 
