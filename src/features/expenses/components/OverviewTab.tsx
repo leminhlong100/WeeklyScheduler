@@ -15,6 +15,7 @@ import { LedgerBalanceCard } from './LedgerBalanceCard'
 import { ExpenseRow } from './ExpenseRow'
 import { MaskedAmount } from './MaskedAmount'
 import { EyeToggle } from './EyeToggle'
+import { DataFreshness, type QueryLike } from './QueryStatus'
 
 interface OverviewTabProps {
   month: MonthKey
@@ -29,6 +30,8 @@ interface OverviewTabProps {
   onSeeReport: () => void
   onEdit?: (expense: Expense) => void
   onMarkPaid?: (expense: Expense) => void
+  /** Query của tháng đang xem: hiện "Cập nhật lúc … · Làm mới" dưới thẻ chính. */
+  query?: QueryLike
 }
 
 /**
@@ -47,6 +50,7 @@ export function OverviewTab({
   onSeeReport,
   onEdit,
   onMarkPaid,
+  query,
 }: OverviewTabProps) {
   const { t } = useTranslation()
   const today = todayISO()
@@ -77,6 +81,8 @@ export function OverviewTab({
           onSetBudget={canEdit ? onOpenCategories : undefined}
         />
       )}
+
+      {query && <DataFreshness query={query} />}
 
       {isEmptyCurrentMonth && canEdit && (
         <EmptyState onAdd={onAdd} onOpenCategories={onOpenCategories} />

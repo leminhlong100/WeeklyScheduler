@@ -396,6 +396,9 @@ export interface Dictionary {
   loadErrorTitle: string
   loadErrorHint: string
   offlineNotice: string
+  /** Dòng nhỏ dưới thẻ chính của Tổng quan: "Cập nhật lúc {time}". */
+  dataUpdatedAtTime: string
+  refreshData: string
   loadingLabel: string
   expenseMonthTotal: string
   expenseYearTotal: string

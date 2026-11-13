@@ -361,6 +361,8 @@ export const zh: Dictionary = {
   loadErrorTitle: '无法加载数据',
   loadErrorHint: '请检查网络后重试。',
   offlineNotice: '离线 · 数据更新于 {time}',
+  dataUpdatedAtTime: '更新于 {time}',
+  refreshData: '刷新',
   loadingLabel: '加载中…',
   expenseMonthTotal: '本月合计',
   expenseYearTotal: '全年合计',

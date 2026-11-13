@@ -223,6 +223,7 @@ function ExpensesPageContent() {
               onSeeReport={() => setView('report')}
               onEdit={canEdit ? setEditTarget : undefined}
               onMarkPaid={canEdit ? handleMarkPaid : undefined}
+              query={expensesQuery}
             />
           </QueryStatus>
         )}

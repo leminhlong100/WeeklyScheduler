@@ -362,6 +362,8 @@ export const ja: Dictionary = {
   loadErrorTitle: 'データを読み込めませんでした',
   loadErrorHint: '接続を確認してもう一度お試しください。',
   offlineNotice: 'オフライン · {time} 時点のデータ',
+  dataUpdatedAtTime: '{time} に更新',
+  refreshData: '再読み込み',
   loadingLabel: '読み込み中…',
   expenseMonthTotal: '今月の合計',
   expenseYearTotal: '年間合計',

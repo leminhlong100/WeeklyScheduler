@@ -363,6 +363,8 @@ export const en: Dictionary = {
   loadErrorTitle: 'Couldn\'t load your data',
   loadErrorHint: 'Check your connection and try again.',
   offlineNotice: 'Offline · data from {time}',
+  dataUpdatedAtTime: 'Updated at {time}',
+  refreshData: 'Refresh',
   loadingLabel: 'Loading…',
   expenseMonthTotal: 'Month total',
   expenseYearTotal: 'Year total',

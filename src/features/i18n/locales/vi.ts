@@ -362,6 +362,8 @@ export const vi: Dictionary = {
   loadErrorTitle: 'Không tải được dữ liệu',
   loadErrorHint: 'Kiểm tra kết nối mạng rồi thử lại.',
   offlineNotice: 'Đang ngoại tuyến · dữ liệu lúc {time}',
+  dataUpdatedAtTime: 'Cập nhật lúc {time}',
+  refreshData: 'Làm mới',
   loadingLabel: 'Đang tải…',
   expenseMonthTotal: 'Tổng tháng',
   expenseYearTotal: 'Tổng năm',

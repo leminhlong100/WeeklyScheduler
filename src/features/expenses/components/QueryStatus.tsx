@@ -3,6 +3,7 @@ import { CloudOffIcon, RotateCwIcon } from 'lucide-react'
 import { useTranslation } from '@/features/i18n/LocaleContext'
 import { useTheme } from '@/features/theme/ThemeContext'
 import { useOnlineStatus } from '@/hooks/useOnlineStatus'
+import { formatClockTime } from '@/lib/utils/formatTime'
 
 /** Phần của một kết quả TanStack Query mà khối trạng thái cần đọc. */
 export interface QueryLike {
@@ -10,6 +11,8 @@ export interface QueryLike {
   isError: boolean
   isPlaceholderData?: boolean
   dataUpdatedAt: number
+  /** Đang tải lại ngầm (đã có dữ liệu). */
+  isFetching?: boolean
   refetch: () => unknown
 }
 
@@ -78,12 +81,7 @@ export function QueryStatus({ query, skeletonRows = 3, children }: QueryStatusPr
     )
   }
 
-  const time = query.dataUpdatedAt
-    ? new Date(query.dataUpdatedAt).toLocaleTimeString(locale, {
-        hour: '2-digit',
-        minute: '2-digit',
-      })
-    : ''
+  const time = formatClockTime(query.dataUpdatedAt, locale)
 
   return (
     <>
@@ -104,5 +102,43 @@ export function QueryStatus({ query, skeletonRows = 3, children }: QueryStatusPr
         {children}
       </div>
     </>
+  )
+}
+
+/**
+ * "Cập nhật lúc HH:mm · Làm mới" — thay cho kéo-để-tải-lại (PWA iOS không có,
+ * và React Query đã tự tải lại khi app quay về). Đủ để biết số đang xem là của
+ * lúc nào và tự tải lại khi nghi ngờ.
+ *
+ * Mất mạng thì ẩn: dải ngoại tuyến của `QueryStatus` đã nói giờ của dữ liệu, và
+ * "Làm mới" lúc đó chỉ ra lỗi.
+ */
+export function DataFreshness({ query }: { query: QueryLike }) {
+  const { t, locale } = useTranslation()
+  const { theme } = useTheme()
+  const online = useOnlineStatus()
+  if (!online || query.dataUpdatedAt === 0) return null
+  const busy = !!query.isFetching
+  return (
+    <div
+      className="-mt-2 flex items-center justify-end gap-1 text-[12px] font-bold"
+      style={{ color: theme.mutedText }}
+    >
+      <span aria-live="polite">
+        {t.dataUpdatedAtTime.replace('{time}', formatClockTime(query.dataUpdatedAt, locale))}
+      </span>
+      <span aria-hidden>·</span>
+      <button
+        type="button"
+        onClick={() => void query.refetch()}
+        disabled={busy}
+        aria-busy={busy}
+        className="flex min-h-11 items-center gap-1 rounded-[10px] px-2 font-extrabold disabled:opacity-60"
+        style={{ color: theme.accent }}
+      >
+        <RotateCwIcon className={busy ? 'size-3.5 animate-spin' : 'size-3.5'} />
+        {t.refreshData}
+      </button>
+    </div>
   )
 }

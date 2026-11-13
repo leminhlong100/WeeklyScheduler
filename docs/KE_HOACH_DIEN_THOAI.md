@@ -350,7 +350,7 @@ nếu cấu hình sai, khiến app không mở được offline). Thông báo ph
 - [x] **M3.2** Rung nhẹ khi lưu (Android)
 - [ ] **M3.3** Web Share Target cho SMS ngân hàng (chờ Q8)
 - [ ] **M3.4** Vuốt trái để xoá
-- [ ] **M3.5** "Cập nhật lúc … · Làm mới"
+- [x] **M3.5** "Cập nhật lúc … · Làm mới"
 - [ ] **M4** Nhắc buổi tối bằng Web Push (kế hoạch riêng, chờ Q9)
 - [ ] Sau mỗi đợt: chủ repo thử trên iPhone + Android thật, cả PWA đã cài lẫn trình duyệt
 
@@ -406,6 +406,10 @@ nếu cấu hình sai, khiến app không mở được offline). Thông báo ph
   chuỗi định kỳ, bản nháp AI) và `onSuccess` của `markPaidWithUndo`. Harness (giả `navigator.vibrate` đếm, giả `supabase.rest.fetch`): "Đã trả" lỗi mạng →
   **0** lần rung; "Đã trả" thành công → **1** lần (`12`). Đường "thêm khoản" không thử được trên harness (không có user) — cùng hàm, có unit test.
   Q10 chưa trả lời: bật mặc định, chưa có nút tắt. Cần chủ repo cảm nhận rung trên Android; iOS không rung, không lỗi.
+- 2026-11-13 — **M3.5 xong (harness).** `DataFreshness` (trong `QueryStatus.tsx`) dưới thẻ chính của Tổng quan: "Cập nhật lúc HH:mm · Làm mới"
+  (`dataUpdatedAt` + `refetch`, nút cao **44px**, đang tải thì `disabled` + `aria-busy="true"` + icon xoay; offline thì ẩn vì dải A2 đã ghi giờ).
+  i18n `dataUpdatedAtTime`/`refreshData` đủ 4 ngôn ngữ; `formatClockTime` dùng chung với dải ngoại tuyến (có test). Harness (giả `supabase.rest.fetch`
+  chờ rồi trả, giả đồng hồ +7 phút): bấm Làm mới → trong lúc tải nút khoá, `aria-busy=true`; xong → giờ đổi 22:54 → 23:01.
 
 ---
 
