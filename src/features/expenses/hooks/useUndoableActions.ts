@@ -42,7 +42,9 @@ if (typeof document !== 'undefined') {
 export function useUndoableActions() {
   const { t } = useTranslation()
   const queryClient = useQueryClient()
-  const updateExpense = useUpdateExpense()
+  // Chỉ lấy `mutate` (ổn định giữa các lần render), không lấy cả object kết quả
+  // (đổi mỗi lần render): `markPaidWithUndo` phải ổn định để dòng `memo` không vẽ lại.
+  const { mutate: updateExpense } = useUpdateExpense()
 
   const refreshExpenses = useCallback(
     () => queryClient.invalidateQueries({ queryKey: ['expenses'] }),
@@ -86,7 +88,7 @@ export function useUndoableActions() {
 
   const markPaidWithUndo = useCallback(
     (expense: Expense) => {
-      updateExpense.mutate(
+      updateExpense(
         { id: expense.id, patch: { status: 'paid' } },
         {
           onSuccess: () =>
@@ -96,8 +98,7 @@ export function useUndoableActions() {
                 duration: UNDO_MS,
                 action: {
                   label: t.undo,
-                  onClick: () =>
-                    updateExpense.mutate({ id: expense.id, patch: { status: 'planned' } }),
+                  onClick: () => updateExpense({ id: expense.id, patch: { status: 'planned' } }),
                 },
               },
             ),

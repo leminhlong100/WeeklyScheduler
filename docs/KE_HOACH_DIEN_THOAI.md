@@ -345,7 +345,7 @@ nếu cấu hình sai, khiến app không mở được offline). Thông báo ph
 - [ ] **M1.5** Bỏ cache Supabase REST trong SW (chờ Q6)
 - [x] **M1.6** Kiểm tra bản mới khi app quay lại từ nền
 - [ ] **M2.1** Mở app vào thẳng Chi tiêu (chờ Q7)
-- [ ] **M2.2** Danh sách dài: đo → `memo` → `useDeferredValue` → `content-visibility`
+- [ ] **M2.2** Danh sách dài: đo → `memo` → `useDeferredValue` → `content-visibility` — *bước 1–4 đã làm; tiêu chí chuyển tab < 200 ms ở throttle 6× **ước tính chưa đạt**, xem Nhật ký*
 - [ ] **M3.1** Manifest `shortcuts` + `?add=1`
 - [ ] **M3.2** Rung nhẹ khi lưu (Android)
 - [ ] **M3.3** Web Share Target cho SMS ngân hàng (chờ Q8)
@@ -383,6 +383,20 @@ nếu cấu hình sai, khiến app không mở được offline). Thông báo ph
   `bottom: keyboardInset`, và kéo ô đang gõ vào chỗ thấy khi bàn phím đổi cỡ. Harness 375×812 (Nhập tay, cuộn hết): thanh nút y 738–811, thân cuộn kết thúc 811,
   **không còn phần tử nào dưới thanh nút** (P9), `overscroll-behavior: contain` (P10). 375×470: ô tiền 281–337, Lưu 409–453. `?debugKbInset=320` (chỉ dev):
   sheet `bottom: 320px`, Lưu 431–475 ngay trên mép bàn phím giả 492; focus Ghi chú → ô ở 222–266, trên thanh nút. Desktop: hộp giữa 460px như cũ.
+- 2026-11-13 — **M2.2: làm bước 1–4, CHƯA đánh [x].** `ExpenseRow` + `ExpenseDayGroup` bọc `memo`, callback ổn định nhận `expense` (bỏ closure mỗi dòng;
+  `markPaidWithUndo` dùng `mutate` ổn định), lọc theo `useDeferredValue(filter)`, nhóm ngày `content-visibility: auto; contain-intrinsic-size: auto 300px`.
+  Đo `perf.html?n=500`, 375×812, **không throttle** (công cụ của tôi không bật được CPU throttle của DevTools), "chặn" = thời gian handler chạy đồng bộ,
+  "xong" = tới khi danh sách đổi, "layout" = reflow ép sau đó:
+  | | Dev trước | Dev sau | **Build trước** | **Build sau** |
+  |---|---|---|---|---|
+  | Mở tab Giao dịch (render / layout) | 290–350 / 107–125 ms | 260–288 / 6–7 ms | 61–83 / 78–92 ms | 60–84 / 5–9 ms |
+  | Gõ 1 ký tự: chặn | 114–127 ms | 16–46 ms | 31–42 ms | **3–6 ms** (danh sách xong 13–19 ms) |
+  | Gõ ký tự 2: chặn | 79–94 ms | 28–32 ms | 9–12 ms | 3–5 ms |
+  | Xoá ô tìm (vẽ lại 500 dòng): chặn / layout | 357–378 / 85–89 ms | 26–28 / 1 ms | 52–58 / 85–95 ms | **3–6** / 1 ms (danh sách xong 46–70 ms, không chặn) |
+  Kết quả lọc giống trước ("bú" 56 dòng, "grab" 55, xoá → 500); bấm dòng mở đúng form. Ước tính ×6 cho điện thoại tầm trung: gõ phím ≈ 18–36 ms (**đạt** < 50),
+  mở tab ≈ (65–93 ms) × 6 ≈ 400–560 ms (**chưa đạt** < 200). Phần còn lại là React dựng 500 dòng lần đầu — `memo`/`content-visibility` không giúp được.
+  Bước 5 (ảo hoá, vướng nhóm "Sắp tới" và tiêu đề ngày) **không làm** vì chưa đo được trên máy thật: cần chủ repo đo bằng bản build trên Android
+  (Chrome remote DevTools, Performance) rồi quyết. Cấu hình build harness hiệu năng: `harness/perf.vite.config.mts` (bị exclude, không commit).
 
 ---
 

@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useDeferredValue, useMemo, useState } from 'react'
 import { toast } from 'sonner'
 import { useIsMobile, useIsTouchDevice } from '@/hooks/useMediaQuery'
 import { useSessionStorageState } from '@/hooks/useSessionStorageState'
@@ -126,9 +126,12 @@ function ExpensesPageContent() {
     () => new Map(categories.map((c) => [c.id, translateExpenseCategoryName(c.name, t)] as const)),
     [categories, t],
   )
+  // Ô tìm đọc `filter` ngay; danh sách lọc theo bản hoãn. Gõ phím không phải đợi
+  // vẽ lại vài trăm dòng — React vẽ danh sách sau, và bỏ dở nếu có phím mới.
+  const deferredFilter = useDeferredValue(filter)
   const visibleExpenses = useMemo(
-    () => filterExpenses(expenses, filter, { matchAmount: !amountsHidden, categoryNames }),
-    [expenses, filter, amountsHidden, categoryNames],
+    () => filterExpenses(expenses, deferredFilter, { matchAmount: !amountsHidden, categoryNames }),
+    [expenses, deferredFilter, amountsHidden, categoryNames],
   )
 
   // Đang xem tháng này thì điền hôm nay; xem tháng khác thì điền ngày 1 của

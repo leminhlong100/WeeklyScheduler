@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { memo, useMemo } from 'react'
 import { useTranslation } from '@/features/i18n/LocaleContext'
 import { useTheme } from '@/features/theme/ThemeContext'
 import { parseISODate, todayISO, weekdayMondayIndex } from '@/lib/utils/date'
@@ -28,7 +28,8 @@ interface ExpenseDayGroupProps {
  * có kỳ chưa trả thì ghi thêm một cụm mờ — để con số ở tiêu đề không bao giờ
  * lệch so với các dòng bên dưới mà người đọc không hiểu tại sao.
  */
-export function ExpenseDayGroup({
+/** `memo`: gõ ô tìm đổi `filter` của danh sách nhưng nhóm ngày không đổi thì khỏi vẽ lại. */
+export const ExpenseDayGroup = memo(function ExpenseDayGroup({
   date,
   expenses,
   categoryById,
@@ -52,7 +53,10 @@ export function ExpenseDayGroup({
         : `${t.dow[weekdayMondayIndex(day)]}, ${day.format('DD/MM')}`)
 
   return (
-    <section className="flex flex-col gap-2">
+    // `content-visibility: auto`: ngày nằm ngoài màn hình thì trình duyệt bỏ qua
+    // layout/vẽ (Chrome 85+, Safari 18+; nơi khác bỏ qua vô hại). Kích thước ước
+    // lượng `auto 300px` được thay bằng cỡ thật sau lần vẽ đầu.
+    <section className="flex flex-col gap-2 [contain-intrinsic-size:auto_300px] [content-visibility:auto]">
       <div className="flex flex-wrap items-baseline gap-x-2.5 gap-y-0.5 px-1">
         <span
           className="text-[13px] font-extrabold"
@@ -121,11 +125,11 @@ export function ExpenseDayGroup({
             key={expense.id}
             expense={expense}
             category={expense.category_id ? (categoryById.get(expense.category_id) ?? null) : null}
-            onEdit={onEdit && (() => onEdit(expense))}
-            onMarkPaid={onMarkPaid && (() => onMarkPaid(expense))}
+            onEdit={onEdit}
+            onMarkPaid={onMarkPaid}
           />
         ))}
       </div>
     </section>
   )
-}
+})

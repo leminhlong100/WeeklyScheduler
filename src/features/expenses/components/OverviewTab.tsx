@@ -100,8 +100,8 @@ export function OverviewTab({
                 key={e.id}
                 expense={e}
                 category={e.category_id ? (categoryById.get(e.category_id) ?? null) : null}
-                onEdit={onEdit ? () => onEdit(e) : undefined}
-                onMarkPaid={onMarkPaid ? () => onMarkPaid(e) : undefined}
+                onEdit={onEdit}
+                onMarkPaid={onMarkPaid}
               />
             ))}
           </div>
@@ -116,7 +116,7 @@ export function OverviewTab({
                 key={e.id}
                 expense={e}
                 category={e.category_id ? (categoryById.get(e.category_id) ?? null) : null}
-                onEdit={onEdit ? () => onEdit(e) : undefined}
+                onEdit={onEdit}
               />
             ))}
           </div>

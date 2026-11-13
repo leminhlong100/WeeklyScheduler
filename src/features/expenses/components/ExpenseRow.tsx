@@ -1,3 +1,4 @@
+import { memo } from 'react'
 import { CheckIcon, RepeatIcon } from 'lucide-react'
 import { useTranslation } from '@/features/i18n/LocaleContext'
 import { useTheme } from '@/features/theme/ThemeContext'
@@ -16,12 +17,22 @@ interface ExpenseRowProps {
   /** Null khi danh mục đã bị xoá — hàng vẫn hiện, chỉ mất nhãn. */
   category: ExpenseCategory | null
   /** Bỏ trống khi chỉ được xem (sổ người khác chia sẻ): hàng không bấm được. */
-  onEdit?: () => void
+  onEdit?: (expense: Expense) => void
   /** Chỉ gọi được với dòng `status = 'planned'`: xác nhận đã trả/đã nhận thật. */
-  onMarkPaid?: () => void
+  onMarkPaid?: (expense: Expense) => void
 }
 
-export function ExpenseRow({ expense, category, onEdit, onMarkPaid }: ExpenseRowProps) {
+/**
+ * `memo`: tháng có vài trăm dòng, mỗi phím gõ ở ô tìm trước đây vẽ lại mọi dòng.
+ * Cha truyền callback ổn định nhận `expense` (không tạo closure mới cho từng
+ * dòng), nên dòng không đổi thì không vẽ lại.
+ */
+export const ExpenseRow = memo(function ExpenseRow({
+  expense,
+  category,
+  onEdit,
+  onMarkPaid,
+}: ExpenseRowProps) {
   const { t, locale } = useTranslation()
   const { theme } = useTheme()
 
@@ -50,7 +61,7 @@ export function ExpenseRow({ expense, category, onEdit, onMarkPaid }: ExpenseRow
       {onEdit && (
         <button
           type="button"
-          onClick={onEdit}
+          onClick={() => onEdit(expense)}
           aria-label={`${isIncome ? t.editIncome : t.editExpense}: ${title}`}
           className="absolute inset-0 rounded-2xl transition-colors active:bg-black/5"
         />
@@ -119,7 +130,7 @@ export function ExpenseRow({ expense, category, onEdit, onMarkPaid }: ExpenseRow
         {isPlanned && onMarkPaid && (
           <button
             type="button"
-            onClick={onMarkPaid}
+            onClick={() => onMarkPaid(expense)}
             className="relative z-[1] flex min-h-11 items-center gap-1 rounded-full px-3 sm:min-h-9 text-[12px] font-extrabold transition-transform active:scale-95"
             style={{ background: `${theme.income}1f`, color: theme.income }}
           >
@@ -130,4 +141,4 @@ export function ExpenseRow({ expense, category, onEdit, onMarkPaid }: ExpenseRow
       </div>
     </div>
   )
-}
+})
