@@ -5,9 +5,6 @@ import { useLedgerBalance } from '../hooks/useLedgers'
 import { subtractAmounts } from '../utils/money'
 import { MaskedAmount } from './MaskedAmount'
 
-const INCOME_COLOR = '#2fc39a'
-const NEGATIVE_COLOR = '#d93a3a'
-
 /**
  * Số dư của cả sổ từ ngày đầu tới nay — câu hỏi chính khi giữ tiền hộ: "tiền
  * của em còn bao nhiêu". Tổng tháng/năm không trả lời được câu đó, vì tiền gửi
@@ -25,12 +22,12 @@ export function LedgerBalanceCard({ ledgerId }: { ledgerId: string }) {
       className="flex flex-col gap-2.5 rounded-[18px] border-[1.5px] px-4 py-3.5"
       style={{ borderColor: theme.accent, background: theme.chip }}
     >
-      <div className="text-[12px] font-extrabold" style={{ color: theme.muted }}>
+      <div className="text-[12px] font-extrabold" style={{ color: theme.mutedText }}>
         {t.ledgerBalanceTitle}
       </div>
 
       {balances.length === 0 ? (
-        <div className="text-[13px] font-semibold" style={{ color: theme.muted }}>
+        <div className="text-[13px] font-semibold" style={{ color: theme.mutedText }}>
           {t.ledgerBalanceEmpty}
         </div>
       ) : (
@@ -45,7 +42,7 @@ export function LedgerBalanceCard({ ledgerId }: { ledgerId: string }) {
                 </span>
                 <span
                   className="font-heading text-[22px] font-extrabold tabular-nums"
-                  style={{ color: remaining < 0 ? NEGATIVE_COLOR : theme.text }}
+                  style={{ color: remaining < 0 ? theme.danger : theme.text }}
                 >
                   <MaskedAmount scope="year">
                     {formatSignedMoney(remaining, b.currency, locale, 'auto')}
@@ -53,13 +50,13 @@ export function LedgerBalanceCard({ ledgerId }: { ledgerId: string }) {
                 </span>
               </div>
               <div className="flex flex-wrap justify-between gap-x-4 gap-y-0.5 text-[12px] font-bold tabular-nums">
-                <span style={{ color: INCOME_COLOR }}>
+                <span style={{ color: theme.income }}>
                   {t.ledgerBalanceIn}{' '}
                   <MaskedAmount scope="year">
                     {formatSignedMoney(b.income, b.currency, locale, 'income')}
                   </MaskedAmount>
                 </span>
-                <span style={{ color: theme.muted }}>
+                <span style={{ color: theme.mutedText }}>
                   {t.ledgerBalanceOut}{' '}
                   <MaskedAmount scope="year">
                     {formatSignedMoney(b.expense, b.currency, locale, 'expense')}

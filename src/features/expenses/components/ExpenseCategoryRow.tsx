@@ -35,7 +35,7 @@ export function ExpenseCategoryRow({ category, onEdit, onDelete }: ExpenseCatego
         </div>
         {/* Hạn mức luôn tính bằng đơn vị tiền mặc định — xem chú thích DEFAULT_CURRENCY. */}
         {category.monthly_budget != null && (
-          <div className="truncate text-[11.5px] font-semibold" style={{ color: theme.muted }}>
+          <div className="truncate text-[11.5px] font-semibold" style={{ color: theme.mutedText }}>
             {t.reportBudget}{' '}
             <MaskedAmount categoryId={category.id}>
               {formatMoney(category.monthly_budget, DEFAULT_CURRENCY, locale)}
@@ -49,7 +49,7 @@ export function ExpenseCategoryRow({ category, onEdit, onDelete }: ExpenseCatego
         onClick={onEdit}
         aria-label={t.editExpenseCategory}
         className="grid h-8 w-8 flex-shrink-0 place-items-center rounded-lg"
-        style={{ color: theme.muted }}
+        style={{ color: theme.mutedText }}
       >
         <PencilIcon className="size-4" />
       </button>

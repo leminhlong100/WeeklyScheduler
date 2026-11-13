@@ -56,7 +56,7 @@ export function ExpenseFilters({ value, onChange, categories, resultCount }: Exp
       <div className="relative">
         <SearchIcon
           className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2"
-          style={{ color: theme.muted }}
+          style={{ color: theme.mutedText }}
         />
         <input
           type="search"
@@ -76,7 +76,7 @@ export function ExpenseFilters({ value, onChange, categories, resultCount }: Exp
             onClick={() => onChange({ ...value, query: '' })}
             aria-label={t.filterClear}
             className="absolute right-2 top-1/2 grid size-7 -translate-y-1/2 place-items-center rounded-lg"
-            style={{ color: theme.muted }}
+            style={{ color: theme.mutedText }}
           >
             <XIcon className="size-4" />
           </button>
@@ -139,7 +139,7 @@ export function ExpenseFilters({ value, onChange, categories, resultCount }: Exp
             type="button"
             onClick={() => onChange({ query: '', kind: 'all', categoryId: 'all' })}
             className="flex h-9 items-center gap-1.5 rounded-[11px] border-[1.5px] px-2.5 text-[12px] font-bold transition-transform duration-150 active:scale-95"
-            style={{ borderColor: theme.border, background: theme.chip, color: theme.muted }}
+            style={{ borderColor: theme.border, background: theme.chip, color: theme.mutedText }}
           >
             <XIcon className="size-3.5" />
             {t.filterClear}

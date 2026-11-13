@@ -65,7 +65,7 @@ export function LedgerBar({
           aria-label={t.ledgerNew}
           title={t.ledgerNew}
           className="grid size-8 flex-shrink-0 place-items-center rounded-full border-[1.5px] transition-transform duration-150 active:scale-95"
-          style={{ borderColor: theme.border, background: theme.chip, color: theme.muted }}
+          style={{ borderColor: theme.border, background: theme.chip, color: theme.mutedText }}
         >
           <PlusIcon className="size-4" />
         </button>
@@ -76,7 +76,7 @@ export function LedgerBar({
             aria-label={t.ledgerSettings}
             title={t.ledgerSettings}
             className="grid size-8 flex-shrink-0 place-items-center rounded-full border-[1.5px] transition-transform duration-150 active:scale-95"
-            style={{ borderColor: theme.border, background: theme.chip, color: theme.muted }}
+            style={{ borderColor: theme.border, background: theme.chip, color: theme.mutedText }}
           >
             <SettingsIcon className="size-4" />
           </button>
@@ -86,7 +86,7 @@ export function LedgerBar({
       {info && info.role !== 'owner' && (
         <div
           className="flex items-center gap-2 rounded-[14px] border-[1.5px] border-dashed px-3 py-2 text-[12.5px] font-bold"
-          style={{ borderColor: theme.border, color: theme.muted }}
+          style={{ borderColor: theme.border, color: theme.mutedText }}
         >
           <EyeIcon className="size-4 flex-shrink-0" />
           <span>{t.ledgerViewOnly.replace('{name}', info.owner_name)}</span>

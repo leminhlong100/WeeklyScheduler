@@ -12,8 +12,6 @@ import { buildMonthlyReport, UNCATEGORIZED, type CurrencyReport } from '../utils
 import { DEFAULT_CURRENCY } from '../schemas/expenseSchema'
 import { MaskedAmount } from './MaskedAmount'
 
-const OVER_BUDGET_COLOR = '#d93a3a'
-
 const SIZE = 160
 const STROKE = 28
 const RADIUS = (SIZE - STROKE) / 2
@@ -138,7 +136,7 @@ function CurrencyStats({ report }: { report: CurrencyReport }) {
         centerBottom={spentOfIncome !== null ? t.statsSpentOfIncome : t.expenseExpenseTotal}
       />
 
-      <div className="text-center text-[11px] font-semibold" style={{ color: theme.muted }}>
+      <div className="text-center text-[11px] font-semibold" style={{ color: theme.mutedText }}>
         {spentOfIncome !== null ? t.statsBasisIncome : t.statsBasisExpense}
       </div>
 
@@ -156,8 +154,8 @@ function CurrencyStats({ report }: { report: CurrencyReport }) {
               style={
                 s.overBudget
                   ? {
-                      background: `${OVER_BUDGET_COLOR}1a`,
-                      boxShadow: `inset 3px 0 0 ${OVER_BUDGET_COLOR}`,
+                      background: `${theme.danger}1a`,
+                      boxShadow: `inset 3px 0 0 ${theme.danger}`,
                     }
                   : undefined
               }
@@ -171,26 +169,26 @@ function CurrencyStats({ report }: { report: CurrencyReport }) {
                 <span>{s.emoji}</span>
                 <span
                   className="min-w-0 flex-1 truncate font-bold"
-                  style={{ color: s.overBudget ? OVER_BUDGET_COLOR : theme.text }}
+                  style={{ color: s.overBudget ? theme.danger : theme.text }}
                 >
                   {s.name}
                 </span>
                 {s.overBudget && (
                   <TriangleAlertIcon
                     className="size-4 flex-shrink-0"
-                    style={{ color: OVER_BUDGET_COLOR }}
+                    style={{ color: theme.danger }}
                     aria-label={t.reportOverBudget}
                   />
                 )}
                 <span
                   className={`flex-shrink-0 tabular-nums ${s.overBudget ? 'font-black' : 'font-extrabold'}`}
-                  style={{ color: s.overBudget ? OVER_BUDGET_COLOR : theme.text }}
+                  style={{ color: s.overBudget ? theme.danger : theme.text }}
                 >
                   {formatPercent(s.share, locale)}
                 </span>
                 <span
                   className={`w-[92px] flex-shrink-0 text-right text-[12px] tabular-nums ${s.overBudget ? 'font-extrabold' : 'font-semibold'}`}
-                  style={{ color: s.overBudget ? OVER_BUDGET_COLOR : theme.muted }}
+                  style={{ color: s.overBudget ? theme.danger : theme.muted }}
                 >
                   <MaskedAmount {...masked}>
                     {formatMoney(s.total, report.currency, locale)}
@@ -200,7 +198,7 @@ function CurrencyStats({ report }: { report: CurrencyReport }) {
               {s.overBudget && s.budget !== null && (
                 <div
                   className="pl-[22px] text-[11px] font-bold tabular-nums"
-                  style={{ color: OVER_BUDGET_COLOR }}
+                  style={{ color: theme.danger }}
                 >
                   {t.reportOverBudget}:{' '}
                   <MaskedAmount {...masked}>
@@ -251,7 +249,7 @@ export function ExpenseStatsDialog({
         </DialogTitle>
 
         {reports.length === 0 ? (
-          <p className="py-6 text-center text-sm font-semibold" style={{ color: theme.muted }}>
+          <p className="py-6 text-center text-sm font-semibold" style={{ color: theme.mutedText }}>
             {t.reportNoData}
           </p>
         ) : (

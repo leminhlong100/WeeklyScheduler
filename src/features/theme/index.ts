@@ -15,7 +15,11 @@ export {
   type ThemeKey,
   type ThemeTokens,
 } from './types'
-export { buildThemeFromRecipe, buildTokensFromRecipe, defaultDecorColors } from './recipe/buildTheme'
+export {
+  buildThemeFromRecipe,
+  buildTokensFromRecipe,
+  defaultDecorColors,
+} from './recipe/buildTheme'
 export { recipeFromDefinition } from './recipe/recipeFromDefinition'
 export { hasBlockingIssue, validateTheme, type ThemeIssue } from './recipe/validate'
 export type {

@@ -77,7 +77,7 @@ export function ExpenseCategoryManagerModal({
                   <div key={kind} className="flex flex-col gap-2">
                     <div
                       className="text-[11px] font-extrabold uppercase tracking-wider"
-                      style={{ color: theme.muted }}
+                      style={{ color: theme.mutedText }}
                     >
                       {kind === 'expense' ? t.expenseKindExpense : t.expenseKindIncome}
                     </div>
@@ -93,7 +93,7 @@ export function ExpenseCategoryManagerModal({
                 )
               })}
               {categories.length === 0 && (
-                <p className="text-sm font-medium" style={{ color: theme.muted }}>
+                <p className="text-sm font-medium" style={{ color: theme.mutedText }}>
                   {t.noCategories}
                 </p>
               )}

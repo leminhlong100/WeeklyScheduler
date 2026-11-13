@@ -451,7 +451,7 @@ làm mặc định thay cho `DEFAULT_CURRENCY` cố định (`QuickAddSheet.tsx:
 - [x] **A3** chống gửi trùng `isSubmitting`
 - [x] **A4** ẩn số tiền: mặc định che hết, `cat:none`, che %
 - [x] **A5** một gốc %, `formatPercent`
-- [ ] **B1** `formatSignedMoney`
+- [x] **B1** `formatSignedMoney`
 - [ ] **B2** token màu theo theme, ≥ 4.5:1, xoá 7 màu viết cứng
 - [ ] **B3** thuật ngữ, nhãn theo kind, lỗi zod i18n
 - [ ] **B4** vùng chạm 44px, ô AI 16px, ARIA
@@ -480,3 +480,4 @@ làm mặc định thay cho `DEFAULT_CURRENCY` cố định (`QuickAddSheet.tsx:
 - 2026-11-13 — A4 xong, KHÁC kế hoạch một chút: không mặc định che hết (vì cờ ẩn reset mỗi lần mở app → người mới sẽ thấy toàn ••• mỗi lần mở). Thay vào đó: chưa chọn mục nào thì nút con mắt = che tất cả. Thêm khoá cat:none, che % trong báo cáo, tìm kiếm bỏ qua số tiền khi đang che.
 - 2026-11-13 — A5 xong: formatPercent (Intl, vi ra 0,4%), hộp Thống kê dùng share như Báo cáo, thêm dòng 'Đã tiêu X% thu nhập' (che theo scope month).
 - 2026-11-13 — **KIỂM CHỨNG ĐỢT A: ĐẠT** — 53 test, typecheck/lint (0 lỗi)/build sạch; MoneyInput và QueryStatus kiểm trên trang thử. Chưa kiểm trang thật (cần chủ repo đăng nhập). Việc cho chủ repo: sau khi deploy, tìm khoản VND amount < 1000 trong DB để xem có khoản nào bị lưu sai từ lỗi cũ.
+- 2026-11-13 — B1 xong: formatSignedMoney (chi luôn −, thu +, số dư âm U+2212). Lưu ý: commit này cũng chạy prettier trên src/features/expenses/components (chỉ đổi định dạng).

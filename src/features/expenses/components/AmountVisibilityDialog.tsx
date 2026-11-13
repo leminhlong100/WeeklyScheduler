@@ -80,7 +80,7 @@ export function AmountVisibilityDialog({
               type="button"
               onClick={b.onClick}
               className="flex-1 rounded-[11px] border-[1.5px] px-2.5 py-1.5 text-[12px] font-bold transition-transform duration-150 active:scale-95"
-              style={{ borderColor: theme.border, background: theme.chip, color: theme.muted }}
+              style={{ borderColor: theme.border, background: theme.chip, color: theme.mutedText }}
             >
               {b.label}
             </button>
@@ -103,7 +103,7 @@ export function AmountVisibilityDialog({
           <div className="flex flex-col gap-2">
             <div
               className="text-[11px] font-extrabold uppercase tracking-wider"
-              style={{ color: theme.muted }}
+              style={{ color: theme.mutedText }}
             >
               {t.hideScopeCategories}
             </div>

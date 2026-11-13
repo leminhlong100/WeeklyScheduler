@@ -20,10 +20,6 @@ import { buildMonthlyReport, UNCATEGORIZED, type CategoryBreakdown } from '../ut
 /** Dưới nửa phần trăm thì coi như đứng yên — "tăng 0%" đọc như một lỗi. */
 const FLAT_THRESHOLD = 0.005
 
-const OVER_BUDGET_COLOR = '#d93a3a'
-const UNDER_BUDGET_COLOR = '#2fc39a'
-const INCOME_COLOR = '#2fc39a'
-
 function ChangeLine({
   change,
   cutoffDay,
@@ -47,7 +43,7 @@ function ChangeLine({
 
   if (change === null) {
     return (
-      <span className="text-[11.5px] font-semibold" style={{ color: theme.muted }}>
+      <span className="text-[11.5px] font-semibold" style={{ color: theme.mutedText }}>
         {t.reportNoPrevMonth}
       </span>
     )
@@ -57,7 +53,7 @@ function ChangeLine({
   // thêm "so với tháng trước" nữa thì thành lặp.
   if (Math.abs(change) < FLAT_THRESHOLD) {
     return (
-      <span className="text-[11.5px] font-semibold" style={{ color: theme.muted }}>
+      <span className="text-[11.5px] font-semibold" style={{ color: theme.mutedText }}>
         {t.reportFlat}
       </span>
     )
@@ -67,19 +63,19 @@ function ChangeLine({
   const Icon = up ? TrendingUpIcon : TrendingDownIcon
   // Tiêu nhiều hơn tô đỏ, ít hơn tô xanh — ngược quy ước của biểu đồ doanh thu,
   // vì ở đây "tăng" mới là tin xấu.
-  const color = up ? OVER_BUDGET_COLOR : UNDER_BUDGET_COLOR
+  const color = up ? theme.danger : theme.income
 
   return (
     <span className="flex flex-wrap items-center gap-1 text-[11.5px] font-bold" style={{ color }}>
       {/* Nói rõ con số này nói về tiền CHI: nó nằm ngay dưới số dư và tổng thu,
           thiếu nhãn thì rất dễ đọc thành "số dư tăng 12%". */}
-      <span className="font-semibold" style={{ color: theme.muted }}>
+      <span className="font-semibold" style={{ color: theme.mutedText }}>
         {t.expenseExpenseTotal}
       </span>
       <Icon className="size-3.5" />
       {up ? '+' : '−'}
       {formatPercent(Math.abs(change), locale)}
-      <span className="font-semibold" style={{ color: theme.muted }}>
+      <span className="font-semibold" style={{ color: theme.mutedText }}>
         {suffix}
       </span>
     </span>
@@ -109,7 +105,7 @@ function CategoryLine({ row, kind, currency, category }: CategoryLineProps) {
       ? category.monthly_budget
       : null
   const overBudget = budget !== null && row.total > budget
-  const budgetColor = overBudget ? OVER_BUDGET_COLOR : theme.muted
+  const budgetColor = overBudget ? theme.danger : theme.muted
 
   return (
     <div className="flex flex-col gap-1.5">
@@ -125,14 +121,14 @@ function CategoryLine({ row, kind, currency, category }: CategoryLineProps) {
         </span>
         <span
           className="flex-shrink-0 text-[11.5px] font-bold tabular-nums"
-          style={{ color: theme.muted }}
+          style={{ color: theme.mutedText }}
         >
           {/* % cũng lộ độ lớn: che cùng lúc với số tiền của danh mục. */}
           <MaskedAmount categoryId={categoryId}>{formatPercent(row.share, locale)}</MaskedAmount>
         </span>
         <span
           className="flex-shrink-0 text-[13px] font-extrabold tabular-nums"
-          style={{ color: kind === 'income' ? INCOME_COLOR : theme.text }}
+          style={{ color: kind === 'income' ? theme.income : theme.text }}
         >
           <MaskedAmount categoryId={categoryId}>
             {formatMoney(row.total, currency, locale)}
@@ -150,7 +146,7 @@ function CategoryLine({ row, kind, currency, category }: CategoryLineProps) {
           className="h-full rounded-full"
           style={{
             width: `${Math.max(row.share * 100, 2)}%`,
-            background: category?.color ?? (kind === 'income' ? INCOME_COLOR : theme.muted),
+            background: category?.color ?? (kind === 'income' ? theme.income : theme.muted),
           }}
         />
       </div>
@@ -177,7 +173,7 @@ function CategoryLine({ row, kind, currency, category }: CategoryLineProps) {
                 // Chặn ở 100%: vượt hạn mức thì thanh đầy và đổi màu, không tràn
                 // ra ngoài khung.
                 width: `${Math.min(row.total / budget, 1) * 100}%`,
-                background: overBudget ? OVER_BUDGET_COLOR : theme.accent,
+                background: overBudget ? theme.danger : theme.accent,
               }}
             />
           </div>
@@ -192,7 +188,7 @@ function SectionLabel({ children }: { children: string }) {
   return (
     <div
       className="text-[11px] font-extrabold uppercase tracking-wider"
-      style={{ color: theme.muted }}
+      style={{ color: theme.mutedText }}
     >
       {children}
     </div>
@@ -236,7 +232,7 @@ export function MonthlyReport({ month }: { month: MonthKey }) {
 
   if (expenses.length === 0) {
     return (
-      <p className="px-1 py-8 text-center text-sm font-semibold" style={{ color: theme.muted }}>
+      <p className="px-1 py-8 text-center text-sm font-semibold" style={{ color: theme.mutedText }}>
         {t.reportNoData}
       </p>
     )
@@ -256,20 +252,20 @@ export function MonthlyReport({ month }: { month: MonthKey }) {
                 <SectionLabel>{t.expenseBalance}</SectionLabel>
                 <div
                   className="font-heading text-[20px] font-extrabold tabular-nums"
-                  style={{ color: report.balance < 0 ? OVER_BUDGET_COLOR : INCOME_COLOR }}
+                  style={{ color: report.balance < 0 ? theme.danger : theme.income }}
                 >
                   <MaskedAmount scope="month">
                     {formatSignedMoney(report.balance, report.currency, locale, 'auto')}
                   </MaskedAmount>
                 </div>
               </div>
-              <span className="text-[11px] font-extrabold" style={{ color: theme.muted }}>
+              <span className="text-[11px] font-extrabold" style={{ color: theme.mutedText }}>
                 {report.currency}
               </span>
             </div>
 
             <div className="flex flex-wrap items-baseline gap-x-4 gap-y-1">
-              <span className="text-[12.5px] font-bold" style={{ color: INCOME_COLOR }}>
+              <span className="text-[12.5px] font-bold" style={{ color: theme.income }}>
                 {t.expenseIncomeTotal}{' '}
                 <span className="tabular-nums">
                   <MaskedAmount scope="month">
@@ -295,7 +291,7 @@ export function MonthlyReport({ month }: { month: MonthKey }) {
               theme={theme}
             />
             {report.incomeTotal > 0 && (
-              <span className="text-[11.5px] font-semibold" style={{ color: theme.muted }}>
+              <span className="text-[11.5px] font-semibold" style={{ color: theme.mutedText }}>
                 {t.reportSpentOfIncome.split('{p}')[0]}
                 <MaskedAmount scope="month">
                   {formatPercent(report.expenseTotal / report.incomeTotal, locale)}
@@ -307,7 +303,7 @@ export function MonthlyReport({ month }: { month: MonthKey }) {
             {(report.plannedExpense > 0 || report.plannedIncome > 0) && (
               <div
                 className="flex flex-wrap items-baseline gap-x-3 gap-y-0.5 text-[11px] font-semibold"
-                style={{ color: theme.muted }}
+                style={{ color: theme.mutedText }}
               >
                 <span>{t.expensePlannedNotCounted}</span>
                 {report.plannedExpense > 0 && (

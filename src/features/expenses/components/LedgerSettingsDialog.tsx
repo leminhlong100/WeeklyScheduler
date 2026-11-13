@@ -74,7 +74,7 @@ function SectionTitle({ children }: { children: string }) {
   return (
     <div
       className="text-[11px] font-extrabold uppercase tracking-wider"
-      style={{ color: theme.muted }}
+      style={{ color: theme.mutedText }}
     >
       {children}
     </div>
@@ -128,7 +128,7 @@ function LedgerForm({ ledger, onDone }: { ledger?: LedgerSummary; onDone?: () =>
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-3">
       {!ledger && (
-        <p className="text-[12.5px] font-semibold" style={{ color: theme.muted }}>
+        <p className="text-[12.5px] font-semibold" style={{ color: theme.mutedText }}>
           {t.ledgerCreateHint}
         </p>
       )}
@@ -253,7 +253,7 @@ function OwnerSettings({ ledger, onDeleted }: { ledger: LedgerSummary; onDeleted
 
       <section className="flex flex-col gap-2.5">
         <SectionTitle>{t.ledgerShareTitle}</SectionTitle>
-        <p className="text-[12.5px] font-semibold" style={{ color: theme.muted }}>
+        <p className="text-[12.5px] font-semibold" style={{ color: theme.mutedText }}>
           {t.ledgerShareHint}
         </p>
         {link ? (
@@ -326,7 +326,7 @@ function OwnerSettings({ ledger, onDeleted }: { ledger: LedgerSummary; onDeleted
       <section className="flex flex-col gap-2">
         <SectionTitle>{t.ledgerMembers}</SectionTitle>
         {!membersLoading && members.length === 0 && (
-          <p className="text-[12.5px] font-semibold" style={{ color: theme.muted }}>
+          <p className="text-[12.5px] font-semibold" style={{ color: theme.mutedText }}>
             {t.ledgerNoMembers}
           </p>
         )}
@@ -345,7 +345,7 @@ function OwnerSettings({ ledger, onDeleted }: { ledger: LedgerSummary; onDeleted
               aria-label={t.ledgerRemoveMember}
               title={t.ledgerRemoveMember}
               className="grid size-8 place-items-center rounded-lg"
-              style={{ color: theme.muted }}
+              style={{ color: theme.mutedText }}
             >
               <UserMinusIcon className="size-4" />
             </button>
@@ -399,7 +399,7 @@ function ViewerSettings({ ledger, onLeft }: { ledger: LedgerSummary; onLeft: () 
         <span className="text-2xl">{ledger.emoji}</span>
         <div className="min-w-0">
           <div className="truncate text-[14px] font-extrabold">{ledger.name}</div>
-          <div className="text-[12px] font-semibold" style={{ color: theme.muted }}>
+          <div className="text-[12px] font-semibold" style={{ color: theme.mutedText }}>
             {t.ledgerViewOnly.replace('{name}', ledger.owner_name)}
           </div>
         </div>

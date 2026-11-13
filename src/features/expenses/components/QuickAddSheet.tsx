@@ -127,7 +127,7 @@ export function QuickAddSheet({ onDrafts, onEnterManually }: QuickAddSheetProps)
     >
       <div
         className="flex items-center gap-1.5 text-[11px] font-extrabold uppercase tracking-wider"
-        style={{ color: theme.muted }}
+        style={{ color: theme.mutedText }}
       >
         <SparklesIcon className="size-3.5" />
         {t.quickAdd}
@@ -158,14 +158,16 @@ export function QuickAddSheet({ onDrafts, onEnterManually }: QuickAddSheetProps)
       />
 
       {tooLong && (
-        <p className="text-xs font-semibold text-[#ff5d7a]">
+        <p className="text-xs font-semibold" style={{ color: theme.danger }}>
           {t.quickAddTooLong.replace('{n}', String(MAX_PARSE_TEXT_LENGTH))}
         </p>
       )}
 
       {shownError && (
         <div className="flex flex-wrap items-center gap-2">
-          <p className="flex-1 text-xs font-semibold text-[#ff5d7a]">{shownError}</p>
+          <p className="flex-1 text-xs font-semibold" style={{ color: theme.danger }}>
+            {shownError}
+          </p>
           <Button
             type="button"
             variant="outline"

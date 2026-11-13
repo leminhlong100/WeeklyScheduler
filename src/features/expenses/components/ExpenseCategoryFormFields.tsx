@@ -133,7 +133,7 @@ export function ExpenseCategoryFormFields({
       )}
 
       <div>
-        <div className="mb-2 text-xs font-extrabold" style={{ color: theme.muted }}>
+        <div className="mb-2 text-xs font-extrabold" style={{ color: theme.mutedText }}>
           {t.categoryEmoji}
         </div>
         <div className="grid grid-cols-8 gap-1.5">
@@ -176,7 +176,7 @@ export function ExpenseCategoryFormFields({
       </div>
 
       <div>
-        <div className="mb-2 text-xs font-extrabold" style={{ color: theme.muted }}>
+        <div className="mb-2 text-xs font-extrabold" style={{ color: theme.mutedText }}>
           {t.categoryColor}
         </div>
         <div className="flex flex-wrap items-center gap-2">

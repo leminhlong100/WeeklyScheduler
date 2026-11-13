@@ -9,8 +9,6 @@ import type { ExpenseCategory } from '../api/expenseCategoriesApi'
 import { summarizeByCurrency } from '../utils/totals'
 import { ExpenseRow } from './ExpenseRow'
 
-const INCOME_COLOR = '#2fc39a'
-
 interface ExpenseDayGroupProps {
   date: string
   expenses: Expense[]
@@ -62,7 +60,7 @@ export function ExpenseDayGroup({
               {s.income > 0 && (
                 <span
                   className="text-[12px] font-extrabold tabular-nums"
-                  style={{ color: INCOME_COLOR }}
+                  style={{ color: theme.income }}
                 >
                   <MaskedAmount scope="day">
                     {formatSignedMoney(s.income, s.currency, locale, 'income')}
@@ -80,7 +78,7 @@ export function ExpenseDayGroup({
                 </span>
               )}
               {(s.plannedExpense > 0 || s.plannedIncome > 0) && (
-                <span className="text-[11px] font-semibold" style={{ color: theme.muted }}>
+                <span className="text-[11px] font-semibold" style={{ color: theme.mutedText }}>
                   {t.expensePlannedShort}
                 </span>
               )}

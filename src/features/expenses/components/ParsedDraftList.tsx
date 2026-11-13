@@ -24,8 +24,6 @@ import { amountErrorKey, parseAmount, CURRENCIES, KINDS } from '../schemas/expen
 import { statusForDate } from '../utils/status'
 import { NO_CATEGORY, type DraftRow, type ExpenseDraft } from '../utils/draft'
 
-const INCOME_COLOR = '#2fc39a'
-
 interface ParsedDraftListProps {
   draft: ExpenseDraft
   /** Mọi thay đổi đi ngược lên trang để được lưu qua `sessionStorage`. */
@@ -118,7 +116,7 @@ export function ParsedDraftList({ draft, onChange, onDone }: ParsedDraftListProp
         <div className="font-heading text-[15px] font-extrabold" style={{ color: theme.text }}>
           {t.draftTitle}
         </div>
-        <p className="text-[11.5px] font-semibold" style={{ color: theme.muted }}>
+        <p className="text-[11.5px] font-semibold" style={{ color: theme.mutedText }}>
           {t.draftHint}
         </p>
       </div>
@@ -136,13 +134,13 @@ export function ParsedDraftList({ draft, onChange, onDone }: ParsedDraftListProp
                 // Nền cảnh báo nhẹ cho dòng AI không chắc — đủ để mắt dừng lại,
                 // không đủ để trông như lỗi.
                 borderColor: row.confidence === 'low' ? '#f0b429' : theme.border,
-                background: row.confidence === 'low' ? '#f0b4291f' : theme.inputBg,
+                background: row.confidence === 'low' ? theme.warningBg : theme.inputBg,
               }}
             >
               {row.confidence === 'low' && (
                 <div
                   className="flex items-center gap-1.5 text-[11px] font-bold"
-                  style={{ color: '#b07300' }}
+                  style={{ color: theme.warning }}
                 >
                   <TriangleAlertIcon className="size-3.5 flex-shrink-0" />
                   {t.draftLowConfidence}
@@ -175,7 +173,7 @@ export function ParsedDraftList({ draft, onChange, onDone }: ParsedDraftListProp
                       style={{
                         background: selected
                           ? option === 'income'
-                            ? INCOME_COLOR
+                            ? theme.income
                             : theme.accent
                           : 'transparent',
                         color: selected ? '#fff' : theme.muted,
@@ -224,7 +222,7 @@ export function ParsedDraftList({ draft, onChange, onDone }: ParsedDraftListProp
                   onClick={() => removeRow(row.key)}
                   aria-label={t.delete}
                   className="grid h-11 w-11 flex-shrink-0 place-items-center rounded-lg transition-transform duration-150 active:scale-95 sm:h-9 sm:w-9"
-                  style={{ color: theme.muted }}
+                  style={{ color: theme.mutedText }}
                 >
                   <Trash2Icon className="size-4" />
                 </button>

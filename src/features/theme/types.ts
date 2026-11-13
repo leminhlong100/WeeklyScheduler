@@ -115,6 +115,16 @@ export interface DerivedTheme extends ThemeDefinition {
   gridLinesImage: string
   danger: string
   dangerBorder: string
+  /**
+   * Màu chữ đọc được (≥ 4.5:1 trên `chip` và `mainBg`) cho các vai trò tiền tệ.
+   * `muted` gốc của theme sáng chỉ 1.5–2.2:1 nên không dùng làm màu CHỮ được nữa.
+   */
+  mutedText: string
+  /** Tiền vào / số dư dương. */
+  income: string
+  /** Kỳ dự kiến, sắp vượt hạn mức. */
+  warning: string
+  warningBg: string
   sidebarText: string
   sidebarStrong: string
   sidebarMuted: string

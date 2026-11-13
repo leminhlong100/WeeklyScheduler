@@ -58,11 +58,11 @@ export function QueryStatus({ query, skeletonRows = 3, children }: QueryStatusPr
         className="flex flex-col items-center gap-2 rounded-2xl border-[1.5px] px-4 py-6 text-center"
         style={{ borderColor: theme.border, background: theme.chip }}
       >
-        <CloudOffIcon className="size-6" style={{ color: theme.muted }} />
+        <CloudOffIcon className="size-6" style={{ color: theme.mutedText }} />
         <div className="font-heading text-[15px] font-extrabold" style={{ color: theme.text }}>
           {t.loadErrorTitle}
         </div>
-        <p className="text-[13px] font-semibold" style={{ color: theme.muted }}>
+        <p className="text-[13px] font-semibold" style={{ color: theme.mutedText }}>
           {t.loadErrorHint}
         </p>
         <button
@@ -91,7 +91,7 @@ export function QueryStatus({ query, skeletonRows = 3, children }: QueryStatusPr
         <div
           role="status"
           className="flex items-center gap-1.5 rounded-[12px] px-3 py-2 text-[12px] font-bold"
-          style={{ background: theme.chip, color: theme.muted }}
+          style={{ background: theme.chip, color: theme.mutedText }}
         >
           <CloudOffIcon className="size-3.5 flex-shrink-0" />
           {t.offlineNotice.replace('{time}', time)}

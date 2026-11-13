@@ -7,9 +7,6 @@ import { useAmountVisibility, type AmountScope } from '../AmountVisibilityContex
 import { MaskedAmount } from './MaskedAmount'
 import type { CurrencySummary } from '../utils/totals'
 
-const INCOME_COLOR = '#2fc39a'
-const NEGATIVE_COLOR = '#d93a3a'
-
 function Line({
   label,
   value,
@@ -85,7 +82,7 @@ export function ExpenseSummaryCard({
           >
             <span
               className="text-[11px] font-extrabold uppercase tracking-wider"
-              style={{ color: theme.muted }}
+              style={{ color: theme.mutedText }}
             >
               {title}
               {showCurrencyLabel && ` · ${s.currency}`}
@@ -93,13 +90,13 @@ export function ExpenseSummaryCard({
             <span className="flex items-center gap-2">
               <span
                 className="font-heading text-[14px] font-extrabold tabular-nums"
-                style={{ color: s.balance < 0 ? NEGATIVE_COLOR : INCOME_COLOR }}
+                style={{ color: s.balance < 0 ? theme.danger : theme.income }}
               >
                 <MaskedAmount scope={scope}>
                   {formatSignedMoney(s.balance, s.currency, locale, 'auto')}
                 </MaskedAmount>
               </span>
-              <ChevronDownIcon className="size-4" style={{ color: theme.muted }} />
+              <ChevronDownIcon className="size-4" style={{ color: theme.mutedText }} />
             </span>
           </button>
         ))}
@@ -120,13 +117,13 @@ export function ExpenseSummaryCard({
             <div className="flex items-baseline justify-between gap-2">
               <span
                 className="text-[11px] font-extrabold uppercase tracking-wider"
-                style={{ color: theme.muted }}
+                style={{ color: theme.mutedText }}
               >
                 {title ?? t.expenseMonthTotal}
               </span>
               <span className="flex items-center gap-2">
                 {showCurrencyLabel && (
-                  <span className="text-[11px] font-extrabold" style={{ color: theme.muted }}>
+                  <span className="text-[11px] font-extrabold" style={{ color: theme.mutedText }}>
                     {s.currency}
                   </span>
                 )}
@@ -136,7 +133,7 @@ export function ExpenseSummaryCard({
                   aria-label={hidden ? t.showAmounts : t.hideAmounts}
                   title={hidden ? t.showAmounts : t.hideAmounts}
                   className="grid h-6 w-6 flex-shrink-0 place-items-center rounded-md transition-transform duration-150 active:scale-95"
-                  style={{ color: theme.muted }}
+                  style={{ color: theme.mutedText }}
                 >
                   {hidden ? <EyeOffIcon className="size-3.5" /> : <EyeIcon className="size-3.5" />}
                 </button>
@@ -147,7 +144,7 @@ export function ExpenseSummaryCard({
                     aria-expanded
                     aria-label={title}
                     className="grid h-6 w-6 flex-shrink-0 place-items-center rounded-md transition-transform duration-150 active:scale-95"
-                    style={{ color: theme.muted }}
+                    style={{ color: theme.mutedText }}
                   >
                     <ChevronUpIcon className="size-4" />
                   </button>
@@ -159,7 +156,7 @@ export function ExpenseSummaryCard({
               scope={scope}
               label={t.expenseIncomeTotal}
               value={formatSignedMoney(s.income, s.currency, locale, 'income')}
-              color={INCOME_COLOR}
+              color={theme.income}
             />
             <Line
               scope={scope}
@@ -173,7 +170,7 @@ export function ExpenseSummaryCard({
                 label={t.expenseBalance}
                 value={formatSignedMoney(s.balance, s.currency, locale, 'auto')}
                 // Âm là tín hiệu cần thấy ngay: tháng này tiêu quá thu.
-                color={s.balance < 0 ? NEGATIVE_COLOR : INCOME_COLOR}
+                color={s.balance < 0 ? theme.danger : theme.income}
                 strong
               />
             </div>
@@ -181,7 +178,7 @@ export function ExpenseSummaryCard({
             {planned && (
               <div
                 className="flex flex-wrap items-baseline gap-x-3 gap-y-0.5 pt-0.5 text-[11px] font-semibold"
-                style={{ color: theme.muted }}
+                style={{ color: theme.mutedText }}
               >
                 <span>{t.expensePlannedNotCounted}</span>
                 {s.plannedExpense > 0 && (

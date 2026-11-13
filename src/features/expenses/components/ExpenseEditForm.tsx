@@ -44,8 +44,6 @@ import { statusForDate } from '../utils/status'
 import { NO_CATEGORY } from '../utils/draft'
 import type { Expense } from '../api/expensesApi'
 
-const INCOME_COLOR = '#2fc39a'
-
 interface ExpenseEditFormProps {
   expense?: Expense
   /** Ngày điền sẵn cho khoản mới — thường là ngày đang xem. */
@@ -256,7 +254,7 @@ export function ExpenseEditForm({ expense, defaultDate, onDone }: ExpenseEditFor
                   style={{
                     background: selected
                       ? option === 'income'
-                        ? INCOME_COLOR
+                        ? theme.income
                         : theme.accent
                       : 'transparent',
                     color: selected ? '#fff' : theme.muted,
@@ -410,13 +408,13 @@ export function ExpenseEditForm({ expense, defaultDate, onDone }: ExpenseEditFor
       )}
 
       {!isEdit && repeatMonths > 1 && (
-        <p className="text-[11.5px] font-semibold" style={{ color: theme.muted }}>
+        <p className="text-[11.5px] font-semibold" style={{ color: theme.mutedText }}>
           {t.expensePlannedHint}
         </p>
       )}
 
       {isEdit && expense.status === 'planned' && (
-        <p className="text-[11.5px] font-semibold" style={{ color: '#b07300' }}>
+        <p className="text-[11.5px] font-semibold" style={{ color: theme.warning }}>
           {t.expensePlannedEditHint}
         </p>
       )}
@@ -424,8 +422,8 @@ export function ExpenseEditForm({ expense, defaultDate, onDone }: ExpenseEditFor
       {isEdit && seriesId && (
         <div className="rounded-2xl px-3.5 py-3" style={{ background: theme.chip }}>
           <div className="flex items-start gap-2">
-            <RepeatIcon className="mt-px size-4 flex-shrink-0" style={{ color: theme.muted }} />
-            <p className="text-[12.5px] font-semibold" style={{ color: theme.muted }}>
+            <RepeatIcon className="mt-px size-4 flex-shrink-0" style={{ color: theme.mutedText }} />
+            <p className="text-[12.5px] font-semibold" style={{ color: theme.mutedText }}>
               {t.expenseSeriesNotice}
             </p>
           </div>

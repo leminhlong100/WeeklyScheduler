@@ -79,7 +79,10 @@ export function ExpenseList({
       {expenses.length === 0 ? (
         <>
           {yearCard}
-          <p className="px-1 py-8 text-center text-sm font-semibold" style={{ color: theme.muted }}>
+          <p
+            className="px-1 py-8 text-center text-sm font-semibold"
+            style={{ color: theme.mutedText }}
+          >
             {isFilterActive(filter) && monthCount > 0 ? t.filterNoResults : t.noExpenses}
           </p>
         </>

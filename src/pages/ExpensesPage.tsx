@@ -231,7 +231,7 @@ function ExpensesPageContent() {
             aria-label={amountsHidden ? t.showAmounts : t.hideAmounts}
             title={amountsHidden ? t.showAmounts : t.hideAmounts}
             className="flex items-center gap-1.5 rounded-[11px] border-[1.5px] px-2.5 py-1.5 text-[12px] font-bold transition-transform duration-150 active:scale-95"
-            style={{ borderColor: theme.border, background: theme.chip, color: theme.muted }}
+            style={{ borderColor: theme.border, background: theme.chip, color: theme.mutedText }}
           >
             {amountsHidden ? <EyeOffIcon className="size-3.5" /> : <EyeIcon className="size-3.5" />}
           </button>
@@ -241,7 +241,7 @@ function ExpensesPageContent() {
             aria-label={t.hideCustomTitle}
             title={t.hideCustomTitle}
             className="flex items-center gap-1.5 rounded-[11px] border-[1.5px] px-2.5 py-1.5 text-[12px] font-bold transition-transform duration-150 active:scale-95"
-            style={{ borderColor: theme.border, background: theme.chip, color: theme.muted }}
+            style={{ borderColor: theme.border, background: theme.chip, color: theme.mutedText }}
           >
             <ListChecksIcon className="size-3.5" />
           </button>
@@ -252,7 +252,7 @@ function ExpensesPageContent() {
               aria-label={t.manageExpenseCategories}
               title={t.manageExpenseCategories}
               className="flex items-center gap-1.5 rounded-[11px] border-[1.5px] px-2.5 py-1.5 text-[12px] font-bold transition-transform duration-150 active:scale-95"
-              style={{ borderColor: theme.border, background: theme.chip, color: theme.muted }}
+              style={{ borderColor: theme.border, background: theme.chip, color: theme.mutedText }}
             >
               <SlidersHorizontalIcon className="size-3.5" />
             </button>
@@ -263,7 +263,7 @@ function ExpensesPageContent() {
             aria-label={t.expenseStats}
             title={t.expenseStats}
             className="flex items-center gap-1.5 rounded-[11px] border-[1.5px] px-2.5 py-1.5 text-[12px] font-bold transition-transform duration-150 active:scale-95"
-            style={{ borderColor: theme.border, background: theme.chip, color: theme.muted }}
+            style={{ borderColor: theme.border, background: theme.chip, color: theme.mutedText }}
           >
             <PieChartIcon className="size-3.5" />
           </button>
@@ -273,7 +273,7 @@ function ExpensesPageContent() {
             aria-label={t.exportCsv}
             title={t.exportCsv}
             className="flex items-center gap-1.5 rounded-[11px] border-[1.5px] px-2.5 py-1.5 text-[12px] font-bold transition-transform duration-150 active:scale-95"
-            style={{ borderColor: theme.border, background: theme.chip, color: theme.muted }}
+            style={{ borderColor: theme.border, background: theme.chip, color: theme.mutedText }}
           >
             <DownloadIcon className="size-3.5" />
           </button>

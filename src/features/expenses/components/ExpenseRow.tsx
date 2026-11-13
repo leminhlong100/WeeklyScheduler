@@ -8,7 +8,6 @@ import type { Expense } from '../api/expensesApi'
 import type { ExpenseCategory } from '../api/expenseCategoriesApi'
 
 /** Tiền vào tô xanh, dùng lại đúng màu "dưới hạn mức" của báo cáo. */
-const INCOME_COLOR = '#2fc39a'
 
 interface ExpenseRowProps {
   expense: Expense
@@ -36,7 +35,6 @@ export function ExpenseRow({ expense, category, onEdit, onDelete, onMarkPaid }: 
         // không phải đọc chữ mới biết.
         border: `1.5px ${isPlanned ? 'dashed' : 'solid'} ${theme.border}`,
         background: theme.chip,
-        opacity: isPlanned ? 0.85 : 1,
       }}
     >
       <span
@@ -60,14 +58,14 @@ export function ExpenseRow({ expense, category, onEdit, onDelete, onMarkPaid }: 
           {expense.series_id && (
             <RepeatIcon
               className="size-3.5 flex-shrink-0"
-              style={{ color: theme.muted }}
+              style={{ color: theme.mutedText }}
               aria-label={t.expenseRepeat}
             />
           )}
           {expense.source === 'ai' && (
             <span
               className="flex-shrink-0 rounded-md px-1.5 py-px text-[10px] font-extrabold"
-              style={{ background: theme.inputBg, color: theme.muted }}
+              style={{ background: theme.inputBg, color: theme.mutedText }}
             >
               {t.expenseSourceAi}
             </span>
@@ -75,20 +73,20 @@ export function ExpenseRow({ expense, category, onEdit, onDelete, onMarkPaid }: 
           {isPlanned && (
             <span
               className="flex-shrink-0 rounded-md px-1.5 py-px text-[10px] font-extrabold"
-              style={{ background: '#f0b4291f', color: '#b07300' }}
+              style={{ background: theme.warningBg, color: theme.warning }}
             >
               {t.expensePlannedBadge}
             </span>
           )}
         </div>
-        <div className="truncate text-[11.5px] font-semibold" style={{ color: theme.muted }}>
+        <div className="truncate text-[11.5px] font-semibold" style={{ color: theme.mutedText }}>
           {category ? translateExpenseCategoryName(category.name, t) : t.expenseUncategorized}
         </div>
       </div>
 
       <span
         className="flex-shrink-0 text-[14px] font-extrabold tabular-nums"
-        style={{ color: isIncome ? INCOME_COLOR : theme.text }}
+        style={{ color: isIncome ? theme.income : theme.text }}
       >
         <MaskedAmount categoryId={expense.category_id}>
           {formatSignedMoney(expense.amount, expense.currency, locale, expense.kind)}
@@ -106,7 +104,7 @@ export function ExpenseRow({ expense, category, onEdit, onDelete, onMarkPaid }: 
               aria-label={t.expenseMarkPaid}
               title={t.expenseMarkPaid}
               className="grid h-8 w-8 place-items-center rounded-lg transition-transform duration-150 active:scale-95"
-              style={{ color: INCOME_COLOR }}
+              style={{ color: theme.income }}
             >
               <CheckIcon className="size-4" />
             </button>
@@ -117,7 +115,7 @@ export function ExpenseRow({ expense, category, onEdit, onDelete, onMarkPaid }: 
               onClick={onEdit}
               aria-label={t.editExpense}
               className="grid h-8 w-8 place-items-center rounded-lg transition-transform duration-150 active:scale-95"
-              style={{ color: theme.muted }}
+              style={{ color: theme.mutedText }}
             >
               <PencilIcon className="size-4" />
             </button>
@@ -128,7 +126,7 @@ export function ExpenseRow({ expense, category, onEdit, onDelete, onMarkPaid }: 
               onClick={onDelete}
               aria-label={t.delete}
               className="grid h-8 w-8 place-items-center rounded-lg transition-transform duration-150 active:scale-95"
-              style={{ color: theme.muted }}
+              style={{ color: theme.mutedText }}
             >
               <Trash2Icon className="size-4" />
             </button>
