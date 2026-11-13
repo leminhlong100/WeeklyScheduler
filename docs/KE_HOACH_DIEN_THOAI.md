@@ -343,7 +343,7 @@ nếu cấu hình sai, khiến app không mở được offline). Thông báo ph
 - [x] **M1.3** Ẩn thanh dưới khi bàn phím mở
 - [x] **M1.4** Lưu offline báo ngay, giữ form (`networkMode: 'always'` + thông điệp)
 - [ ] **M1.5** Bỏ cache Supabase REST trong SW (chờ Q6)
-- [ ] **M1.6** Kiểm tra bản mới khi app quay lại từ nền
+- [x] **M1.6** Kiểm tra bản mới khi app quay lại từ nền
 - [ ] **M2.1** Mở app vào thẳng Chi tiêu (chờ Q7)
 - [ ] **M2.2** Danh sách dài: đo → `memo` → `useDeferredValue` → `content-visibility`
 - [ ] **M3.1** Manifest `shortcuts` + `?add=1`
@@ -375,6 +375,9 @@ nếu cấu hình sai, khiến app không mở được offline). Thông báo ph
   `errNetworkNotSaved` đủ vi/en/ja/zh, dùng ở ExpenseEditForm + ParsedDraftList. Harness: giả offline (`fetch` reject `TypeError`, `navigator.onLine=false`,
   bắn sự kiện `offline`) → Nhập tay 45.000 → Lưu → toast "…chưa được lưu…" sau **62 ms**, ô tiền vẫn `45.000`, nút Lưu bấm được. Harness không có user nên lỗi
   đến từ `mutationFn` chứ không phải `fetch` thật. Cần chủ repo: bản build + đăng nhập, DevTools Offline → Lưu → bật mạng → Lưu → DB đúng 1 dòng.
+- 2026-11-13 — **M1.6 xong (bản build).** `PwaUpdatePrompt` giữ `registration` từ `onRegisteredSW`; `visibilitychange → visible` + quá 1 giờ
+  (`shouldCheckForUpdate`, có test) + online → `registration.update()`. `vite preview` (cổng 4173, có SW): giả `Date.now` +61 phút → `update()` gọi **1** lần;
+  quay lại ngay sau đó → không gọi thêm; chưa tới 1 giờ → 0 lần. Cần chủ repo: deploy A, mở PWA, để nền; deploy B; mở lại sau > 1 giờ → thấy toast "Có bản mới".
 
 ---
 
