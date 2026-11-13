@@ -346,7 +346,7 @@ nếu cấu hình sai, khiến app không mở được offline). Thông báo ph
 - [x] **M1.6** Kiểm tra bản mới khi app quay lại từ nền
 - [ ] **M2.1** Mở app vào thẳng Chi tiêu (chờ Q7)
 - [ ] **M2.2** Danh sách dài: đo → `memo` → `useDeferredValue` → `content-visibility` — *bước 1–4 đã làm; tiêu chí chuyển tab < 200 ms ở throttle 6× **ước tính chưa đạt**, xem Nhật ký*
-- [ ] **M3.1** Manifest `shortcuts` + `?add=1`
+- [x] **M3.1** Manifest `shortcuts` + `?add=1`
 - [ ] **M3.2** Rung nhẹ khi lưu (Android)
 - [ ] **M3.3** Web Share Target cho SMS ngân hàng (chờ Q8)
 - [ ] **M3.4** Vuốt trái để xoá
@@ -397,6 +397,11 @@ nếu cấu hình sai, khiến app không mở được offline). Thông báo ph
   mở tab ≈ (65–93 ms) × 6 ≈ 400–560 ms (**chưa đạt** < 200). Phần còn lại là React dựng 500 dòng lần đầu — `memo`/`content-visibility` không giúp được.
   Bước 5 (ảo hoá, vướng nhóm "Sắp tới" và tiêu đề ngày) **không làm** vì chưa đo được trên máy thật: cần chủ repo đo bằng bản build trên Android
   (Chrome remote DevTools, Performance) rồi quyết. Cấu hình build harness hiệu năng: `harness/perf.vite.config.mts` (bị exclude, không commit).
+- 2026-11-13 — **M3.1 xong (harness + bản build).** Manifest `shortcuts` "Thêm giao dịch" → `/expenses?add=1` (đã có trong `dist/manifest.webmanifest`).
+  `useExpensesUrlState` đọc `add=1`; ExpensesPage đợi biết quyền sổ (sổ chỉ xem thì bỏ qua), xoá tham số bằng `replace` trong `useLayoutEffect` (trước khi sheet
+  đẩy mục lịch sử) rồi mở sheet. `harness.html?tab=report&add=1` → sheet mở, URL `?tab=report`, Back đóng sheet và không mở lại.
+  **Icon tạm:** `public/icons/shortcut-add-96.png` chỉ là `icon-192.png` thu nhỏ (chưa có dấu ＋) — chủ repo nên thay bằng icon riêng.
+  Cần chủ repo thử trên Android (PWA đã cài): nhấn giữ icon → "Thêm giao dịch" → mở thẳng form (có thể phải gỡ/cài lại PWA để Android nhận manifest mới).
 
 ---
 

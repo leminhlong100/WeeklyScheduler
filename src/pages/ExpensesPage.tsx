@@ -1,4 +1,4 @@
-import { useDeferredValue, useMemo, useState } from 'react'
+import { useDeferredValue, useLayoutEffect, useMemo, useState } from 'react'
 import { toast } from 'sonner'
 import { useIsMobile, useIsTouchDevice } from '@/hooks/useMediaQuery'
 import { useSessionStorageState } from '@/hooks/useSessionStorageState'
@@ -82,12 +82,12 @@ export function ExpensesPage() {
  */
 function ExpensesPageContent() {
   const { t, locale, setLocale } = useTranslation()
-  const { ledgerId, canEdit } = useCurrentLedger()
+  const { ledgerId, canEdit, info: ledgerInfo } = useCurrentLedger()
   const { theme } = useTheme()
   const { hidden: amountsHidden } = useAmountVisibility()
   const isMobile = useIsMobile()
   const isTouch = useIsTouchDevice()
-  const { month, view, setMonth, setView } = useExpensesUrlState()
+  const { month, view, setMonth, setView, addRequested, clearAddRequest } = useExpensesUrlState()
 
   const [sidebarOpen, setSidebarOpen] = useState(!isMobile && !isTouch)
   // Chỉ drawer trên mobile là một "lớp"; sidebar desktop là một cột cố định.
@@ -140,6 +140,21 @@ function ExpensesPageContent() {
   const defaultDateForMonth = isCurrentMonth ? todayISO() : monthRange(month).startISO
 
   const openAdd = canEdit ? () => setAddOpen(true) : undefined
+
+  // Mở từ lối tắt `?add=1`: đợi biết quyền của sổ đang mở (sổ được mời xem thì
+  // không thêm được). Tham số phải được xoá TRƯỚC khi sheet đẩy mục lịch sử của
+  // nó: `useLayoutEffect` chạy trước mọi `useEffect` (kể cả của `useBackToClose`),
+  // nên mục của sheet nằm trên URL đã sạch và Back đóng sheet mà không mở lại.
+  const ledgerPermissionKnown = ledgerId === null || ledgerInfo !== null
+  const [addHandled, setAddHandled] = useState(false)
+  if (addRequested && ledgerPermissionKnown && !addHandled) {
+    setAddHandled(true)
+    if (canEdit) setAddOpen(true)
+  }
+  if (!addRequested && addHandled) setAddHandled(false)
+  useLayoutEffect(() => {
+    if (addRequested && addHandled) clearAddRequest()
+  }, [addRequested, addHandled, clearAddRequest])
 
   const handleExportCsv = () => {
     // Xuất đúng tập đang xem: đã lọc thì file phải khớp với những gì trên màn

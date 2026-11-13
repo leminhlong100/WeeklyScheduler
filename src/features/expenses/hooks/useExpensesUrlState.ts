@@ -59,5 +59,26 @@ export function useExpensesUrlState() {
     [setParams],
   )
 
-  return { month, view, setMonth, setView }
+  /**
+   * `?add=1` — lối tắt "Thêm giao dịch" ở icon app (manifest `shortcuts`). Trang
+   * đọc xong thì xoá bằng `replace`, để Back hay tải lại không mở lại form.
+   */
+  const addRequested = params.get('add') === '1'
+  const clearAddRequest = useCallback(() => {
+    whenHistorySettles(() => {
+      // Đọc URL thật lúc chạy, không đọc `params` của lần render cũ: gọi lần hai
+      // (StrictMode) sau khi tham số đã xoá sẽ ghi đè mục lịch sử của sheet vừa mở.
+      if (!new URLSearchParams(window.location.search).has('add')) return
+      setParams(
+        (prev) => {
+          const p = new URLSearchParams(prev)
+          p.delete('add')
+          return p
+        },
+        { replace: true },
+      )
+    })
+  }, [setParams])
+
+  return { month, view, setMonth, setView, addRequested, clearAddRequest }
 }

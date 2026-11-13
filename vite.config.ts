@@ -91,6 +91,16 @@ export default defineConfig(({ mode }) => ({
           { src: '/icons/icon-512.png', sizes: '512x512', type: 'image/png', purpose: 'any' },
           { src: '/icons/maskable-512.png', sizes: '512x512', type: 'image/png', purpose: 'maskable' },
         ],
+        // Nhấn giữ icon (Android, PWA đã cài) → "Thêm giao dịch" mở thẳng form.
+        // iOS chưa hỗ trợ `shortcuts` và bỏ qua mục này.
+        shortcuts: [
+          {
+            name: 'Thêm giao dịch',
+            short_name: 'Thêm',
+            url: '/expenses?add=1',
+            icons: [{ src: '/icons/shortcut-add-96.png', sizes: '96x96', type: 'image/png' }],
+          },
+        ],
       },
       workbox: {
         // Font files are excluded from precache on purpose: @fontsource ships
