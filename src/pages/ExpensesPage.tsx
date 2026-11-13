@@ -146,7 +146,7 @@ function ExpensesPageContent() {
       toast.error(t.noExpenses)
       return
     }
-    downloadCsv(expensesCsvFilename(month), buildExpensesCsv(visibleExpenses, categories, t))
+    downloadCsv(expensesCsvFilename(month, t), buildExpensesCsv(visibleExpenses, categories, t))
   }
 
   const handleDelete = (expense: Expense) => {
@@ -162,7 +162,8 @@ function ExpensesPageContent() {
     updateExpense.mutate(
       { id: expense.id, patch: { status: 'paid' } },
       {
-        onSuccess: () => toast.success(t.expenseMarkedPaid),
+        onSuccess: () =>
+          toast.success(expense.kind === 'income' ? t.incomeMarkedReceived : t.expenseMarkedPaid),
         onError: (error) => toast.error(describeError(t, error)),
       },
     )
@@ -321,7 +322,11 @@ function ExpensesPageContent() {
             className="font-heading text-xl font-extrabold"
             style={{ color: theme.text }}
           >
-            {editTarget === 'new' ? t.addExpense : t.editExpense}
+            {editTarget === 'new'
+              ? t.addTransaction
+              : editTarget?.kind === 'income'
+                ? t.editIncome
+                : t.editExpense}
           </DialogTitle>
           {editTarget !== null && (
             <ExpenseEditForm

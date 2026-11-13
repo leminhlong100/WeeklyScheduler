@@ -152,7 +152,7 @@ export function ExpenseEditForm({ expense, defaultDate, onDone }: ExpenseEditFor
           id: expense.id,
           patch: { ...shared, spent_at: values.spentAt },
         })
-        toast.success(t.expenseUpdated)
+        toast.success(values.kind === 'income' ? t.incomeUpdated : t.expenseUpdated)
         onDone()
         return
       }
@@ -187,7 +187,7 @@ export function ExpenseEditForm({ expense, defaultDate, onDone }: ExpenseEditFor
         status: statusForDate(values.spentAt),
         source: 'manual',
       })
-      toast.success(t.expenseCreated)
+      toast.success(values.kind === 'income' ? t.incomeCreated : t.expenseCreated)
       onDone()
     } catch (error) {
       toast.error(describeError(t, error))

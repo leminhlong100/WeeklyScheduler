@@ -336,6 +336,13 @@ export interface Dictionary {
   expensesSub: string
   addExpense: string
   editExpense: string
+  addTransaction: string
+  addIncome: string
+  editIncome: string
+  incomeCreated: string
+  incomeUpdated: string
+  incomeMarkReceived: string
+  incomeMarkedReceived: string
   expenseAmount: string
   expenseAmountPh: string
   expenseCurrency: string
@@ -526,6 +533,8 @@ export interface Dictionary {
   hideScopeDay: string
   hideScopeCategories: string
   csvColumnKind: string
+  csvColumnKindLabel: string
+  csvFilePrefix: string
   csvColumnStatus: string
   csvColumnSource: string
   csvColumnRawText: string

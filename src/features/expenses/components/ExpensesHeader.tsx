@@ -94,11 +94,11 @@ export function ExpensesHeader({
       {onAddExpense && (
         <GradientButton
           onClick={onAddExpense}
-          aria-label={t.addExpense}
+          aria-label={t.addTransaction}
           className="h-10 gap-1.5 px-3 text-[13.5px] sm:px-[18px]"
         >
           <PlusIcon className="size-4" />
-          <span className="hidden sm:inline">{t.addExpense}</span>
+          <span className="hidden sm:inline">{t.addTransaction}</span>
         </GradientButton>
       )}
 

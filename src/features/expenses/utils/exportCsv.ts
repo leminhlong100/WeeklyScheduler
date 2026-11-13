@@ -34,6 +34,7 @@ export function buildExpensesCsv(
   const header = [
     t.expenseDate,
     t.csvColumnKind,
+    t.csvColumnKindLabel,
     t.expenseAmount,
     t.expenseCurrency,
     t.expenseCategory,
@@ -48,6 +49,8 @@ export function buildExpensesCsv(
     // Mã thô ('expense'/'income'), không phải nhãn đã dịch: cột này để máy lọc
     // và để hai file xuất ở hai ngôn ngữ vẫn ghép được với nhau.
     e.kind,
+    // Bên cạnh mã thô là nhãn đã dịch, để người mở file bằng Excel đọc được ngay.
+    e.kind === 'income' ? t.expenseKindIncome : t.expenseKindExpense,
     formatNumber(e.amount),
     e.currency,
     // Tên thô trong DB, không dịch: file xuất ra là dữ liệu, đổi ngôn ngữ giao
@@ -63,8 +66,8 @@ export function buildExpensesCsv(
   return [header, ...rows].map((row) => row.map(escapeField).join(',')).join('\r\n')
 }
 
-export function expensesCsvFilename(month: MonthKey): string {
-  return `chi-tieu-${month}.csv`
+export function expensesCsvFilename(month: MonthKey, t: Dictionary): string {
+  return `${t.csvFilePrefix}-${month}.csv`
 }
 
 /**

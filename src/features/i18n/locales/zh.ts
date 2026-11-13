@@ -305,6 +305,13 @@ export const zh: Dictionary = {
   expensesSub: '随手记一笔',
   addExpense: '添加开支',
   editExpense: '编辑开支',
+  addTransaction: '添加记录',
+  addIncome: '添加收入',
+  editIncome: '编辑收入',
+  incomeCreated: '已添加收入',
+  incomeUpdated: '已更新收入',
+  incomeMarkReceived: '标记已收到',
+  incomeMarkedReceived: '已标记为已收到',
   expenseAmount: '金额',
   expenseAmountPh: '例如：40,000',
   expenseCurrency: '货币',
@@ -376,7 +383,7 @@ export const zh: Dictionary = {
   voiceErrorNetwork: '语音识别需要联网，请检查网络连接',
   voiceErrorGeneric: '语音输入不可用，请改用文字输入',
 
-  manageExpenseCategories: '管理开支类别',
+  manageExpenseCategories: '分类与预算',
 
   ledgerPersonal: '个人',
   ledgerNew: '新建账本',
@@ -490,6 +497,10 @@ export const zh: Dictionary = {
   filterCategoryAll: '所有类别',
 
   csvColumnKind: '类型',
+
+  csvColumnKindLabel: '类型（文字）',
+
+  csvFilePrefix: 'shouzhi',
   csvColumnStatus: '状态',
 
   dow: ['周一', '周二', '周三', '周四', '周五', '周六', '周日'],

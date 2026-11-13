@@ -306,6 +306,13 @@ export const ja: Dictionary = {
   expensesSub: 'その場で記録',
   addExpense: '支出を追加',
   editExpense: '支出を編集',
+  addTransaction: '取引を追加',
+  addIncome: '収入を追加',
+  editIncome: '収入を編集',
+  incomeCreated: '収入を追加しました',
+  incomeUpdated: '収入を更新しました',
+  incomeMarkReceived: '受け取り済みにする',
+  incomeMarkedReceived: '受け取り済みにしました',
   expenseAmount: '金額',
   expenseAmountPh: '例：40,000',
   expenseCurrency: '通貨',
@@ -377,7 +384,7 @@ export const ja: Dictionary = {
   voiceErrorNetwork: '音声認識にはネット接続が必要です。接続を確認してください',
   voiceErrorGeneric: '音声入力が使えません。文字で入力してください',
 
-  manageExpenseCategories: '支出カテゴリの管理',
+  manageExpenseCategories: 'カテゴリと予算',
 
   ledgerPersonal: '個人',
   ledgerNew: '新しい帳簿',
@@ -493,6 +500,10 @@ export const ja: Dictionary = {
   filterCategoryAll: 'すべてのカテゴリ',
 
   csvColumnKind: '種別',
+
+  csvColumnKindLabel: '種類（表示名）',
+
+  csvFilePrefix: 'kakeibo',
   csvColumnStatus: '状態',
 
   dow: ['月', '火', '水', '木', '金', '土', '日'],

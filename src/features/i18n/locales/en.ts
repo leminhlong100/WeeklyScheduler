@@ -307,6 +307,13 @@ export const en: Dictionary = {
   expensesSub: 'Track it as you go',
   addExpense: 'Add expense',
   editExpense: 'Edit expense',
+  addTransaction: 'Add transaction',
+  addIncome: 'Add income',
+  editIncome: 'Edit income',
+  incomeCreated: 'Income added',
+  incomeUpdated: 'Income updated',
+  incomeMarkReceived: 'Mark received',
+  incomeMarkedReceived: 'Marked as received',
   expenseAmount: 'Amount',
   expenseAmountPh: 'e.g. 40,000 or 40k',
   expenseCurrency: 'Currency',
@@ -316,7 +323,7 @@ export const en: Dictionary = {
   expenseCategory: 'Category',
   expenseUncategorized: 'Uncategorized',
   expenseSourceAi: 'AI',
-  noExpenses: 'No expenses this month yet',
+  noExpenses: 'No transactions this month yet',
   loadErrorTitle: 'Couldn\'t load your data',
   loadErrorHint: 'Check your connection and try again.',
   offlineNotice: 'Offline · data from {time}',
@@ -326,7 +333,7 @@ export const en: Dictionary = {
   deleteExpenseConfirm: 'Delete this expense? This cannot be undone.',
   expenseCreated: 'Expense added',
   expenseUpdated: 'Expense updated',
-  expenseDeleted: 'Expense deleted',
+  expenseDeleted: 'Transaction deleted',
   expenseAmountPositive: 'Amount must be greater than 0',
   expenseAmountWhole: 'This currency has no decimals',
   expenseAmountTooLarge: 'Amount is too large',
@@ -360,7 +367,7 @@ export const en: Dictionary = {
   retry: 'Try again',
   enterManually: 'Enter by hand',
 
-  tabExpenseList: 'Expenses',
+  tabExpenseList: 'Transactions',
   tabReport: 'Report',
   reportNoData: 'Nothing to report for this month yet',
   reportVsPrevMonth: 'vs last month',
@@ -378,7 +385,7 @@ export const en: Dictionary = {
   voiceErrorNetwork: 'Speech recognition needs a connection — check your network',
   voiceErrorGeneric: "Voice input isn't working, please type instead",
 
-  manageExpenseCategories: 'Manage expense categories',
+  manageExpenseCategories: 'Categories & budgets',
 
   ledgerPersonal: 'Personal',
   ledgerNew: 'New ledger',
@@ -495,6 +502,10 @@ export const en: Dictionary = {
   filterCategoryAll: 'All categories',
 
   csvColumnKind: 'Type',
+
+  csvColumnKindLabel: 'Type (label)',
+
+  csvFilePrefix: 'transactions',
   csvColumnStatus: 'Status',
 
   dow: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],

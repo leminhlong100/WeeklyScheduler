@@ -101,8 +101,8 @@ export function ExpenseRow({ expense, category, onEdit, onDelete, onMarkPaid }: 
             <button
               type="button"
               onClick={onMarkPaid}
-              aria-label={t.expenseMarkPaid}
-              title={t.expenseMarkPaid}
+              aria-label={isIncome ? t.incomeMarkReceived : t.expenseMarkPaid}
+              title={isIncome ? t.incomeMarkReceived : t.expenseMarkPaid}
               className="grid h-8 w-8 place-items-center rounded-lg transition-transform duration-150 active:scale-95"
               style={{ color: theme.income }}
             >
@@ -113,7 +113,7 @@ export function ExpenseRow({ expense, category, onEdit, onDelete, onMarkPaid }: 
             <button
               type="button"
               onClick={onEdit}
-              aria-label={t.editExpense}
+              aria-label={isIncome ? t.editIncome : t.editExpense}
               className="grid h-8 w-8 place-items-center rounded-lg transition-transform duration-150 active:scale-95"
               style={{ color: theme.mutedText }}
             >
