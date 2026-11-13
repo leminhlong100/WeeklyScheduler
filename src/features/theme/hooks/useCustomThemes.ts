@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useIsRestoring, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useAuth } from '@/features/auth/AuthContext'
 import {
@@ -68,6 +68,11 @@ export function useCustomThemes(): UseCustomThemesResult {
     queryKey: key,
     queryFn: async () => parseCustomThemes(await listCustomThemes(user!.id)),
     enabled: !!user,
+    // Bản trong IndexedDB có thể thiếu theme vừa tạo (persister ghi có độ trễ)
+    // hoặc theme tạo trên máy khác, nên mỗi lần mở app đều tải lại một lần — kể
+    // cả khi bản cache còn "tươi" theo `staleTime`. `isReady` bên dưới chờ dữ
+    // liệu của phiên này.
+    refetchOnMount: 'always',
   })
 
   const saveMutation = useMutation({
@@ -115,7 +120,20 @@ export function useCustomThemes(): UseCustomThemesResult {
   // rehydrates IndexedDB, `useQuery` is paused and `isSuccess` is false, which is
   // indistinguishable from "fetched, empty" to anything downstream — and the
   // context's self-heal reads that as "the active theme no longer exists".
-  const isReady = !!user && !isRestoring && query.isSuccess
+  //
+  // The freshness check is the other half: data restored from the persister is
+  // also `isSuccess`, but it is only as fresh as the last write to IndexedDB. A
+  // theme saved just before the app was closed can be missing from it, and the
+  // self-heal would then wipe the user's selection. So only data written in this
+  // session (the mount-time refetch, or a save) counts. `isFetchedAfterMount`
+  // can't be used: the observer mounts while the persister is still restoring,
+  // and the hydration itself counts as an update after mount.
+  // Offline, the refetch fails and the list never becomes "ready" — the snapshot
+  // keeps painting, nothing is wiped, and the orphan sweep waits for a session
+  // that can reach the server.
+  const [sessionStart] = useState(() => Date.now())
+  const isReady =
+    !!user && !isRestoring && query.isSuccess && query.dataUpdatedAt >= sessionStart
 
   // One sweep per session, after the list is known. This is what eventually
   // reconciles the best-effort deletes in the API layer; failing it is fine.

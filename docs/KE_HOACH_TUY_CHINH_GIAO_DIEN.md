@@ -522,3 +522,13 @@ chính: Tạo → chọn 1 màu → (sáng/tối) → đặt tên → Lưu, tấ
   trong `ArtTab.tsx`; chỉ còn dòng ở dải cảnh báo ghim cuối Studio (hiện ở mọi tab, cùng nút "Dùng N%" — đã kiểm ở
   lượt 3). Test 334/334, typecheck, lint 0 lỗi. Chưa xem lại trên trình duyệt vì tab Tranh nền cần user giả, mà bản
   giả đã gỡ.
+- 2026-11-14 (lượt 5) — Sửa danh sách theme tự tạo lấy từ cache. Trước đây dữ liệu khôi phục từ IndexedDB được coi
+  ngay là chính xác (`isReady` = `isSuccess`), không tải lại nếu cache còn "tươi" theo `staleTime`. Hậu quả: theme mới
+  (vừa lưu trước khi tắt app, hoặc tạo ở máy khác) không hiện, và nếu nó đang được chọn thì ThemeContext tưởng đã bị
+  xoá và **xoá luôn lựa chọn** của người dùng. Sửa trong `useCustomThemes.ts`: `refetchOnMount: 'always'`, và chỉ
+  `isReady` khi `dataUpdatedAt` mới hơn lúc mở app (không dùng `isFetchedAfterMount` vì lần khôi phục cache cũng làm
+  nó thành true — đã thử và thấy lỗi vẫn còn). Mất mạng: không bao giờ "ready" nên không xoá gì, snapshot vẫn vẽ.
+  Kiểm bằng Supabase giả (`git apply harness/fake-supabase.patch`, đã gỡ sau đó): theme có trong "DB" nhưng không có
+  trong cache, đang được chọn → tải lại: theme được dùng, có trong danh sách, khoá `customThemeId` còn nguyên. Theme
+  đang dùng bị xoá ở nơi khác → lúc đầu vẽ bằng snapshot, tải xong thì quay về preset và dọn khoá. Test 334/334,
+  typecheck, lint 0 lỗi.
