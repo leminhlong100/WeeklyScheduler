@@ -78,7 +78,12 @@ export function ThemeArtLayer({ theme, variant }: ThemeArtLayerProps) {
           className="absolute inset-0"
           style={{
             opacity: isPage ? 1 : (art.sceneOpacity ?? DEFAULT_SCENE_OPACITY),
-            background: `${cssUrl(scene)} ${position}/cover no-repeat`,
+            // Longhands only: the `background` shorthand next to
+            // `backgroundAttachment` makes React reset one of them on rerender.
+            backgroundImage: cssUrl(scene),
+            backgroundPosition: position,
+            backgroundSize: 'cover',
+            backgroundRepeat: 'no-repeat',
             backgroundAttachment: flowsThrough && !isMobile ? 'fixed' : undefined,
           }}
         />

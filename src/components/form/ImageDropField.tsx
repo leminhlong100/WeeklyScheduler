@@ -93,7 +93,9 @@ export function ImageDropField({
         style={{
           aspectRatio: aspect,
           borderColor: error ? '#ff5d7a' : dragging ? colors.accent : colors.border,
-          background: value ? colors.chip : colors.inputBg,
+          // backgroundColor, not the `background` shorthand: mixed with the
+          // longhands below, React resets size/position on rerender.
+          backgroundColor: value ? colors.chip : colors.inputBg,
           // The preview is the field: judging a background at thumbnail size is
           // guesswork, so show as much of it as the panel width allows.
           backgroundImage: value ? `url("${encodeURI(value)}")` : undefined,

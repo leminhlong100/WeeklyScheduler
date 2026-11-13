@@ -497,3 +497,24 @@ chính: Tạo → chọn 1 màu → (sáng/tối) → đặt tên → Lưu, tấ
   thanh bên nhạt hơn" trên một theme đã lưu thật, bàn phím ảo, Back cứng trên máy thật, trình đọc màn hình. Ảnh chụp
   trong pane đôi khi là khung hình cũ (bảng chọn còn hiện sau khi đã rời DOM) vì pane không có focus — đã đối chiếu
   bằng DOM mỗi lần.
+- 2026-11-14 (lượt 3) — Kiểm các luồng cần đăng nhập bằng **Supabase giả tạm thời** (theo yêu cầu chủ repo):
+  `harness.html?scheduler&fakeuser` → `AuthContext` tạo user giả, `customThemesApi` lưu vào localStorage
+  (`tmpTest.customThemes`), ảnh là `blob:` URL, `customThemeSchema` tạm nhận `blob:`. Mọi dòng giả đánh dấu
+  `TẠM TEST`, **không commit**, gỡ bằng `git restore` 3 file đó. Kết quả (1280×800):
+  - Tạo → đặt tên, chọn màu → Lưu: theme được chọn ngay, header đổi tên; tải lại vẫn giữ, `recipe.v = 2` còn nguyên.
+  - Sửa: mở đúng dữ liệu đã lưu; Huỷ khi chưa đổi gì → đóng, không hỏi. Đổi tên + màu → Lưu → cập nhật đúng 1 bản ghi.
+  - Nhân bản → "… 2" hiện ngay. Xoá theme đang dùng → hỏi lại → xoá, app quay về preset, bản nhân bản còn.
+  - Tranh nền: chọn ảnh 1600×900 (PNG 1.2MB) → hộp cắt ảnh → Áp dụng: hiện trên lưới sau ~0.5 giây. Esc trong hộp
+    cắt chỉ đóng hộp cắt, Studio còn nguyên. Cảnh báo "Tranh nền làm chữ khó đọc (3.6:1)" + "Dùng 31%" → bấm → hết
+    cảnh báo. Nhân vật PNG nền trong → hiện trên lưới; lưu theme có tranh + nhân vật được.
+  - Theme kiểu cũ (không có `v`): dựng ra y như trước (thanh bên `#caa200`); nút "Cho phép thanh bên nhạt hơn" →
+    thanh bên giữ nguyên màu, nút biến mất, lưu ra `v: 2`.
+  - **Hai lỗi có sẵn tìm ra và đã sửa (cần commit):** React cảnh báo trộn `background` với thuộc tính riêng —
+    `ThemeArtLayer.tsx` (`background` + `backgroundAttachment`, mỗi lần đổi tranh/vị trí) và `ImageDropField.tsx`
+    (`background` + `backgroundSize/Position`, làm ảnh xem trước tranh nền chỉ hiện một góc). Sau khi sửa: 0 cảnh báo,
+    ảnh xem trước hiện trọn.
+  - Còn hai chỗ nhỏ chưa sửa: cảnh báo tranh nền hiện hai lần (ngay dưới thanh độ mờ và ở dải cảnh báo) khi đang ở
+    tab Trang trí; danh sách theme lấy từ cache khi tải lại nên bản ghi thêm từ ngoài app (chỉ xảy ra khi test) chưa
+    hiện ngay.
+  - Vẫn chưa kiểm được: tải ảnh lên Supabase Storage thật và dọn ảnh mồ côi, bàn phím ảo, Back cứng, trình đọc màn
+    hình, máy yếu.
