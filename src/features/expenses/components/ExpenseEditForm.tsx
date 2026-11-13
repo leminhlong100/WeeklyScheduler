@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react'
+import { useState } from 'react'
 import { useForm, useWatch, Controller } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { RepeatIcon } from 'lucide-react'
@@ -74,8 +74,6 @@ export function ExpenseEditForm({ expense, defaultDate, onDone }: ExpenseEditFor
   // Đọc một lần khi mở form: lựa chọn lần trước làm mặc định cho lần này.
   const [prefs] = useState(() => readAddPreferences(ledgerKey))
   const initialKind = expense?.kind ?? prefs.kind ?? 'expense'
-  /** Bấm "Lưu & thêm tiếp" thì giữ form mở cho khoản kế tiếp. */
-  const keepOpen = useRef(false)
 
   const form = useForm<ExpenseFormInput>({
     resolver: zodResolver(expenseSchema),
@@ -123,7 +121,8 @@ export function ExpenseEditForm({ expense, defaultDate, onDone }: ExpenseEditFor
     label: n === 1 ? t.expenseRepeatNone : t.expenseRepeatMonths.replace('{n}', String(n)),
   }))
 
-  const onSubmit = async (values: ExpenseFormInput) => {
+  /** `keepOpen`: bấm "Lưu & thêm tiếp" thì giữ form mở cho khoản kế tiếp. */
+  const onSubmit = async (values: ExpenseFormInput, keepOpen = false) => {
     // Không đưa `status` vào đây: mỗi kỳ giữ trạng thái đã trả / chưa trả của
     // riêng nó, một bản vá chung cho cả chuỗi sẽ ghi đè hết.
     // Danh mục nhớ từ lần trước có thể đã bị xoá ở thiết bị khác: không gửi một
@@ -209,16 +208,14 @@ export function ExpenseEditForm({ expense, defaultDate, onDone }: ExpenseEditFor
       })
       toast.success(values.kind === 'income' ? t.incomeCreated : t.expenseCreated)
       rememberAddChoice(ledgerKey, { currency: values.currency, kind: values.kind, categoryId })
-      if (keepOpen.current) {
+      if (keepOpen) {
         // Giữ ngày, loại, danh mục, tiền tệ; chỉ xoá số tiền và ghi chú.
-        keepOpen.current = false
         form.reset({ ...values, amount: '', note: '', repeatMonths: 1 })
         form.setFocus('amount')
         return
       }
       onDone()
     } catch (error) {
-      keepOpen.current = false
       toast.error(describeError(t, error))
     }
   }
@@ -251,7 +248,10 @@ export function ExpenseEditForm({ expense, defaultDate, onDone }: ExpenseEditFor
   const contentStyle = { background: theme.modalBg, borderColor: theme.border, color: theme.text }
 
   return (
-    <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-4">
+    <form
+      onSubmit={form.handleSubmit((values) => onSubmit(values))}
+      className="flex flex-col gap-4"
+    >
       {/* Chi hay Thu là câu hỏi đầu tiên: nó đổi cả danh sách danh mục bên dưới
           và đổi dấu của khoản này trong số dư. */}
       <Controller
@@ -541,10 +541,7 @@ export function ExpenseEditForm({ expense, defaultDate, onDone }: ExpenseEditFor
             size="touch"
             variant="outline"
             disabled={isPending}
-            onClick={() => {
-              keepOpen.current = true
-              void form.handleSubmit(onSubmit)()
-            }}
+            onClick={() => void form.handleSubmit((values) => onSubmit(values, true))()}
             style={{ background: 'transparent', borderColor: theme.accent, color: theme.accent }}
           >
             {t.saveAndAddAnother}
