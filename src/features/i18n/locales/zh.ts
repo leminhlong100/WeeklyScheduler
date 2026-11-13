@@ -347,6 +347,8 @@ export const zh: Dictionary = {
   yearSection: '{year} 年',
   sidebarYearEmpty: '今年还没有交易',
   sidebarYearChart: '每月支出',
+  sidebarYearShow: '显示金额',
+  sidebarYearHide: '隐藏金额',
 
   expensesTitle: '开支',
   expensesSub: '随手记一笔',

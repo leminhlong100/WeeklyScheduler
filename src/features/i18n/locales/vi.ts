@@ -348,6 +348,8 @@ export const vi: Dictionary = {
   yearSection: 'Năm {year}',
   sidebarYearEmpty: 'Năm nay chưa có giao dịch',
   sidebarYearChart: 'Chi theo tháng',
+  sidebarYearShow: 'Bấm để xem số liệu',
+  sidebarYearHide: 'Ẩn số liệu',
 
   expensesTitle: 'Chi tiêu',
   expensesSub: 'Ghi lại mỗi ngày',

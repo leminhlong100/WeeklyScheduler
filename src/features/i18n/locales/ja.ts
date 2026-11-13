@@ -348,6 +348,8 @@ export const ja: Dictionary = {
   yearSection: '{year}年',
   sidebarYearEmpty: '今年はまだ取引がありません',
   sidebarYearChart: '月別の支出',
+  sidebarYearShow: '金額を表示',
+  sidebarYearHide: '金額を隠す',
 
   expensesTitle: '支出',
   expensesSub: 'その場で記録',

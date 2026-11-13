@@ -349,6 +349,8 @@ export const en: Dictionary = {
   yearSection: 'Year {year}',
   sidebarYearEmpty: 'No transactions this year yet',
   sidebarYearChart: 'Spending by month',
+  sidebarYearShow: 'Show amounts',
+  sidebarYearHide: 'Hide amounts',
 
   expensesTitle: 'Expenses',
   expensesSub: 'Track it as you go',

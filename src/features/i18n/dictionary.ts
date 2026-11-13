@@ -380,6 +380,8 @@ export interface Dictionary {
   sidebarYearEmpty: string
   /** Accessible name of the sidebar's 12-month spending bars. */
   sidebarYearChart: string
+  sidebarYearShow: string
+  sidebarYearHide: string
 
   /* --- Expenses --- */
   expensesTitle: string
