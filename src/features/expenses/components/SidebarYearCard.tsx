@@ -92,9 +92,10 @@ export function SidebarYearCard({
         <button
           type="button"
           onClick={() => setRevealed(true)}
-          className="w-full rounded-2xl bg-white/13 px-3.5 py-3 text-left text-xs font-bold text-(--side-muted)"
+          className="flex w-full items-center gap-2 rounded-2xl bg-white/13 px-3.5 py-3 text-left text-xs font-bold text-(--side-muted) transition-colors hover:bg-white/20"
         >
-          •••••• · {t.sidebarYearShow}
+          <EyeIcon className="size-4 shrink-0" aria-hidden />
+          {t.sidebarYearShow}
         </button>
       ) : (
         <div className="rounded-2xl bg-white/13 px-3.5 py-3">
