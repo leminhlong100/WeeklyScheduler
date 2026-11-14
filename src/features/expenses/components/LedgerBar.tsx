@@ -2,6 +2,7 @@ import { EyeIcon, PlusIcon, SettingsIcon } from 'lucide-react'
 import { useTranslation } from '@/features/i18n/LocaleContext'
 import { useTheme } from '@/features/theme/ThemeContext'
 import { useLedgerSwitcher } from '../LedgerContext'
+import { usePendingDepositCounts } from '../hooks/useLedgerDeposits'
 
 /**
  * Hàng chọn sổ ở đầu trang chi tiêu: "Cá nhân", các sổ mình tạo, và các sổ người
@@ -21,14 +22,16 @@ export function LedgerBar({
   const { t } = useTranslation()
   const { theme } = useTheme()
   const { ledgerId, ledgers, info, selectLedger } = useLedgerSwitcher()
+  const { data: pendingCounts } = usePendingDepositCounts(ledgers.some((l) => l.role === 'owner'))
 
   const chips = [
-    { id: null as string | null, emoji: '👤', label: t.ledgerPersonal, viewer: false },
+    { id: null as string | null, emoji: '👤', label: t.ledgerPersonal, viewer: false, pending: 0 },
     ...ledgers.map((l) => ({
       id: l.id as string | null,
       emoji: l.emoji,
       label: l.role === 'owner' ? l.name : `${l.name} · ${l.owner_name}`,
       viewer: l.role !== 'owner',
+      pending: pendingCounts?.get(l.id) ?? 0,
     })),
   ]
 
@@ -54,6 +57,16 @@ export function LedgerBar({
                 <span className="text-sm leading-none">{chip.emoji}</span>
                 <span className="truncate">{chip.label}</span>
                 {chip.viewer && <EyeIcon className="size-3.5 flex-shrink-0 opacity-80" />}
+                {chip.pending > 0 && (
+                  <span
+                    aria-label={t.depositPendingBadge.replace('{n}', String(chip.pending))}
+                    title={t.depositPendingBadge.replace('{n}', String(chip.pending))}
+                    className="grid h-[18px] min-w-[18px] flex-shrink-0 place-items-center rounded-full px-1 text-[10.5px] font-extrabold tabular-nums"
+                    style={{ background: theme.danger, color: '#fff' }}
+                  >
+                    {chip.pending}
+                  </span>
+                )}
               </button>
             )
           })}

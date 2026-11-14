@@ -47,6 +47,9 @@ export type ExpenseStatus = 'paid' | 'planned'
 /** Quyền của người được mời vào một sổ chia sẻ. Hiện chỉ có xem. */
 export type LedgerRole = 'viewer'
 
+/** Trạng thái một yêu cầu nạp tiền vào sổ chia sẻ (migration 0017). */
+export type LedgerDepositStatus = 'pending' | 'approved' | 'rejected' | 'cancelled'
+
 export type ThemeKey =
   | 'lavender'
   | 'mint'
@@ -389,6 +392,26 @@ export interface Database {
         Update: Record<string, never>
         Relationships: []
       }
+      ledger_deposits: {
+        Row: {
+          id: string
+          ledger_id: string
+          from_user_id: string
+          amount: number
+          currency: Currency
+          note: string
+          deposited_at: string
+          status: LedgerDepositStatus
+          income_expense_id: string | null
+          decided_at: string | null
+          created_at: string
+          updated_at: string
+        }
+        /** Chỉ ghi qua RPC (`create_ledger_deposit`, `decide_ledger_deposit`…). */
+        Insert: Record<string, never>
+        Update: Record<string, never>
+        Relationships: []
+      }
     }
     Views: Record<string, never>
     Functions: {
@@ -421,6 +444,46 @@ export interface Database {
       ledger_balance: {
         Args: { p_ledger_id: string }
         Returns: { currency: Currency; income: number; expense: number }[]
+      }
+      list_ledger_deposits: {
+        Args: { p_ledger_id?: string | null }
+        Returns: {
+          id: string
+          ledger_id: string
+          ledger_name: string
+          ledger_emoji: string
+          from_user_id: string
+          from_name: string
+          amount: number
+          currency: Currency
+          note: string
+          deposited_at: string
+          status: LedgerDepositStatus
+          decided_at: string | null
+          created_at: string
+        }[]
+      }
+      count_pending_ledger_deposits: {
+        Args: Record<string, never>
+        Returns: { ledger_id: string; pending: number }[]
+      }
+      create_ledger_deposit: {
+        Args: {
+          p_ledger_id: string
+          p_amount: number
+          p_currency: Currency
+          p_note: string
+          p_deposited_at: string
+        }
+        Returns: string
+      }
+      cancel_ledger_deposit: {
+        Args: { p_id: string }
+        Returns: undefined
+      }
+      decide_ledger_deposit: {
+        Args: { p_id: string; p_approve: boolean; p_income_note?: string }
+        Returns: undefined
       }
     }
   }

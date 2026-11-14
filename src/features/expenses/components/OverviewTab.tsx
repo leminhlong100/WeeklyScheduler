@@ -22,6 +22,8 @@ import { useExpensesInRange } from '../hooks/useExpenses'
 import { buildBudgetProgress, computeSpendable, upcomingPlanned } from '../utils/overview'
 import { summarizeByCurrency } from '../utils/totals'
 import { LedgerBalanceCard } from './LedgerBalanceCard'
+import { LedgerDepositsCard } from './LedgerDepositsCard'
+import { useLedgerSwitcher } from '../LedgerContext'
 import { ExpenseRow } from './ExpenseRow'
 import { MaskedAmount } from './MaskedAmount'
 import { EyeToggle } from './EyeToggle'
@@ -84,6 +86,9 @@ export function OverviewTab({
   const recent = useMemo(() => expenses.filter((e) => e.status === 'paid').slice(0, 5), [expenses])
 
   const isEmptyCurrentMonth = expenses.length === 0 && month === currentMonthKey()
+  // Sổ mình được mời xem = sổ mình nạp tiền vào được.
+  const { ledgers } = useLedgerSwitcher()
+  const viewerLedgers = useMemo(() => ledgers.filter((l) => l.role !== 'owner'), [ledgers])
 
   return (
     <div className="flex flex-col gap-4">
@@ -92,6 +97,11 @@ export function OverviewTab({
         // hạn mức của chủ sổ — người xem không đặt hạn mức đó.
         <>
           <LedgerBalanceCard ledgerId={ledgerId} />
+          <LedgerDepositsCard
+            mode={canEdit ? 'owner' : 'sender'}
+            ledgerId={ledgerId}
+            targetLedgers={viewerLedgers}
+          />
           <MonthInOut expenses={expenses} month={month} />
         </>
       ) : (
@@ -136,6 +146,12 @@ export function OverviewTab({
             ))}
           </div>
         </Section>
+      )}
+
+      {/* Sổ cá nhân của người được mời xem sổ chung: lối nạp tiền vào các sổ đó,
+          tách khỏi số liệu chi tiêu vì tiền gửi giữ hộ không phải tiền đã tiêu. */}
+      {!ledgerId && viewerLedgers.length > 0 && (
+        <LedgerDepositsCard mode="sender" ledgerId={null} targetLedgers={viewerLedgers} />
       )}
 
       {recent.length > 0 && (

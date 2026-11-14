@@ -1,6 +1,7 @@
 import { EyeIcon, PlusIcon } from 'lucide-react'
 import { useTranslation } from '@/features/i18n/LocaleContext'
 import { useLedgerSwitcher } from '../LedgerContext'
+import { usePendingDepositCounts } from '../hooks/useLedgerDeposits'
 
 /**
  * Danh sách sổ ở sidebar trang chi tiêu — cùng dữ liệu với `LedgerBar`, nhưng
@@ -16,14 +17,22 @@ export function SidebarLedgerList({
 }) {
   const { t } = useTranslation()
   const { ledgerId, ledgers, selectLedger } = useLedgerSwitcher()
+  const { data: pendingCounts } = usePendingDepositCounts(ledgers.some((l) => l.role === 'owner'))
 
   const items = [
-    { id: null as string | null, emoji: '👤', label: t.ledgerPersonal, sub: null as string | null },
+    {
+      id: null as string | null,
+      emoji: '👤',
+      label: t.ledgerPersonal,
+      sub: null as string | null,
+      pending: 0,
+    },
     ...ledgers.map((l) => ({
       id: l.id as string | null,
       emoji: l.emoji,
       label: l.name,
       sub: l.role === 'owner' ? null : l.owner_name,
+      pending: pendingCounts?.get(l.id) ?? 0,
     })),
   ]
 
@@ -58,6 +67,15 @@ export function SidebarLedgerList({
                 )}
               </span>
               {item.sub && <EyeIcon className="size-3.5 flex-shrink-0 opacity-75" />}
+              {item.pending > 0 && (
+                <span
+                  aria-label={t.depositPendingBadge.replace('{n}', String(item.pending))}
+                  title={t.depositPendingBadge.replace('{n}', String(item.pending))}
+                  className="grid h-[18px] min-w-[18px] flex-shrink-0 place-items-center rounded-full bg-red-500 px-1 text-[10.5px] font-extrabold text-white tabular-nums"
+                >
+                  {item.pending}
+                </span>
+              )}
             </button>
           )
         })}

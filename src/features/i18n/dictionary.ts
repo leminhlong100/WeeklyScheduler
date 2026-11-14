@@ -575,6 +575,32 @@ export interface Dictionary {
   ledgerBalanceRemaining: string
   ledgerBalanceIn: string
   ledgerBalanceOut: string
+  depositButton: string
+  depositTitle: string
+  depositToLedger: string
+  depositNotePh: string
+  depositHint: string
+  depositSubmit: string
+  depositSent: string
+  depositNoLedger: string
+  depositsMineTitle: string
+  depositsPendingTitle: string
+  depositsReceivedTitle: string
+  depositFrom: string
+  depositIncomeNote: string
+  depositStatusPending: string
+  depositStatusApproved: string
+  depositStatusRejected: string
+  depositStatusCancelled: string
+  depositCancel: string
+  depositCancelConfirm: string
+  depositCancelled: string
+  depositApprove: string
+  depositReject: string
+  depositRejectConfirm: string
+  depositApproved: string
+  depositRejected: string
+  depositPendingBadge: string
   joinLedgerTitle: string
   joinLedgerLoginHint: string
   joinLedgerInvalid: string
