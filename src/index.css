@@ -143,6 +143,12 @@
   html {
     @apply font-sans;
     }
+  /* App tự cuộn bên trong khung 100dvh; trang không được kéo nảy (rubber-band)
+     trên iOS, nếu không cả app trượt đi và để lộ khoảng trắng ở đáy. */
+  html,
+  body {
+    overscroll-behavior: none;
+    }
 }
 
 ::selection {

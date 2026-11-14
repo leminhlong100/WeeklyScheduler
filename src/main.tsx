@@ -16,6 +16,9 @@ import '@fontsource/noto-sans-jp/500.css'
 import '@fontsource/noto-sans-jp/700.css'
 import './index.css'
 import App from './App.tsx'
+import { installWindowScrollReset } from './lib/utils/resetWindowScroll'
+
+installWindowScrollReset()
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
