@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react'
+import { useEffect, type ReactNode } from 'react'
 import type { DerivedTheme } from '@/features/theme/types'
 import { cn } from '@/lib/utils'
 import { DecorBackground } from './DecorBackground'
@@ -28,9 +28,21 @@ export function AppShell({
   insetRight = false,
   children,
 }: AppShellProps) {
+  // Khung bám `fixed inset-0` thay vì `h-[100dvh]`: iOS (nhất là PWA) có lúc
+  // giữ `100dvh` ở chiều cao lúc bàn phím còn mở, để lại dải trắng ở đáy. Nền
+  // trang cũng tô theo theme, để lỡ còn hở thì không lộ màu trắng.
+  useEffect(() => {
+    const body = document.body
+    const prev = body.style.background
+    body.style.background = theme.pageBg
+    return () => {
+      body.style.background = prev
+    }
+  }, [theme.pageBg])
+
   return (
     <div
-      className="scrollbar-hidden relative flex h-[100dvh] w-full items-center justify-center overflow-auto p-0 sm:p-[26px]"
+      className="scrollbar-hidden fixed inset-0 flex w-full items-center justify-center overflow-auto p-0 sm:p-[26px]"
       style={{
         background: theme.pageBg,
         color: theme.text,
@@ -43,7 +55,7 @@ export function AppShell({
 
       <div
         className={cn(
-          'relative z-[1] flex h-[100dvh] w-full max-w-full flex-col overflow-hidden rounded-none transition-[margin] duration-200 sm:h-[calc(100vh-52px)] sm:max-w-[1460px] sm:rounded-[26px]',
+          'relative z-[1] flex h-full w-full max-w-full flex-col overflow-hidden rounded-none transition-[margin] duration-200 sm:h-[calc(100vh-52px)] sm:max-w-[1460px] sm:rounded-[26px]',
           // 380px dock + the 26px gutter on each side.
           insetRight && 'lg:mr-[406px]',
         )}
