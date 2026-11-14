@@ -263,3 +263,17 @@
     transform: scale(1.15);
   }
 }
+/* Chiều cao khung app (AppShell).
+   - Trình duyệt: 100dvh, co theo thanh công cụ của Safari.
+   - Mở từ màn hình chính (PWA): 100lvh. Không có thanh công cụ nên lvh = cả màn
+     hình, và không đổi theo bàn phím. iOS có lúc giữ 100dvh ở chiều cao lúc bàn
+     phím còn mở, để lại dải trắng ở đáy; `fixed inset-0` thì trong PWA iOS lại
+     ngắn hơn màn hình, dải trắng hiện luôn. */
+.app-shell-h {
+  height: 100dvh;
+}
+@media (display-mode: standalone) {
+  .app-shell-h {
+    height: 100lvh;
+  }
+}
