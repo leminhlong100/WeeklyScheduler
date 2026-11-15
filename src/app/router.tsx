@@ -1,5 +1,6 @@
 import { lazy, Suspense } from 'react'
-import { Route, Routes } from 'react-router-dom'
+import { Route, Routes, useLocation } from 'react-router-dom'
+import { AppErrorBoundary } from '@/components/common/AppErrorBoundary'
 import { ProtectedRoute } from '@/routes/ProtectedRoute'
 import { PublicOnlyRoute } from '@/routes/PublicOnlyRoute'
 import { FullScreenSpinner } from '@/components/common/FullScreenSpinner'
@@ -26,30 +27,33 @@ const DevTestUserMenu = lazy(() =>
 )
 
 export function AppRouter() {
+  const { pathname } = useLocation()
   return (
-    <Suspense fallback={<FullScreenSpinner />}>
-      <Routes>
-        <Route path="/devtest" element={<DevTestUserMenu />} />
-        <Route element={<PublicOnlyRoute />}>
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/signup" element={<SignupPage />} />
-          <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-        </Route>
+    <AppErrorBoundary resetKey={pathname}>
+      <Suspense fallback={<FullScreenSpinner />}>
+        <Routes>
+          <Route path="/devtest" element={<DevTestUserMenu />} />
+          <Route element={<PublicOnlyRoute />}>
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/signup" element={<SignupPage />} />
+            <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+          </Route>
 
-        {/* Supabase's recovery link establishes its own session on arrival, so
+          {/* Supabase's recovery link establishes its own session on arrival, so
             this route is intentionally outside both PublicOnlyRoute and
             ProtectedRoute. */}
-        <Route path="/reset-password" element={<ResetPasswordPage />} />
+          <Route path="/reset-password" element={<ResetPasswordPage />} />
 
-        {/* Ledger invite link: signed-out visitors are asked to sign in first
+          {/* Ledger invite link: signed-out visitors are asked to sign in first
             (the code is kept until they do), signed-in ones join right away. */}
-        <Route path="/join/:code" element={<JoinLedgerPage />} />
+          <Route path="/join/:code" element={<JoinLedgerPage />} />
 
-        <Route element={<ProtectedRoute />}>
-          <Route path="/" element={<SchedulerPage />} />
-          <Route path="/expenses" element={<ExpensesPage />} />
-        </Route>
-      </Routes>
-    </Suspense>
+          <Route element={<ProtectedRoute />}>
+            <Route path="/" element={<SchedulerPage />} />
+            <Route path="/expenses" element={<ExpensesPage />} />
+          </Route>
+        </Routes>
+      </Suspense>
+    </AppErrorBoundary>
   )
 }
