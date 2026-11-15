@@ -1,4 +1,4 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient, type QueryClient, type QueryKey } from '@tanstack/react-query'
 import type { Dayjs } from 'dayjs'
 import { useAuth } from '@/features/auth/AuthContext'
 import { addDays, parseISODate, toISODate } from '@/lib/utils/date'
@@ -157,16 +157,47 @@ export function useUpdateTask(weekStartISO: string) {
   return useMutation({
     mutationFn: ({ id, patch }: { id: string; patch: TaskUpdate }) => updateTask(id, patch),
     onMutate: async ({ id, patch }) => {
-      const previous = queryClient.getQueryData<Task[]>(key)
+      const previous = await snapshotWeek(queryClient, key)
       queryClient.setQueryData<Task[]>(key, (prev) =>
         (prev ?? []).map((task) => (task.id === id ? { ...task, ...patch } : task)),
       )
       return { previous }
     },
-    onError: (_err, _vars, context) => {
-      if (context?.previous) queryClient.setQueryData(key, context.previous)
+    onError: (_err, _vars, context) => rollbackWeek(queryClient, key, context?.previous),
+    onSuccess: (_data, { patch }) => {
+      // Moving a task to another week (edit form date) takes it out of this
+      // week's entry; the target week may already be cached and fresh, and
+      // would not show it until its next refetch.
+      if (patch.task_date && !isInWeek(patch.task_date, weekStartISO)) {
+        void queryClient.invalidateQueries({ queryKey: ['tasks', user?.id] })
+      }
     },
   })
+}
+
+function isInWeek(dateISO: string, weekStartISO: string): boolean {
+  const weekEndISO = toISODate(addDays(parseISODate(weekStartISO), 6))
+  return dateISO >= weekStartISO && dateISO <= weekEndISO
+}
+
+/**
+ * Snapshot for an optimistic edit. Cancels an in-flight refetch first: one
+ * that started before the edit would land after it with the old rows and
+ * snap a dragged task back to where it was.
+ */
+async function snapshotWeek(queryClient: QueryClient, key: QueryKey) {
+  await queryClient.cancelQueries({ queryKey: key })
+  return queryClient.getQueryData<Task[]>(key)
+}
+
+/**
+ * Undo an optimistic edit that the server refused, then refetch: the
+ * snapshot predates any other edit made while this one was in flight (drag
+ * A, then B, A fails), so restoring it alone would also undo B on screen.
+ */
+function rollbackWeek(queryClient: QueryClient, key: QueryKey, previous: Task[] | undefined) {
+  if (previous) queryClient.setQueryData(key, previous)
+  void queryClient.invalidateQueries({ queryKey: key })
 }
 
 /** Copies every task from the week before `weekStart` into `weekStart`, shifting each date by 7 days. */
@@ -215,13 +246,11 @@ export function useDeleteTask(weekStartISO: string) {
   return useMutation({
     mutationFn: (id: string) => deleteTask(id),
     onMutate: async (id) => {
-      const previous = queryClient.getQueryData<Task[]>(key)
+      const previous = await snapshotWeek(queryClient, key)
       queryClient.setQueryData<Task[]>(key, (prev) => (prev ?? []).filter((task) => task.id !== id))
       return { previous }
     },
-    onError: (_err, _vars, context) => {
-      if (context?.previous) queryClient.setQueryData(key, context.previous)
-    },
+    onError: (_err, _vars, context) => rollbackWeek(queryClient, key, context?.previous),
   })
 }
 
@@ -234,16 +263,14 @@ export function useUpdateTasks(weekStartISO: string) {
   return useMutation({
     mutationFn: ({ ids, patch }: { ids: string[]; patch: TaskUpdate }) => bulkUpdateTasks(ids, patch),
     onMutate: async ({ ids, patch }) => {
-      const previous = queryClient.getQueryData<Task[]>(key)
+      const previous = await snapshotWeek(queryClient, key)
       const idSet = new Set(ids)
       queryClient.setQueryData<Task[]>(key, (prev) =>
         (prev ?? []).map((task) => (idSet.has(task.id) ? { ...task, ...patch } : task)),
       )
       return { previous }
     },
-    onError: (_err, _vars, context) => {
-      if (context?.previous) queryClient.setQueryData(key, context.previous)
-    },
+    onError: (_err, _vars, context) => rollbackWeek(queryClient, key, context?.previous),
   })
 }
 
@@ -256,13 +283,11 @@ export function useDeleteTasks(weekStartISO: string) {
   return useMutation({
     mutationFn: (ids: string[]) => bulkDeleteTasks(ids),
     onMutate: async (ids: string[]) => {
-      const previous = queryClient.getQueryData<Task[]>(key)
+      const previous = await snapshotWeek(queryClient, key)
       const idSet = new Set(ids)
       queryClient.setQueryData<Task[]>(key, (prev) => (prev ?? []).filter((task) => !idSet.has(task.id)))
       return { previous }
     },
-    onError: (_err, _vars, context) => {
-      if (context?.previous) queryClient.setQueryData(key, context.previous)
-    },
+    onError: (_err, _vars, context) => rollbackWeek(queryClient, key, context?.previous),
   })
 }

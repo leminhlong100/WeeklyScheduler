@@ -173,6 +173,10 @@ export function WeekGrid({
     })
   }
 
+  // Optimistic edits roll back on failure; without a message the task just
+  // jumps back (or a note vanishes) and the user cannot tell why.
+  const showError = (error: unknown) => toast.error(describeError(t, error))
+
   const { preview, startDrag } = useTaskDragResize({
     weekStart,
     snapMinutes: DEFAULT_SNAP_MINUTES,
@@ -182,14 +186,17 @@ export function WeekGrid({
     getTaskOrigin,
     onMove: (id, { dayIndex, startMinute }) => {
       if (selectMode) return
-      updateTask.mutate({
-        id,
-        patch: { task_date: toISODate(addDays(weekStart, dayIndex)), start_minute: startMinute },
-      })
+      updateTask.mutate(
+        {
+          id,
+          patch: { task_date: toISODate(addDays(weekStart, dayIndex)), start_minute: startMinute },
+        },
+        { onError: showError },
+      )
     },
     onResize: (id, { durationMinute }) => {
       if (selectMode) return
-      updateTask.mutate({ id, patch: { duration_minute: durationMinute } })
+      updateTask.mutate({ id, patch: { duration_minute: durationMinute } }, { onError: showError })
     },
     // A tap always opens the note popover — on mobile that's the one thing
     // that was hard to reach before. The action sheet (edit/duplicate/delete)
@@ -247,7 +254,7 @@ export function WeekGrid({
   }
 
   const handleSaveNotes = (taskId: string, notes: TaskNoteItem[]) => {
-    updateTask.mutate({ id: taskId, patch: { notes } })
+    updateTask.mutate({ id: taskId, patch: { notes } }, { onError: showError })
   }
 
   // Optimistic (see useUpdateTask) and reversible with one more tap, so it

@@ -151,7 +151,12 @@ export function DailyNotesModal({ open, onOpenChange, defaultDate }: DailyNotesM
                         type="button"
                         role="checkbox"
                         aria-checked={note.done}
-                        onClick={() => toggle.mutate({ id: note.id, done: !note.done })}
+                        onClick={() =>
+                          toggle.mutate(
+                            { id: note.id, done: !note.done },
+                            { onError: (error) => toast.error(describeError(t, error)) },
+                          )
+                        }
                         className="mt-0.5 flex size-5 flex-shrink-0 items-center justify-center rounded-md border-2"
                         style={{
                           borderColor: note.done ? theme.accent : theme.border,
