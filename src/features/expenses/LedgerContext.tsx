@@ -50,7 +50,7 @@ export function rememberLedger(ledgerId: string | null) {
 
 export function LedgerProvider({ children }: { children: ReactNode }) {
   const { user } = useAuth()
-  const { data: ledgers = [], isLoading, isSuccess } = useLedgers()
+  const { data: ledgers = [], isLoading, isSuccess, isError } = useLedgers()
   const [selectedId, setSelectedId] = useState<string | null>(readStoredLedgerId)
 
   const selectLedger = useCallback((ledgerId: string | null) => {
@@ -63,7 +63,9 @@ export function LedgerProvider({ children }: { children: ReactNode }) {
 
     // Đã tải xong danh sách mà không thấy sổ đã nhớ (bị gỡ quyền, sổ bị xoá) thì
     // quay về sổ cá nhân — không bao giờ kẹt ở một sổ không mở được.
-    if (selectedId && !info && isSuccess) {
+    // Tải danh sách sổ lỗi (mất mạng, chưa có cache) cũng vậy: không biết chủ sổ
+    // thì query chi tiêu bị tắt và trang chỉ hiện khung xương mãi mãi.
+    if (selectedId && !info && (isSuccess || isError)) {
       return {
         ledgerId: null,
         ownerId: user?.id,
@@ -86,7 +88,7 @@ export function LedgerProvider({ children }: { children: ReactNode }) {
       isLoadingLedgers: isLoading,
       selectLedger,
     }
-  }, [selectedId, ledgers, isLoading, isSuccess, user?.id, selectLedger])
+  }, [selectedId, ledgers, isLoading, isSuccess, isError, user?.id, selectLedger])
 
   return <LedgerContext.Provider value={value}>{children}</LedgerContext.Provider>
 }
