@@ -4,7 +4,7 @@ import { toast } from 'sonner'
 import { useTranslation } from '@/features/i18n/LocaleContext'
 import { describeError } from '@/lib/utils/errorMessage'
 import { haptic } from '@/lib/utils/haptic'
-import { deleteExpense } from '../api/expensesApi'
+import { createExpense, deleteExpense } from '../api/expensesApi'
 import type { Expense } from '../api/expensesApi'
 import { useUpdateExpense } from './useExpenseMutations'
 
@@ -78,8 +78,21 @@ export function useUndoableActions() {
           label: t.undo,
           onClick: () => {
             clearTimeout(timer)
-            pendingDeletes.delete(expense.id)
-            void refreshExpenses()
+            if (pendingDeletes.delete(expense.id)) {
+              void refreshExpenses()
+              return
+            }
+            // The delete already ran — the app was hidden within the undo window
+            // (see flushPendingDeletes) and the toast is still up on return.
+            // Clearing a timer that already fired did nothing, so the row stayed
+            // gone while the user believed it was back. Put the same row back,
+            // same id, so its series and links still match.
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
+            const { created_at, updated_at, ...row } = expense
+            createExpense(row)
+              .then(() => toast.success(t.restored))
+              .catch((error) => toast.error(describeError(t, error)))
+              .finally(() => void refreshExpenses())
           },
         },
       })
@@ -100,7 +113,11 @@ export function useUndoableActions() {
                 duration: UNDO_MS,
                 action: {
                   label: t.undo,
-                  onClick: () => updateExpense({ id: expense.id, patch: { status: 'planned' } }),
+                  onClick: () =>
+                    updateExpense(
+                      { id: expense.id, patch: { status: 'planned' } },
+                      { onError: (error) => toast.error(describeError(t, error)) },
+                    ),
                 },
               },
             )
