@@ -32,7 +32,7 @@ export function SidebarLedgerList({
       emoji: l.emoji,
       label: l.name,
       sub: l.role === 'owner' ? null : l.owner_name,
-      pending: pendingCounts?.get(l.id) ?? 0,
+      pending: pendingCounts?.[l.id] ?? 0,
     })),
   ]
 

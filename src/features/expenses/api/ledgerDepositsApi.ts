@@ -26,11 +26,15 @@ export async function listLedgerDeposits(ledgerId: string | null): Promise<Ledge
   return (data ?? []).map((d) => ({ ...d, amount: Number(d.amount) }))
 }
 
-/** Số yêu cầu đang chờ duyệt, theo từng sổ mình sở hữu. */
-export async function countPendingDeposits(): Promise<Map<string, number>> {
+/**
+ * Số yêu cầu đang chờ duyệt, theo từng sổ mình sở hữu (`ledger_id` → số).
+ * Object thường chứ không phải `Map`: cache react-query được lưu xuống
+ * localStorage dạng JSON, `Map` thành `{}` và mở lại app là `.get` sập trang.
+ */
+export async function countPendingDeposits(): Promise<Record<string, number>> {
   const { data, error } = await supabase.rpc('count_pending_ledger_deposits')
   if (error) throw error
-  return new Map((data ?? []).map((r) => [r.ledger_id, Number(r.pending)] as const))
+  return Object.fromEntries((data ?? []).map((r) => [r.ledger_id, Number(r.pending)]))
 }
 
 export async function createLedgerDeposit(input: NewLedgerDeposit): Promise<string> {

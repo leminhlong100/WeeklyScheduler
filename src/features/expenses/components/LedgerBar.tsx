@@ -31,7 +31,7 @@ export function LedgerBar({
       emoji: l.emoji,
       label: l.role === 'owner' ? l.name : `${l.name} · ${l.owner_name}`,
       viewer: l.role !== 'owner',
-      pending: pendingCounts?.get(l.id) ?? 0,
+      pending: pendingCounts?.[l.id] ?? 0,
     })),
   ]
 
