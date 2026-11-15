@@ -102,3 +102,31 @@ describe('firstAmountIn', () => {
     expect(firstAmountIn(text, 'VND')).toBe(expected)
   })
 })
+
+describe('shorthand with digits after the unit', () => {
+  it.each([
+    ['1tr5', 1_500_000],
+    ['1 tr 5', 1_500_000],
+    ['2k5', 2_500],
+    ['1tỷ2', 1_200_000_000],
+    ['1m5', 1_500_000],
+    ['1tr250', 1_250_000],
+    ['1tr05', 1_050_000],
+    ['1tr5đ', 1_500_000],
+  ])('%s → %d', (raw, expected) => {
+    expect(ok(raw)).toBe(expected)
+  })
+
+  it('rejects a fraction finer than a dong', () => {
+    expect(ok('1k2345')).toBe('invalid')
+    expect(ok('1k25', 'JPY')).toBe(1250)
+  })
+
+  it.each([
+    ['ăn 1tr5 hôm qua', '1500000'],
+    ['cafe 2k5', '2500'],
+    ['tiền nhà 4tr', '4000000'],
+  ])('firstAmountIn(%s) → %s', (text, expected) => {
+    expect(firstAmountIn(text, 'VND')).toBe(expected)
+  })
+})

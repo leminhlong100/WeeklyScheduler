@@ -28,11 +28,27 @@ export type MoneyParseResult =
 
 const WHOLE_ONLY: Record<Currency, boolean> = { VND: true, JPY: true, USD: false }
 
-const MULTIPLIERS: Array<[RegExp, number]> = [
-  [/(?:tỷ|tỉ|ty|ti)$/u, 1_000_000_000],
-  [/(?:triệu|trieu|tr|m)$/u, 1_000_000],
-  [/(?:nghìn|nghin|ngàn|ngan|k)$/u, 1_000],
+const UNITS: Array<[string, number]> = [
+  ['tỷ|tỉ|ty|ti', 1_000_000_000],
+  ['triệu|trieu|tr|m', 1_000_000],
+  ['nghìn|nghin|ngàn|ngan|k', 1_000],
 ]
+
+const MULTIPLIERS: Array<[RegExp, number]> = UNITS.map(([alts, mult]) => [
+  new RegExp(`(?:${alts})$`, 'u'),
+  mult,
+])
+
+/**
+ * Kiểu gõ tắt "1tr5", "2k5", "1tỷ2": chữ số SAU đơn vị là phần lẻ của đơn vị
+ * đó — "1tr5" = 1,5tr = 1.500.000, "1tr250" = 1.250.000, "1tr05" = 1.050.000.
+ * Trước đây dạng này bị báo "không hợp lệ", còn ô nhập nhanh (`firstAmountIn`)
+ * cắt ở "1tr" và lưu nhầm 1.000.000.
+ */
+const INFIX_UNITS: Array<[RegExp, number]> = UNITS.map(([alts, mult]) => [
+  new RegExp(`^(\\d+)\\s*(?:${alts})\\s*(\\d{1,3})$`, 'u'),
+  mult,
+])
 
 const CURRENCY_WORDS = /(?:₫|vnđ|vnd|đồng|dong|đ|¥|円|yen|jpy|\$|usd)/giu
 
@@ -69,15 +85,22 @@ export function parseMoneyInput(raw: string, currency: Currency): MoneyParseResu
   if (s === '') return { ok: false, error: 'invalid' }
 
   let multiplier = 1
-  for (const [re, mult] of MULTIPLIERS) {
-    if (re.test(s)) {
-      s = s.replace(re, '').trim()
-      multiplier = mult
-      break
+  let base: number | null
+  const infix = INFIX_UNITS.find(([re]) => re.test(s))
+  if (infix) {
+    const m = infix[0].exec(s)!
+    base = Number(`${m[1]}.${m[2]}`)
+    multiplier = infix[1]
+  } else {
+    for (const [re, mult] of MULTIPLIERS) {
+      if (re.test(s)) {
+        s = s.replace(re, '').trim()
+        multiplier = mult
+        break
+      }
     }
+    base = parseNumberPart(s, WHOLE_ONLY[currency] ? 0 : 2, multiplier !== 1)
   }
-
-  const base = parseNumberPart(s, WHOLE_ONLY[currency] ? 0 : 2, multiplier !== 1)
   if (base === null) return { ok: false, error: 'invalid' }
 
   // Nhân qua số nguyên để 1,5 × 1.000.000 không ra 1499999.9999.
@@ -151,7 +174,9 @@ export function formatStoredAmount(value: number, currency: Currency, intlLocale
  */
 export function firstAmountIn(text: string, currency: Currency): string | null {
   const match =
-    /\d[\d.,]*(?:\s*(?:tỷ|tỉ|triệu|trieu|tr|nghìn|nghin|ngàn|ngan|k)(?![\p{L}]))?/iu.exec(text)
+    /\d[\d.,]*(?:\s*(?:tỷ|tỉ|triệu|trieu|tr|nghìn|nghin|ngàn|ngan|k)(?:\d{1,3}(?!\d))?(?![\p{L}]))?/iu.exec(
+      text,
+    )
   if (!match) return null
   const r = parseMoneyInput(match[0], currency)
   return r.ok ? r.canonical : null
