@@ -517,7 +517,7 @@ function EmptyState({
             >
               <span
                 className="grid size-7 flex-shrink-0 place-items-center rounded-full text-[13px] font-extrabold"
-                style={{ background: theme.accent }}
+                style={{ background: theme.accentFill, color: theme.onAccent }}
               >
                 {i + 1}
               </span>

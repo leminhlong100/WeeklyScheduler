@@ -72,7 +72,7 @@ export function QueryStatus({ query, skeletonRows = 3, children }: QueryStatusPr
           type="button"
           onClick={() => void query.refetch()}
           className="mt-1 flex min-h-11 items-center gap-1.5 rounded-[12px] px-4 text-[13px] font-extrabold transition-transform active:scale-95"
-          style={{ background: theme.accent }}
+          style={{ background: theme.accentFill, color: theme.onAccent }}
         >
           <RotateCwIcon className="size-4" />
           {t.retry}
