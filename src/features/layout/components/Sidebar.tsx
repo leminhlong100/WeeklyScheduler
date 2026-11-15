@@ -120,7 +120,7 @@ export function Sidebar({
               <button
                 type="button"
                 onClick={onClose}
-                aria-label="Close"
+                aria-label={t.a11yClose}
                 className="grid h-9 w-9 flex-shrink-0 place-items-center rounded-full bg-white/16"
               >
                 <XIcon className="size-4" />

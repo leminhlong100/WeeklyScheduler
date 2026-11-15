@@ -91,7 +91,7 @@ export function MobileActionBar({
 
       <DropdownMenu>
         <DropdownMenuTrigger
-          aria-label="More"
+          aria-label={t.a11yMore}
           className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-[14px] border-[1.5px] outline-none transition-transform duration-150 active:scale-95"
           style={{ borderColor: theme.border, background: theme.chip, color: theme.text }}
         >

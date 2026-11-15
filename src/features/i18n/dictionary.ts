@@ -334,6 +334,10 @@ export interface Dictionary {
   errPermission: string
   /** The database is missing a table, column or function the app expects (migration not run yet). */
   errServerOutdated: string
+  /** Accessible names for icon-only buttons. */
+  a11yClose: string
+  a11yMenu: string
+  a11yMore: string
   errNotFound: string
   errInvalidLogin: string
   errEmailTaken: string

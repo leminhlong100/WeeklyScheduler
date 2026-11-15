@@ -1,3 +1,4 @@
+import { useTranslation } from '@/features/i18n/LocaleContext'
 import * as React from "react"
 import { Dialog as DialogPrimitive } from "@base-ui/react/dialog"
 
@@ -75,7 +76,7 @@ function DialogContent({
           >
             <XIcon
             />
-            <span className="sr-only">Close</span>
+            <CloseLabel />
           </DialogPrimitive.Close>
         )}
       </DialogPrimitive.Popup>
@@ -160,4 +161,10 @@ export {
   DialogPortal,
   DialogTitle,
   DialogTrigger,
+}
+
+/** Screen-reader name for the corner close button, in the user's language. */
+function CloseLabel() {
+  const { t } = useTranslation()
+  return <span className="sr-only">{t.a11yClose}</span>
 }

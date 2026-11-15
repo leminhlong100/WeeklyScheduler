@@ -91,7 +91,7 @@ export function StickerDock({
           <button
             type="button"
             onClick={onClose}
-            aria-label="Close"
+            aria-label={t.a11yClose}
             className="grid h-7 w-7 shrink-0 place-items-center rounded-full"
             style={{ background: theme.chip, color: theme.mutedText }}
           >
