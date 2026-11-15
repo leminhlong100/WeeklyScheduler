@@ -3,6 +3,7 @@ import { useTranslation } from '@/features/i18n/LocaleContext'
 import { useTheme } from '@/features/theme/ThemeContext'
 import { useLedgerSwitcher } from '../LedgerContext'
 import { usePendingDepositCounts } from '../hooks/useLedgerDeposits'
+import { pendingCountFor } from '../utils/deposits'
 
 /**
  * Hàng chọn sổ ở đầu trang chi tiêu: "Cá nhân", các sổ mình tạo, và các sổ người
@@ -31,7 +32,7 @@ export function LedgerBar({
       emoji: l.emoji,
       label: l.role === 'owner' ? l.name : `${l.name} · ${l.owner_name}`,
       viewer: l.role !== 'owner',
-      pending: pendingCounts?.get(l.id) ?? 0,
+      pending: pendingCountFor(pendingCounts, l.id),
     })),
   ]
 

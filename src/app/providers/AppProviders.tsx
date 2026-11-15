@@ -12,7 +12,7 @@ import { LocaleProvider } from '@/features/i18n/LocaleContext'
 import { ConfirmProvider } from '@/components/common/ConfirmDialog'
 import { ThemeUiProvider } from '@/features/theme/components/ThemeUiProvider'
 import { PwaUpdatePrompt } from '@/app/PwaUpdatePrompt'
-import { QUERY_CACHE_BUSTER, queryPersister } from '@/lib/queryPersister'
+import { QUERY_CACHE_BUSTER, queryPersister, shouldPersistQuery } from '@/lib/queryPersister'
 
 export function AppProviders({ children }: { children: ReactNode }) {
   const [queryClient] = useState(
@@ -29,6 +29,7 @@ export function AppProviders({ children }: { children: ReactNode }) {
         persister: queryPersister,
         maxAge: 1000 * 60 * 60 * 24 * 7,
         buster: QUERY_CACHE_BUSTER,
+        dehydrateOptions: { shouldDehydrateQuery: shouldPersistQuery },
       }}
     >
       {/* AuthProvider sits above ThemeProvider because themes are now per-account:

@@ -1,5 +1,6 @@
 import { supabase } from '@/lib/supabase/client'
 import type { Currency, Database } from '@/lib/supabase/database.types'
+import type { PendingDepositCounts } from '../utils/deposits'
 
 /**
  * Một yêu cầu nạp tiền vào sổ chia sẻ (migration 0017), như người đang đăng
@@ -27,10 +28,12 @@ export async function listLedgerDeposits(ledgerId: string | null): Promise<Ledge
 }
 
 /** Số yêu cầu đang chờ duyệt, theo từng sổ mình sở hữu. */
-export async function countPendingDeposits(): Promise<Map<string, number>> {
+export async function countPendingDeposits(): Promise<PendingDepositCounts> {
   const { data, error } = await supabase.rpc('count_pending_ledger_deposits')
   if (error) throw error
-  return new Map((data ?? []).map((r) => [r.ledger_id, Number(r.pending)] as const))
+  const counts: PendingDepositCounts = {}
+  for (const r of data ?? []) counts[r.ledger_id] = Number(r.pending) || 0
+  return counts
 }
 
 export async function createLedgerDeposit(input: NewLedgerDeposit): Promise<string> {

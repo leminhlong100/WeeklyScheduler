@@ -2,6 +2,7 @@ import { EyeIcon, PlusIcon } from 'lucide-react'
 import { useTranslation } from '@/features/i18n/LocaleContext'
 import { useLedgerSwitcher } from '../LedgerContext'
 import { usePendingDepositCounts } from '../hooks/useLedgerDeposits'
+import { pendingCountFor } from '../utils/deposits'
 
 /**
  * Danh sách sổ ở sidebar trang chi tiêu — cùng dữ liệu với `LedgerBar`, nhưng
@@ -32,7 +33,7 @@ export function SidebarLedgerList({
       emoji: l.emoji,
       label: l.name,
       sub: l.role === 'owner' ? null : l.owner_name,
-      pending: pendingCounts?.get(l.id) ?? 0,
+      pending: pendingCountFor(pendingCounts, l.id),
     })),
   ]
 
