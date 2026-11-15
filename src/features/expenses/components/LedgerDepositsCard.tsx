@@ -4,7 +4,7 @@ import { useConfirm } from '@/components/common/ConfirmDialog'
 import { useTranslation } from '@/features/i18n/LocaleContext'
 import { useTheme } from '@/features/theme/ThemeContext'
 import { useAuth } from '@/features/auth/AuthContext'
-import { describeError } from '@/lib/utils/errorMessage'
+import { describeError, isMissingSchemaError } from '@/lib/utils/errorMessage'
 import { formatMoney } from '@/lib/utils/formatMoney'
 import type { LedgerDepositStatus } from '@/lib/supabase/database.types'
 import type { LedgerDeposit } from '../api/ledgerDepositsApi'
@@ -42,7 +42,7 @@ export function LedgerDepositsCard({
   const { theme } = useTheme()
   const { user } = useAuth()
   const [depositOpen, setDepositOpen] = useState(false)
-  const { data: deposits = [] } = useLedgerDeposits(ledgerId)
+  const { data: deposits = [], error } = useLedgerDeposits(ledgerId)
 
   // Ở sổ cá nhân hàm trả cả yêu cầu gửi VÀO sổ của mình; thẻ người gửi chỉ lấy
   // yêu cầu do chính mình gửi.
@@ -51,6 +51,9 @@ export function LedgerDepositsCard({
   const done = rows.filter((d) => d.status !== 'pending').slice(0, RECENT_DONE)
 
   if (mode === 'owner' && rows.length === 0) return null
+  // DB chưa chạy migration 0017: không có gì để xem, và nút "Nạp tiền" chắc
+  // chắn lỗi — ẩn hẳn thay vì mời người dùng bấm vào một nút hỏng.
+  if (isMissingSchemaError(error)) return null
 
   return (
     <section

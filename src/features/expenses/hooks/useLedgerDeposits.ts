@@ -1,4 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { isMissingSchemaError } from '@/lib/utils/errorMessage'
 import { useAuth } from '@/features/auth/AuthContext'
 import {
   cancelLedgerDeposit,
@@ -30,7 +31,8 @@ export function usePendingDepositCounts(enabled = true) {
     queryFn: countPendingDeposits,
     enabled: !!user && enabled,
     // Người nạp ở máy khác; mở lại tab là thấy yêu cầu mới.
-    refetchOnWindowFocus: true,
+    // Không gọi lại mỗi lần mở tab khi DB chưa có hàm (chưa chạy migration 0017).
+    refetchOnWindowFocus: (query) => !isMissingSchemaError(query.state.error),
   })
 }
 

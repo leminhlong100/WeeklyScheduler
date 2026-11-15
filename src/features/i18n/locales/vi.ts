@@ -303,6 +303,7 @@ export const vi: Dictionary = {
   errTooLong: 'Nội dung nhập quá dài. Hãy rút ngắn lại.',
   errRateLimit: 'Bạn thao tác quá nhanh hoặc gửi quá nhiều yêu cầu. Chờ một lát rồi thử lại.',
   errPermission: 'Bạn không có quyền thực hiện thao tác này.',
+  errServerOutdated: 'Tính năng này cần cập nhật máy chủ nhưng máy chủ chưa được cập nhật.',
   errNotFound: 'Không tìm thấy mục này, có thể nó đã bị xoá ở thiết bị khác.',
   errInvalidLogin: 'Email hoặc mật khẩu không đúng.',
   errEmailTaken: 'Email này đã được đăng ký. Hãy đăng nhập hoặc dùng email khác.',

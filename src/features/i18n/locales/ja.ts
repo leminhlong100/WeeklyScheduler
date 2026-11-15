@@ -303,6 +303,7 @@ export const ja: Dictionary = {
   errTooLong: '入力が長すぎます。短くしてください。',
   errRateLimit: 'リクエストが多すぎます。しばらくしてからもう一度お試しください。',
   errPermission: 'この操作を行う権限がありません。',
+  errServerOutdated: 'この機能はサーバーの更新が必要ですが、まだ適用されていません。',
   errNotFound: '項目が見つかりません。別の端末で削除された可能性があります。',
   errInvalidLogin: 'メールアドレスまたはパスワードが正しくありません。',
   errEmailTaken: 'このメールアドレスはすでに登録されています。ログインするか別のメールアドレスを使ってください。',

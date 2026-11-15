@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { vi as viDict } from '@/features/i18n/locales/vi'
-import { describeError, isNetworkError } from './errorMessage'
+import { describeError, isMissingSchemaError, isNetworkError } from './errorMessage'
 
 describe('isNetworkError', () => {
   it('nhận lỗi fetch của Chrome, Firefox, Safari', () => {
@@ -36,5 +36,19 @@ describe('describeError với lỗi mạng', () => {
       }),
     ).toBe(viDict.errNetworkNotSaved)
     expect(viDict.errNetworkNotSaved).toMatch(/chưa được lưu/)
+  })
+})
+
+describe('missing migration', () => {
+  it.each(['PGRST202', 'PGRST204', 'PGRST205', '42883', '42703', '42P01'])('%s', (code) => {
+    expect(isMissingSchemaError({ code })).toBe(true)
+    expect(describeError(viDict, { code, message: 'Could not find the function' }, {})).toBe(
+      viDict.errServerOutdated,
+    )
+  })
+  it('other errors are not', () => {
+    expect(isMissingSchemaError({ code: '42501' })).toBe(false)
+    expect(isMissingSchemaError(new Error('x'))).toBe(false)
+    expect(isMissingSchemaError(null)).toBe(false)
   })
 })

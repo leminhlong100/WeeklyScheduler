@@ -332,6 +332,8 @@ export interface Dictionary {
   errTooLong: string
   errRateLimit: string
   errPermission: string
+  /** The database is missing a table, column or function the app expects (migration not run yet). */
+  errServerOutdated: string
   errNotFound: string
   errInvalidLogin: string
   errEmailTaken: string

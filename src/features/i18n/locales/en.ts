@@ -304,6 +304,7 @@ export const en: Dictionary = {
   errTooLong: 'The text is too long. Please shorten it.',
   errRateLimit: 'Too many requests. Wait a moment and try again.',
   errPermission: 'You do not have permission to do this.',
+  errServerOutdated: 'This feature needs a server update that has not been applied yet.',
   errNotFound: 'This item was not found; it may have been deleted on another device.',
   errInvalidLogin: 'Incorrect email or password.',
   errEmailTaken: 'This email is already registered. Sign in or use another email.',

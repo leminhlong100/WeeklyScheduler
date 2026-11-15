@@ -87,7 +87,7 @@ export function OverviewTab({
 
   const isEmptyCurrentMonth = expenses.length === 0 && month === currentMonthKey()
   // Sổ mình được mời xem = sổ mình nạp tiền vào được.
-  const { ledgers } = useLedgerSwitcher()
+  const { ledgers, info: ledgerInfo } = useLedgerSwitcher()
   const viewerLedgers = useMemo(() => ledgers.filter((l) => l.role !== 'owner'), [ledgers])
 
   return (
@@ -97,11 +97,15 @@ export function OverviewTab({
         // hạn mức của chủ sổ — người xem không đặt hạn mức đó.
         <>
           <LedgerBalanceCard ledgerId={ledgerId} />
-          <LedgerDepositsCard
-            mode={canEdit ? 'owner' : 'sender'}
-            ledgerId={ledgerId}
-            targetLedgers={viewerLedgers}
-          />
+          {/* Chờ biết vai trò: lúc danh sách sổ còn đang tải, `canEdit` tạm là
+              false và chủ sổ sẽ thấy nút "Nạp tiền" vào chính sổ của mình. */}
+          {ledgerInfo && (
+            <LedgerDepositsCard
+              mode={canEdit ? 'owner' : 'sender'}
+              ledgerId={ledgerId}
+              targetLedgers={viewerLedgers}
+            />
+          )}
           <MonthInOut expenses={expenses} month={month} />
         </>
       ) : (

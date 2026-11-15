@@ -1,4 +1,5 @@
 import { type ReactNode, useState } from 'react'
+import { isMissingSchemaError } from '@/lib/utils/errorMessage'
 import { QueryClient } from '@tanstack/react-query'
 import { PersistQueryClientProvider } from '@tanstack/react-query-persist-client'
 import { BrowserRouter } from 'react-router-dom'
@@ -18,7 +19,14 @@ export function AppProviders({ children }: { children: ReactNode }) {
   const [queryClient] = useState(
     () =>
       new QueryClient({
-        defaultOptions: { queries: { staleTime: 30_000, retry: 1 } },
+        defaultOptions: {
+          queries: {
+            staleTime: 30_000,
+            // One retry for flaky networks, none when the server lacks the table,
+            // column or RPC (migration not run yet): that will not fix itself.
+            retry: (failureCount, error) => failureCount < 1 && !isMissingSchemaError(error),
+          },
+        },
       }),
   )
 

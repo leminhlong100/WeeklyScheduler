@@ -34,6 +34,19 @@ export function isNetworkError(
 }
 
 /**
+ * Mã lỗi khi DB thiếu bảng / cột / hàm mà app gọi tới — production chưa chạy
+ * migration mới (0016, 0017...). PostgREST: PGRST202 (không có hàm), PGRST204
+ * (không có cột), PGRST205 (không có bảng); Postgres: 42883, 42703, 42P01.
+ */
+const MISSING_SCHEMA_CODES = new Set(['PGRST202', 'PGRST204', 'PGRST205', '42883', '42703', '42P01'])
+
+/** True khi lỗi là do máy chủ chưa có phần schema mà tính năng cần. */
+export function isMissingSchemaError(error: unknown): boolean {
+  const e: ErrorLike = typeof error === 'object' && error !== null ? error : {}
+  return typeof e.code === 'string' && MISSING_SCHEMA_CODES.has(e.code)
+}
+
+/**
  * Đổi một lỗi bắt được thành câu nói thẳng NGUYÊN NHÂN để người dùng biết sửa
  * gì, thay vì "có lỗi xảy ra" chung chung.
  *
@@ -52,6 +65,8 @@ export function describeError(
   const status = typeof e.status === 'number' ? e.status : 0
   const message = typeof e.message === 'string' ? e.message : ''
 
+  // Trước kiểm tra mạng: mã này do máy chủ trả về, nên chắc chắn đã tới được máy chủ.
+  if (isMissingSchemaError(error)) return t.errServerOutdated
   if (isNetworkError(error)) return overrides.network ?? t.errNetwork
 
   switch (code) {

@@ -302,6 +302,7 @@ export const zh: Dictionary = {
   errTooLong: '输入内容过长，请缩短。',
   errRateLimit: '请求过于频繁，请稍候再试。',
   errPermission: '你没有权限执行此操作。',
+  errServerOutdated: '此功能需要服务器更新，但服务器尚未更新。',
   errNotFound: '找不到该项目，可能已在其他设备上删除。',
   errInvalidLogin: '邮箱或密码不正确。',
   errEmailTaken: '该邮箱已注册，请登录或使用其他邮箱。',
