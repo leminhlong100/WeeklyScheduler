@@ -1,3 +1,4 @@
+import { storageGet, storageRemove, storageSet } from '@/lib/utils/safeStorage'
 import {
   createContext,
   useCallback,
@@ -32,13 +33,13 @@ const CUSTOM_SNAPSHOT_KEY = 'weeklyScheduler.customTheme'
 
 function readStoredPreset(): ThemeKey {
   if (typeof window === 'undefined') return 'lavender'
-  const stored = window.localStorage.getItem(PRESET_KEY)
+  const stored = storageGet(PRESET_KEY)
   return stored && isThemeKey(stored) ? stored : 'lavender'
 }
 
 function readStoredCustomId(): string | null {
   if (typeof window === 'undefined') return null
-  return window.localStorage.getItem(CUSTOM_ID_KEY)
+  return storageGet(CUSTOM_ID_KEY)
 }
 
 /**
@@ -52,7 +53,7 @@ function readStoredCustomId(): string | null {
  */
 function readSnapshot(): CustomThemeRecord | null {
   if (typeof window === 'undefined') return null
-  const raw = window.localStorage.getItem(CUSTOM_SNAPSHOT_KEY)
+  const raw = storageGet(CUSTOM_SNAPSHOT_KEY)
   if (!raw) return null
   try {
     return parseCustomTheme(JSON.parse(raw))
@@ -63,11 +64,11 @@ function readSnapshot(): CustomThemeRecord | null {
 
 function writeSnapshot(record: CustomThemeRecord | null): void {
   if (!record) {
-    window.localStorage.removeItem(CUSTOM_SNAPSHOT_KEY)
+    storageRemove(CUSTOM_SNAPSHOT_KEY)
     return
   }
   const { id, name, icon, recipe, overrides, art } = record
-  window.localStorage.setItem(
+  storageSet(
     CUSTOM_SNAPSHOT_KEY,
     JSON.stringify({ id, name, icon, recipe, overrides, art }),
   )
@@ -148,14 +149,14 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     const uuid = parseCustomThemeId(next)
     if (uuid) {
       setCustomId(uuid)
-      window.localStorage.setItem(CUSTOM_ID_KEY, uuid)
+      storageSet(CUSTOM_ID_KEY, uuid)
       return
     }
     if (!isThemeKey(next)) return
     setPresetKey(next)
     setCustomId(null)
-    window.localStorage.setItem(PRESET_KEY, next)
-    window.localStorage.removeItem(CUSTOM_ID_KEY)
+    storageSet(PRESET_KEY, next)
+    storageRemove(CUSTOM_ID_KEY)
     writeSnapshot(null)
   }, [])
 
@@ -171,7 +172,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (!isReady || !customId) return
     if (themes.some((t) => t.id === customId)) return
-    window.localStorage.removeItem(CUSTOM_ID_KEY)
+    storageRemove(CUSTOM_ID_KEY)
     writeSnapshot(null)
   }, [isReady, customId, themes])
 
@@ -189,7 +190,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
       // is being deleted.
       if (customId === id) {
         setCustomId(null)
-        window.localStorage.removeItem(CUSTOM_ID_KEY)
+        storageRemove(CUSTOM_ID_KEY)
         writeSnapshot(null)
       }
       await removeTheme(id)

@@ -1,3 +1,4 @@
+import { storageGet, storageSet } from '@/lib/utils/safeStorage'
 import { useState } from 'react'
 import { Share2Icon } from 'lucide-react'
 import { useTranslation } from '@/features/i18n/LocaleContext'
@@ -28,12 +29,12 @@ export function IosInstallBanner() {
   const { t } = useTranslation()
   const { theme } = useTheme()
   const [visible, setVisible] = useState(() => {
-    if (window.localStorage.getItem(DISMISSED_KEY)) return false
+    if (storageGet(DISMISSED_KEY)) return false
     return isIosSafariTab()
   })
 
   const dismiss = () => {
-    window.localStorage.setItem(DISMISSED_KEY, '1')
+    storageSet(DISMISSED_KEY, '1')
     setVisible(false)
   }
 

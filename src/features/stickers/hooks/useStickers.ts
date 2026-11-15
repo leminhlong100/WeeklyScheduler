@@ -1,3 +1,4 @@
+import { storageGet, storageSet } from '@/lib/utils/safeStorage'
 import { useEffect, useState } from 'react'
 import type { PlacedSticker } from '../types'
 
@@ -14,12 +15,29 @@ function seedStickers(): PlacedSticker[] {
 
 function readStoredStickers(): PlacedSticker[] {
   if (typeof window === 'undefined') return []
+  const raw = storageGet(STORAGE_KEY)
+  if (!raw) return seedStickers()
   try {
-    const raw = window.localStorage.getItem(STORAGE_KEY)
-    return raw ? (JSON.parse(raw) as PlacedSticker[]) : seedStickers()
+    const parsed: unknown = JSON.parse(raw)
+    // Một giá trị hỏng ("null", object…) từng làm `.map` sập cả trang Lịch tuần.
+    return Array.isArray(parsed) ? parsed.filter(isPlacedSticker) : seedStickers()
   } catch {
     return seedStickers()
   }
+}
+
+function isPlacedSticker(v: unknown): v is PlacedSticker {
+  if (!v || typeof v !== 'object') return false
+  const s = v as Record<string, unknown>
+  return (
+    typeof s.id === 'string' &&
+    Number.isFinite(s.x) &&
+    Number.isFinite(s.y) &&
+    Number.isFinite(s.size) &&
+    Number.isFinite(s.rot) &&
+    !!s.item &&
+    typeof s.item === 'object'
+  )
 }
 
 export function useStickers() {
@@ -27,7 +45,7 @@ export function useStickers() {
   const [selectedId, setSelectedId] = useState<string | null>(null)
 
   useEffect(() => {
-    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(stickers))
+    storageSet(STORAGE_KEY, JSON.stringify(stickers))
   }, [stickers])
 
   const addSticker = (item: PlacedSticker['item'], x: number, y: number) => {

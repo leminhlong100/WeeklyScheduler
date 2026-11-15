@@ -1,3 +1,4 @@
+import { storageGet, storageSet } from '@/lib/utils/safeStorage'
 import { createContext, useContext, useMemo, useState, type ReactNode } from 'react'
 import { LOCALES, type Locale } from './types'
 import { dictionaries } from './dictionaries'
@@ -10,7 +11,7 @@ function isLocale(value: string): value is Locale {
 
 function readStoredLocale(): Locale {
   if (typeof window === 'undefined') return 'vi'
-  const stored = window.localStorage.getItem(STORAGE_KEY)
+  const stored = storageGet(STORAGE_KEY)
   return stored && isLocale(stored) ? stored : 'vi'
 }
 
@@ -26,7 +27,7 @@ export function LocaleProvider({ children }: { children: ReactNode }) {
 
   const setLocale = (next: Locale) => {
     setLocaleState(next)
-    window.localStorage.setItem(STORAGE_KEY, next)
+    storageSet(STORAGE_KEY, next)
   }
 
   const value = useMemo(() => ({ locale, setLocale }), [locale])
