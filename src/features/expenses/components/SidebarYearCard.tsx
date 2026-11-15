@@ -3,12 +3,10 @@ import { EyeIcon, EyeOffIcon } from 'lucide-react'
 import { useTranslation } from '@/features/i18n/LocaleContext'
 import { formatSignedMoney } from '@/lib/utils/formatMoney'
 import type { Currency } from '@/lib/supabase/database.types'
-import { useAmountVisibility } from '../AmountVisibilityContext'
 import { useExpensesForYear } from '../hooks/useExpenses'
 import { summarizeByCurrency } from '../utils/totals'
 import { totalsByMonth } from '../utils/yearByMonth'
 import { currentMonthKey, type MonthKey } from '../utils/month'
-import { MaskedAmount } from './MaskedAmount'
 
 /**
  * Thẻ "Năm …" ở sidebar trang chi tiêu: thu, chi, số dư cả năm của sổ đang mở,
@@ -25,7 +23,6 @@ export function SidebarYearCard({
   onPickMonth: (month: MonthKey) => void
 }) {
   const { t, locale } = useTranslation()
-  const { isMasked } = useAmountVisibility()
   const year = Number(month.slice(0, 4))
   const { data, isLoading } = useExpensesForYear(year)
   const expenses = useMemo(() => data ?? [], [data])
@@ -41,9 +38,9 @@ export function SidebarYearCard({
 
   const viewedMonthIndex = Number(month.slice(5, 7)) - 1
   const today = currentMonthKey()
-  const masked = isMasked('year')
   // Mặc định luôn thu gọn mỗi lần mở trang (không lưu): người ngồi cạnh không
-  // thấy tiền, chỉ khi bấm nút mới xổ ra.
+  // thấy tiền, chỉ khi bấm nút mới xổ ra. Thẻ này có nút ẩn riêng nên KHÔNG theo
+  // tuỳ chọn "Ẩn số tiền" chung — xổ ra là thấy số thật.
   const [revealed, setRevealed] = useState(false)
 
   return (
@@ -107,25 +104,19 @@ export function SidebarYearCard({
             <>
               <div className="text-[11px] font-bold text-(--side-muted)">{t.expenseBalance}</div>
               <div className="font-heading text-[22px] font-extrabold leading-tight tabular-nums">
-                <MaskedAmount scope="year">
-                  {formatSignedMoney(summary.balance, summary.currency, locale, 'auto')}
-                </MaskedAmount>
+                {formatSignedMoney(summary.balance, summary.currency, locale, 'auto')}
               </div>
               <div className="mt-1.5 grid grid-cols-2 gap-2 text-[12px] font-bold tabular-nums">
                 <div className="min-w-0">
                   <div className="text-[10.5px] text-(--side-muted)">{t.expenseIncomeTotal}</div>
                   <div className="truncate">
-                    <MaskedAmount scope="year">
-                      {formatSignedMoney(summary.income, summary.currency, locale, 'income')}
-                    </MaskedAmount>
+                    {formatSignedMoney(summary.income, summary.currency, locale, 'income')}
                   </div>
                 </div>
                 <div className="min-w-0">
                   <div className="text-[10.5px] text-(--side-muted)">{t.expenseExpenseTotal}</div>
                   <div className="truncate">
-                    <MaskedAmount scope="year">
-                      {formatSignedMoney(summary.expense, summary.currency, locale, 'expense')}
-                    </MaskedAmount>
+                    {formatSignedMoney(summary.expense, summary.currency, locale, 'expense')}
                   </div>
                 </div>
               </div>
@@ -148,8 +139,8 @@ export function SidebarYearCard({
                       type="button"
                       onClick={() => onPickMonth(key)}
                       aria-current={viewed ? 'date' : undefined}
-                      aria-label={masked ? label : `${label}: ${amount}`}
-                      title={masked ? label : `${label}: ${amount}`}
+                      aria-label={`${label}: ${amount}`}
+                      title={`${label}: ${amount}`}
                       className="group flex h-full min-w-0 flex-1 flex-col items-center justify-end gap-1"
                     >
                       <span className="flex min-h-0 w-full flex-1 items-end">
